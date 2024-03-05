@@ -196,60 +196,7 @@ class FieldComponentGenerator {
         })
     }
 
-    static generateVariables(commands) {
-        return commands?.map((command) => {
-            return command.fields.map((field) => {
-                if (field?.cardinality?.toLowerCase() === "list") {
-                    return `\t\t\t\t\t<ListSelect name={"${field.name}"} propertyValue={${field.name}} setValue={${toCamelCase("set", field.name)}} values={[]}/>`
-                }
-                var mapping = typeMapping(field.type, field.cardinality);
 
-                switch (mapping) {
-                    case "string":
-                        return `\t\t\t\t\t<TextInput name={"${field.name}"} propertyValue={${field.name}} setValue={${toCamelCase("set", field.name)}}/>`
-                    case "boolean":
-                        return `\t\t\t\t\t<BoolSelect name={"${field.name}"} propertyValue={${field.name}} setValue={${toCamelCase("set", field.name)}}/>`
-                }
-            }).filter((it) => it !== undefined).join("\n")
-        })
-    }
-
-    static generateCommandTrigger(slice, commands) {
-
-        return commands?.map((command) => {
-            var target = config.sliceDependencies.find((item) => {
-                return item.source == slice.title && item.command == command.title
-            })
-
-            return `<a className="button" onClick={()=>{
-            //issue command 
-            new ${command.title}CommandHandler().handle(${invocation(command.title, command.fields)})
-            // go to target
-            ${target?.target ? `router.push(\"${_sliceTitle(target?.target)}\")` : "// no target slice"}
-
-
-            }}>${command.title}</a>`
-        })
-    }
-
-
-    static generateSliceSpecificImports(slice, types) {
-        return types?.map((type) => {
-            return `import {${type.title}} from '@/components/${_sliceTitle(slice.title)}/${packageName(type)}/${type.title}';`
-        }).join("\n")
-    }
-
-    static generateGlobalImports(slice, types) {
-        return types?.map((type) => {
-            return `import {${type.title}} from '@/components/${packageName(type)}/${type.title}';`
-        }).join("\n")
-    }
-
-    static generateHandlerImports(slice, types) {
-        return types?.map((type) => {
-            return `import {${type.title}CommandHandler} from '@/components/${_sliceTitle(slice.title)}/${packageName(type)}/${type.title}CommandHandler';`
-        }).join("\n")
-    }
 }
 
 const invocation = (type, fields) => {
@@ -275,14 +222,6 @@ const packageName = (type) => {
     }
 }
 
-const typeMapping = (type, cardinality = "single") => {
-    switch (type.toLowerCase()) {
-        case "string":
-            return cardinality.toLowerCase() === "list" ? "string[]" : "string"
-        case "boolean":
-            return cardinality.toLowerCase() === "list" ? "boolean[]" : "boolean"
-    }
-}
 
 const defaultValue = (type, cardinality = "single") => {
     switch (type.toLowerCase()) {

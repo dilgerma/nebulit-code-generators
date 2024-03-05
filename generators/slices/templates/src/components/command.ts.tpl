@@ -7,3 +7,4 @@ export class <%= _name; %> implements Command {
     <%= _constructor; %>
 
 }
+data class <%= _name; %>(override var aggregateId: UUID, val id:UUID=UUID.randomUUID()) : Command

@@ -7,7 +7,9 @@
   },
   "generator-prototype": {
     "promptValues": {
-      "appName": "demo"
+      "appName": "foo2",
+      "rootPackage": "de.nebulit.test",
+      "rootPackageName": "de.nebulit.testy"
     }
   }
 }
