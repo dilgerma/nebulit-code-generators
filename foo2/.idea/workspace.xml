@@ -5,31 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f731fbf1-5cef-42b3-8fb7-0ce651995505" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../.yo-rc.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.yo-rc.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../foo/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../generators/app/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/mvnw" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/mvnw" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/mvnw.cmd" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/mvnw.cmd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/EventModelingApplication.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/challenge/ChallengeAggregateService.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/challenge/debug/DebugAggregateService.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/challenge/debug/DebugEventsReadModel.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/AggregateRoot.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/AggregateService.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/Command.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/CommandException.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/CommandHandler.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/Processor.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/ReadModel.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/persistence/InternalEvent.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/slices/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/command.ts.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/slices/templates/src/components/command.ts.tpl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/commandhandler.ts.tpl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/event.ts.tpl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/readmodel.ts.tpl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../generators/app/templates/root/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,24 +44,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;go&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
+    "go.import.settings.migrated": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "go",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Spring Boot.EventmodelingApplication (1)">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
@@ -199,7 +183,7 @@
       <method v="2" />
     </configuration>
     <configuration name="EventmodelingApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
-      <module name="demo" />
+      <module name="foo2" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="de.nebulit.testy.EventmodelingApplication" />
       <extension name="coverage">
         <pattern>
@@ -269,7 +253,7 @@
       <updated>1709642036138</updated>
       <workItem from="1709642037378" duration="1487000" />
       <workItem from="1709659985804" duration="44000" />
-      <workItem from="1709660035860" duration="305000" />
+      <workItem from="1709660035860" duration="2480000" />
     </task>
     <servers />
   </component>

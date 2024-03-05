@@ -51,7 +51,8 @@ module.exports = class extends Generator {
             this.templatePath('root'),
             this.destinationPath(slugify(this.answers.appName)),
             {
-                rootPackageName: this.answers.rootPackageName
+                rootPackageName: this.answers.rootPackageName,
+                appName: this.answers.appName,
             }
         )
         this.fs.copyTpl(

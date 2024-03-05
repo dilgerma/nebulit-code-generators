@@ -5,31 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c86d2872-8aa1-4254-a0b5-13627d5a63ad" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../.yo-rc.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.yo-rc.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../foo2/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../foo2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../generators/app/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/mvnw" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/mvnw" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/mvnw.cmd" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/mvnw.cmd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/EventModelingApplication.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/challenge/ChallengeAggregateService.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/challenge/debug/DebugAggregateService.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/challenge/debug/DebugEventsReadModel.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/AggregateRoot.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/AggregateService.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/Command.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/CommandException.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/CommandHandler.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/Processor.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/ReadModel.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/main/kotlin/de/nebulit/eventsourcing/common/persistence/InternalEvent.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/slices/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/command.ts.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/slices/templates/src/components/command.ts.tpl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/commandhandler.ts.tpl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/event.ts.tpl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/readmodel.ts.tpl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../generators/app/templates/root/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,7 +134,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1709641432280</updated>
-      <workItem from="1709641433645" duration="1271000" />
+      <workItem from="1709641433645" duration="1965000" />
     </task>
     <servers />
   </component>
