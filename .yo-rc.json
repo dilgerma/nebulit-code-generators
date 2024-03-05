@@ -1,0 +1,13 @@
+{
+  "generator-martin": {
+    "promptValues": {
+      "name": "eventsourcing",
+      "appName": "eventsourcing"
+    }
+  },
+  "generator-prototype": {
+    "promptValues": {
+      "appName": "demo"
+    }
+  }
+}
