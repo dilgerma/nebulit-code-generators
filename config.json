@@ -3,101 +3,64 @@
   "slices": [
     {
       "id": "",
-      "title": "slice: Slice1",
+      "title": "slice: slice",
       "commands": [
         {
-          "id": "3458764581201675303",
-          "title": "Command1",
-          "fields": [
-            {
-              "name": "feld1",
-              "example": "",
-              "mapping": "",
-              "type": "String",
-              "cardinality": "Single"
-            },
-            {
-              "name": "feld2",
-              "example": "",
-              "mapping": "",
-              "type": "String",
-              "cardinality": "Single"
-            },
-            {
-              "name": "feld3",
-              "example": "",
-              "mapping": "",
-              "type": "String",
-              "cardinality": "Single"
-            }
-          ],
+          "id": "3458764581236390023",
+          "title": "3command3",
+          "fields": [],
           "type": "COMMAND"
         }
       ],
-      "events": [
-        {
-          "id": "3458764581201675195",
-          "title": "Event1",
-          "fields": [
-            {
-              "name": "feld1",
-              "example": "",
-              "mapping": "",
-              "type": "String",
-              "cardinality": "Single"
-            },
-            {
-              "name": "feld2",
-              "example": "",
-              "mapping": "",
-              "type": "String",
-              "cardinality": "Single"
-            },
-            {
-              "name": "feld3",
-              "example": "",
-              "mapping": "",
-              "type": "String",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT"
-        }
-      ],
+      "events": [],
       "readmodels": [],
       "screens": [],
       "automations": []
     },
     {
       "id": "",
-      "title": "slice: Slice2",
+      "title": "slice: redmodelslice",
       "commands": [],
       "events": [],
       "readmodels": [
         {
-          "id": "3458764581201675758",
-          "title": "readmodel",
+          "id": "3458764581350122417",
+          "title": "Foo",
           "fields": [
             {
-              "name": "feld1",
+              "name": "foo1",
               "example": "",
               "mapping": "",
               "type": "String",
               "cardinality": "Single"
             },
             {
-              "name": "feld2",
+              "name": "foo2",
               "example": "",
               "mapping": "",
               "type": "String",
               "cardinality": "Single"
             },
             {
-              "name": "feld3",
+              "name": "foo3",
+              "example": "",
+              "mapping": "",
+              "type": "Boolean",
+              "cardinality": "Single"
+            },
+            {
+              "name": "foo4",
+              "example": "",
+              "mapping": "",
+              "type": "Long",
+              "cardinality": "Single"
+            },
+            {
+              "name": "foo5",
               "example": "",
               "mapping": "",
               "type": "String",
-              "cardinality": "Single"
+              "cardinality": "List"
             }
           ],
           "type": "READMODEL"

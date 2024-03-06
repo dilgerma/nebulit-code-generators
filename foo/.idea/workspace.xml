@@ -5,11 +5,43 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c86d2872-8aa1-4254-a0b5-13627d5a63ad" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../foo2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../foo2/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../foo2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../foo2/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../generators/slices/templates/src/components/Command.kt.tpl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../generators/slices/templates/src/components/CommandHandler.kt.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../config.json" beforeDir="false" afterPath="$PROJECT_DIR$/../config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/kotlinc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/.idea/kotlinc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/src/main/kotlin/de/nebulit/testy/EventModelingApplication.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/src/main/kotlin/de/nebulit/testy/common/AggregateRoot.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/src/main/kotlin/de/nebulit/testy/common/AggregateService.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/src/main/kotlin/de/nebulit/testy/common/Command.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/src/main/kotlin/de/nebulit/testy/common/CommandException.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/src/main/kotlin/de/nebulit/testy/common/CommandHandler.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/src/main/kotlin/de/nebulit/testy/common/Event.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/src/main/kotlin/de/nebulit/testy/common/Processor.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/src/main/kotlin/de/nebulit/testy/common/ReadModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../foo2/src/main/kotlin/de/nebulit/testy/common/persistence/InternalEvent.kt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../generators/app/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/root/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../generators/slices/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/slices/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/command.ts.tpl" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,7 +166,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1709641432280</updated>
-      <workItem from="1709641433645" duration="1965000" />
+      <workItem from="1709641433645" duration="2563000" />
     </task>
     <servers />
   </component>

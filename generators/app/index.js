@@ -1,6 +1,7 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var slugify = require('slugify')
+const config = require("../../config.json");
 
 module.exports = class extends Generator {
 
@@ -11,6 +12,7 @@ module.exports = class extends Generator {
 
     // Async Await
     async prompting() {
+
         this.answers = await this.prompt([{
             type: 'input',
             name: 'appName',
@@ -35,6 +37,7 @@ module.exports = class extends Generator {
     }
 
     writing() {
+
         if (this.answers.generatorType === 'Skeleton') {
             this._writeReactSkeleton();
         } else if (this.answers.generatorType === 'slices') {

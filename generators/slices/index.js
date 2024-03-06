@@ -3,6 +3,7 @@ var chalk = require('chalk');
 var slugify = require('slugify')
 var config = require('./../../config.json')
 const {answers} = require("../app");
+const {givenAnswers} = require("./index");
 
 function _sliceTitle(title) {
     return slugify(title.replace("slice:", "")).toLowerCase()
@@ -16,38 +17,40 @@ module.exports = class extends Generator {
     }
 
     async prompting() {
+
         this.answers = await this.prompt([
             {
                 type: 'checkbox',
                 name: 'slices',
-                message: 'Welcher Slice soll generiert werden?',
-                choices: config.slices.map((item) => item.title).sort()
+                message: 'Welche Slices soll generiert werden?',
+                choices: config.slices.map((item,idx) => item.title).sort()
             }]);
+
     }
 
-    writePages() {
-        this.answers.slices.forEach((slice) => {
-            this._writePage(slice)
-        });
-    }
+    // writePages() {
+    //     this.answers.slices.forEach((slice) => {
+    //         this._writePage(slice)
+    //     });
+    // }
 
-    _writePage(sliceName) {
-        var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
-        this.fs.copyTpl(
-            this.templatePath('src/pages/page.tsx'),
-            this.destinationPath(`${this.givenAnswers?.appName}/src/pages/${title}.tsx`),
-            {
-                _name: title,
-                _fields: FieldComponentGenerator.generateVariables(slice.commands),
-                _state: FieldComponentGenerator.generateState(slice.commands),
-                _commandTriggers: FieldComponentGenerator.generateCommandTrigger(slice, slice.commands),
-                _imports: FieldComponentGenerator.generateSliceSpecificImports(slice, slice.commands),
-                _handlerImports: FieldComponentGenerator.generateHandlerImports(slice, slice.commands),
-
-            }
-        )
-    }
+    // _writePage(sliceName) {
+    //     var slice = this._findSlice(sliceName)
+    //     var title = _sliceTitle(slice.title).toLowerCase()
+    //     this.fs.copyTpl(
+    //         this.templatePath('src/pages/page.tsx'),
+    //         this.destinationPath(`${this.givenAnswers?.appName}/src/pages/${title}.tsx`),
+    //         {
+    //             _name: title,
+    //             _fields: FieldComponentGenerator.generateVariables(slice.commands),
+    //             _state: FieldComponentGenerator.generateState(slice.commands),
+    //             _commandTriggers: FieldComponentGenerator.generateCommandTrigger(slice, slice.commands),
+    //             _imports: FieldComponentGenerator.generateSliceSpecificImports(slice, slice.commands),
+    //             _handlerImports: FieldComponentGenerator.generateHandlerImports(slice, slice.commands),
+    //
+    //         }
+    //     )
+    // }
 
     writeCommandHandlers() {
         this.answers.slices.forEach((slice) => {
@@ -61,14 +64,13 @@ module.exports = class extends Generator {
         var title = _sliceTitle(slice.title).toLowerCase()
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
-                this.templatePath(`src/components/commandhandler.ts.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/components/${title}/commands/${command.title}CommandHandler.ts`),
+                this.templatePath(`src/components/CommandHandler.kt.tpl`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/slices/${title}/${command.title}CommandHandler.kt`),
                 {
                     _slice: title,
-                    _name: command.title,
-                    _eventInvocations: slice.events.map((event) => receiverInvocation(event, "command")).join("\n"),
-                    _imports: FieldComponentGenerator.generateSliceSpecificImports(slice, slice.commands),
-                    _globalImports: FieldComponentGenerator.generateGlobalImports(slice, slice.events),
+                    _commandType: this._commandTitle(command.title),
+                    _rootPackageName: this.givenAnswers.rootPackageName,
+                    _name: this._commandTitle(command.title)
                 }
             )
         })
@@ -76,6 +78,8 @@ module.exports = class extends Generator {
     }
 
     writeCommands() {
+        this.log(chalk.green(JSON.stringify(this.answers)))
+
         this.answers.slices.forEach((slice) => {
             this._writeCommands(slice)
         });
@@ -85,13 +89,16 @@ module.exports = class extends Generator {
         var slice = this._findSlice(sliceName)
         var title = _sliceTitle(slice.title).toLowerCase()
 
+
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
-                this.templatePath(`src/components/command.ts.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/components/${title}/commands/${command.title}.ts`),
+                this.templatePath(`src/components/Command.kt.tpl`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/slices/${title}/${this._commandTitle(command.title)}.kt`),
                 {
-                    _name: command.title,
-                    _constructor: ConstructorGenerator.generateConstructor(
+                    _slice: title,
+                    _rootPackageName: this.givenAnswers.rootPackageName,
+                    _name: this._commandTitle(command.title),
+                    _fields: ConstructorGenerator.generateConstructorVariables(
                         command.fields
                     )
                 }
@@ -101,30 +108,30 @@ module.exports = class extends Generator {
 
     }
 
-    writeEvents() {
-           this.answers.slices.forEach((slice) => {
-               this._writeEvents(slice)
-           });
-       }
-
-    _writeEvents(sliceName) {
-        var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
-
-        slice.events?.filter((event) => event.title).forEach((event) => {
-            this.fs.copyTpl(
-                this.templatePath(`src/components/event.ts.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/components/events/${event.title}.ts`),
-                {
-                    _name: event.title,
-                    _constructor: ConstructorGenerator.generateConstructor(
-                        event.fields
-                    )
-                }
-            )
-        })
-
-    }
+    // writeEvents() {
+    //        this.answers.slices.forEach((slice) => {
+    //            this._writeEvents(slice)
+    //        });
+    //    }
+    //
+    // _writeEvents(sliceName) {
+    //     var slice = this._findSlice(sliceName)
+    //     var title = _sliceTitle(slice.title).toLowerCase()
+    //
+    //     slice.events?.filter((event) => event.title).forEach((event) => {
+    //         this.fs.copyTpl(
+    //             this.templatePath(`src/components/event.ts.tpl`),
+    //             this.destinationPath(`${this.givenAnswers?.appName}/src/components/events/${event.title}.ts`),
+    //             {
+    //                 _name: event.title,
+    //                 _constructor: ConstructorGenerator.generateConstructorVariables(
+    //                     event.fields
+    //                 )
+    //             }
+    //         )
+    //     })
+    //
+    // }
 
     writeReadModels() {
               this.answers.slices.forEach((slice) => {
@@ -133,25 +140,34 @@ module.exports = class extends Generator {
           }
 
     _writeReadModels(sliceName) {
-        var slice = this._findSlice(sliceName)
-
-        var title = _sliceTitle(slice.title).toLowerCase()
-
-        slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
-            this.fs.copyTpl(
-                this.templatePath(`src/components/readmodel.ts.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/components/${title}/readmodels/${readmodel.title}.ts`),
-                {
-                    _name: readmodel.title,
-                    _variables: VariablesGenerator.generateVariables(
-                        readmodel?.fields
-                    )
-                }
-            )
-        })
+            var slice = this._findSlice(sliceName)
+            var title = _sliceTitle(slice.title).toLowerCase()
 
 
+            slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
+                this.fs.copyTpl(
+                    this.templatePath(`src/components/ReadModel.kt.tpl`),
+                    this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/slices/${title}/${this._readmodelTitle(readmodel.title)}.kt`),
+                    {
+                        _slice: title,
+                        _rootPackageName: this.givenAnswers.rootPackageName,
+                        _name: this._readmodelTitle(readmodel.title),
+                        _fields: VariablesGenerator.generateVariables(
+                            readmodel.fields
+                        )
+                    }
+                )
+            })
+
+
+        }
+
+    _commandTitle(title) {
+        return `${capitalizeFirstCharacter(title)}Command`
     }
+    _readmodelTitle(title) {
+           return `${capitalizeFirstCharacter(title)}ReadModel`
+       }
 
     end() {
         this.log(chalk.green('------------'))
@@ -169,8 +185,8 @@ module.exports = class extends Generator {
 class ConstructorGenerator {
 
 //(: {name, type, example, mapping}
-    static generateConstructor(fields) {
-        return `constructor(${fields?.map((field) => "public readonly " + field.name + ":" + typeMapping(field.type)).join(",")}) {}`
+    static generateConstructorVariables(fields) {
+        return `${fields?.map((field) => "var " + field.name + ":" + typeMapping(field.type)).join(",")}`
     }
 }
 
@@ -179,23 +195,29 @@ class VariablesGenerator {
 //(: {name, type, example, mapping}
     static generateVariables(fields) {
         return fields?.map((variable) => {
-            return `\t${variable.name}:${typeMapping(variable.type, variable.cardinality)};`
+            if (variable.cardinality?.toLowerCase() === "list") {
+                return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality)} = emptyList();`;
+            } else {
+                return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality)}? = null;`;
+            }
         }).join("\n")
     }
 }
 
-class FieldComponentGenerator {
-
-    static generateState(commands) {
-        return commands?.map((variable) => {
-            return variable.fields.map((field) => {
-
-                //var typeMapping = typeMapping(variable.type, variable.cardinality)
-                return `\tconst [${field.name}, ${toCamelCase("set", field.name)}] = useState<${typeMapping(field.type, field.cardinality)}>(${defaultValue(field.type, field.cardinality)})`
-            }).filter((it) => it !== undefined).join("\n")
-        })
+const typeMapping = (fieldType, fieldCardinality)=>{
+    var fieldType;
+    switch (fieldType?.toLowerCase()) {
+        case "string": fieldType = "String";break
+        case "double": fieldType = "Double";break
+        case "long": fieldType="Long";break
+        case "boolean": fieldType = "Boolean";break
+        default: fieldType = "String";break
     }
-
+    if (fieldCardinality?.toLowerCase() === "list") {
+        return `List<${fieldType}>`
+    } else {
+        return fieldType
+    }
 
 }
 
@@ -237,4 +259,15 @@ function toCamelCase(prefix, variableName) {
     return (prefix + variableName).replace(/_([a-z])/g, function (match, group1) {
         return group1.toUpperCase();
     });
+}
+
+function capitalizeFirstCharacter(inputString) {
+    // Check if the string is not empty
+    if (inputString.length > 0) {
+        // Capitalize the first character and concatenate the rest of the string
+        return inputString.charAt(0).toUpperCase() + inputString.slice(1);
+    } else {
+        // Return an empty string if the input is empty
+        return "";
+    }
 }
