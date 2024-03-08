@@ -1,21 +1,14 @@
 package <%= rootPackageName%>.common.persistence
 
 import com.thoughtworks.xstream.XStream
-import com.thoughtworks.xstream.converters.MarshallingContext
-import com.thoughtworks.xstream.converters.UnmarshallingContext
-import com.thoughtworks.xstream.io.HierarchicalStreamReader
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import <%= rootPackageName%>.common.Event
 import jakarta.persistence.*
 import org.hibernate.annotations.JdbcTypeCode
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.repository.CrudRepository
-import java.nio.ByteBuffer
-import java.nio.charset.StandardCharsets
 import java.sql.Types
 import java.time.LocalDateTime
 import java.util.*
-
 
 @Entity
 @Table(name = "events")

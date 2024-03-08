@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @SpringBootApplication
 @EnableScheduling
 @EntityScan(basePackages = ["<%= rootPackageName%>"])
-class EventmodelingApplication
+class SpringApp
 
 fun main(args: Array<String>) {
-    runApplication<EventmodelingApplication>(*args)
+    runApplication<SpringApp>(*args)
 }

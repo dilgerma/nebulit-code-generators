@@ -8,6 +8,7 @@ module.exports = class extends Generator {
     constructor(args, opts) {
         super(args, opts);
         this.argument('appname', {type: String, required: false});
+        //this.destinationRoot('/tmp')
     }
 
     // Async Await
@@ -59,12 +60,19 @@ module.exports = class extends Generator {
             }
         )
         this.fs.copyTpl(
-                    this.templatePath('src'),
-                    this.destinationPath(`${slugify(this.answers.appName)}/src/main/kotlin/${this.answers.rootPackageName.split(".").join("/")}`),
-                    {
-                        rootPackageName: this.answers.rootPackageName
-                    }
-                )
+            this.templatePath('src'),
+            this.destinationPath(`${slugify(this.answers.appName)}/src/main/kotlin/${this.answers.rootPackageName.split(".").join("/")}`),
+            {
+                rootPackageName: this.answers.rootPackageName
+            }
+        )
+        this.fs.copyTpl(
+            this.templatePath('test'),
+            this.destinationPath(`${slugify(this.answers.appName)}/src/test/kotlin/${this.answers.rootPackageName.split(".").join("/")}`),
+            {
+                rootPackageName: this.answers.rootPackageName
+            }
+        )
     }
 
     end() {

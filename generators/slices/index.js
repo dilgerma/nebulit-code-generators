@@ -23,7 +23,12 @@ module.exports = class extends Generator {
                 type: 'checkbox',
                 name: 'slices',
                 message: 'Welche Slices soll generiert werden?',
-                choices: config.slices.map((item,idx) => item.title).sort()
+                choices: config.slices.map((item, idx) => item.title).sort()
+            },
+            {
+                type: 'confirm',
+                name: 'restendpoint',
+                message: 'Sollen Rest Endpunkte generiert werden?',
             }]);
 
     }
@@ -65,12 +70,13 @@ module.exports = class extends Generator {
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/CommandHandler.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/slices/${title}/${command.title}CommandHandler.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${command.title}CommandHandler.kt`),
                 {
                     _slice: title,
                     _commandType: this._commandTitle(command.title),
                     _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._commandTitle(command.title)
+                    _name: this._commandTitle(command.title),
+                    _typeImports: typeImports(command.fields)
                 }
             )
         })
@@ -93,14 +99,17 @@ module.exports = class extends Generator {
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/Command.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/slices/${title}/${this._commandTitle(command.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${this._commandTitle(command.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: this._commandTitle(command.title),
                     _fields: ConstructorGenerator.generateConstructorVariables(
-                        command.fields
-                    )
+                        command.fields,
+                        "aggregateId"
+                    ),
+                    _typeImports: typeImports(command.fields)
+
                 }
             )
         })
@@ -108,66 +117,121 @@ module.exports = class extends Generator {
 
     }
 
-    // writeEvents() {
-    //        this.answers.slices.forEach((slice) => {
-    //            this._writeEvents(slice)
-    //        });
-    //    }
-    //
-    // _writeEvents(sliceName) {
-    //     var slice = this._findSlice(sliceName)
-    //     var title = _sliceTitle(slice.title).toLowerCase()
-    //
-    //     slice.events?.filter((event) => event.title).forEach((event) => {
-    //         this.fs.copyTpl(
-    //             this.templatePath(`src/components/event.ts.tpl`),
-    //             this.destinationPath(`${this.givenAnswers?.appName}/src/components/events/${event.title}.ts`),
-    //             {
-    //                 _name: event.title,
-    //                 _constructor: ConstructorGenerator.generateConstructorVariables(
-    //                     event.fields
-    //                 )
-    //             }
-    //         )
-    //     })
-    //
-    // }
+    writeEvents() {
+        this.answers.slices.forEach((slice) => {
+            this._writeEvents(slice)
+        });
+    }
+
+    _writeEvents(sliceName) {
+        var slice = this._findSlice(sliceName)
+        var title = _sliceTitle(slice.title).toLowerCase()
+
+
+        slice.events?.filter((event) => event.title).forEach((event) => {
+            this.fs.copyTpl(
+                this.templatePath(`src/components/Event.kt.tpl`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/events/${this._eventTitle(event.title)}.kt`),
+                {
+                    _slice: title,
+                    _rootPackageName: this.givenAnswers.rootPackageName,
+                    _name: this._eventTitle(event.title),
+                    _fields: ConstructorGenerator.generateConstructorVariables(
+                        event.fields
+                    ),
+                    _typeImports: typeImports(event.fields)
+
+                }
+            )
+        })
+
+
+    }
 
     writeReadModels() {
-              this.answers.slices.forEach((slice) => {
-                  this._writeReadModels(slice)
-              });
-          }
+        this.answers.slices.forEach((slice) => {
+            this._writeReadModels(slice)
+        });
+    }
 
     _writeReadModels(sliceName) {
-            var slice = this._findSlice(sliceName)
-            var title = _sliceTitle(slice.title).toLowerCase()
+        var slice = this._findSlice(sliceName)
+        var title = _sliceTitle(slice.title).toLowerCase()
 
 
-            slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
-                this.fs.copyTpl(
-                    this.templatePath(`src/components/ReadModel.kt.tpl`),
-                    this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/slices/${title}/${this._readmodelTitle(readmodel.title)}.kt`),
-                    {
-                        _slice: title,
-                        _rootPackageName: this.givenAnswers.rootPackageName,
-                        _name: this._readmodelTitle(readmodel.title),
-                        _fields: VariablesGenerator.generateVariables(
-                            readmodel.fields
-                        )
-                    }
-                )
-            })
+        slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
+            this.fs.copyTpl(
+                this.templatePath(`src/components/ReadModel.kt.tpl`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${this._readmodelTitle(readmodel.title)}.kt`),
+                {
+                    _slice: title,
+                    _rootPackageName: this.givenAnswers.rootPackageName,
+                    _name: this._readmodelTitle(readmodel.title),
+                    _fields: VariablesGenerator.generateVariables(
+                        readmodel.fields
+                    ),
+                    _typeImports: typeImports(readmodel.fields)
+                }
+            )
+        })
 
 
+    }
+
+    writeRestControllers() {
+        if (this.answers.restendpoint) {
+            this.answers.slices.forEach((slice) => {
+                this._writeRestControllers(slice)
+            });
         }
+
+    }
+
+    _writeRestControllers(sliceName) {
+        var slice = this._findSlice(sliceName)
+        var title = _sliceTitle(slice.title).toLowerCase()
+
+
+        slice.commands?.filter((command) => command.title).forEach((command) => {
+            this.fs.copyTpl(
+                this.templatePath(`src/components/RestResource.kt.tpl`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${this._restResourceTitle(command.title)}.kt`),
+                {
+                    _slice: title,
+                    _rootPackageName: this.givenAnswers.rootPackageName,
+                    _name: title,
+                    _variables: VariablesGenerator.generateInvocation(
+                        command.fields
+                    ),
+                    _controller: capitalizeFirstCharacter(title),
+                    _command: this._commandTitle(command.title),
+                    _restVariables: VariablesGenerator.generateRestParamInvocation(
+                        command.fields
+                    ),
+                    _typeImports: typeImports(command.fields)
+                }
+            )
+        })
+
+
+    }
 
     _commandTitle(title) {
         return `${capitalizeFirstCharacter(title)}Command`
     }
+
+    _restResourceTitle(title) {
+        return `${capitalizeFirstCharacter(title)}RestController`
+    }
+
     _readmodelTitle(title) {
-           return `${capitalizeFirstCharacter(title)}ReadModel`
-       }
+        return `${capitalizeFirstCharacter(title)}ReadModel`
+    }
+
+    _eventTitle(title) {
+        return `${capitalizeFirstCharacter(title)}Event`
+    }
+
 
     end() {
         this.log(chalk.green('------------'))
@@ -185,8 +249,8 @@ module.exports = class extends Generator {
 class ConstructorGenerator {
 
 //(: {name, type, example, mapping}
-    static generateConstructorVariables(fields) {
-        return `${fields?.map((field) => "var " + field.name + ":" + typeMapping(field.type)).join(",")}`
+    static generateConstructorVariables(fields, overrides) {
+        return `${fields?.map((field) => (overrides?.includes(field.name) ? "override " : "") + "var " + field.name + ":" + typeMapping(field.type)).join(",")}`
     }
 }
 
@@ -202,22 +266,75 @@ class VariablesGenerator {
             }
         }).join("\n")
     }
+
+    static generateInvocation(fields) {
+        return fields?.map((variable) => {
+
+            return `${variable.name}`;
+
+        }).filter((it) => it !== "").join(",")
+    }
+
+    static generateRestParamInvocation(fields) {
+        return fields?.map((variable) => {
+
+            return `@RequestParam ${variable.name}:${typeMapping(variable.type, variable.cardinality)}`;
+
+        }).filter((it) => it !== "").join(",")
+    }
 }
 
-const typeMapping = (fieldType, fieldCardinality)=>{
+const typeMapping = (fieldType, fieldCardinality) => {
     var fieldType;
     switch (fieldType?.toLowerCase()) {
-        case "string": fieldType = "String";break
-        case "double": fieldType = "Double";break
-        case "long": fieldType="Long";break
-        case "boolean": fieldType = "Boolean";break
-        default: fieldType = "String";break
+        case "string":
+            fieldType = "String";
+            break
+        case "double":
+            fieldType = "Double";
+            break
+        case "long":
+            fieldType = "Long";
+            break
+        case "boolean":
+            fieldType = "Boolean";
+            break
+        case "date":
+            fieldType = "LocalDate";
+            break
+        case "uuid":
+            fieldType = "UUID";
+            break
+        default:
+            fieldType = "String";
+            break
     }
     if (fieldCardinality?.toLowerCase() === "list") {
         return `List<${fieldType}>`
     } else {
         return fieldType
     }
+
+}
+
+const typeImports = (fields) => {
+    var imports = fields.map((field) => {
+        switch (field.type?.toLowerCase()) {
+            case "date":
+                return "import java.time.LocalDate"
+            case "uuid":
+                return "import java.util.UUID"
+            default:
+                return ""
+        }
+        switch (field.cardinality?.toLowerCase()) {
+            case "LIST":
+                return "java.util.List"
+            default:
+                return ""
+        }
+    })
+    return imports.filter((item) => item !== "").join(";\n")
 
 }
 
@@ -230,7 +347,7 @@ const receiverInvocation = (type, receiver) => {
 }
 
 const variableNameOrMapping = (field) => {
-    return (field.mapping && field.mapping!=="") ? field.mapping : field.name
+    return (field.mapping && field.mapping !== "") ? field.mapping : field.name
 }
 
 const packageName = (type) => {

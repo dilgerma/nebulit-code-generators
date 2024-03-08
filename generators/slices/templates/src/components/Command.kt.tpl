@@ -1,6 +1,6 @@
-package <%= _rootPackageName%>.slices.<%=_slice%>
+package <%= _rootPackageName%>.<%=_slice%>
 
 import <%= _rootPackageName%>.common.Command
-import java.util.UUID
+<%= _typeImports %>
 
-data class <%=_name%>(override var aggregateId: UUID, <%= _fields%>) : Command
+data class <%=_name%>(<%= _fields%>) : Command

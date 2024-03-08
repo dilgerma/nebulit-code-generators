@@ -1,6 +1,7 @@
-package de.nebulit.todo.slices.addtodo
+package de.nebulit.todo.addtodo
 
 import de.nebulit.todo.common.Command
+import java.time.LocalDate;
 import java.util.UUID
 
-data class AddTodoCommand(override var aggregateId: UUID, var taskName:String,var startDate:String,var endDate:String) : Command
+data class AddTodoCommand(var taskName:String,var createdDate:LocalDate,override var aggregateId:UUID) : Command
