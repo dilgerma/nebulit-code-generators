@@ -3,26 +3,57 @@
   "slices": [
     {
       "id": "",
-      "title": "slice: TodoReport",
+      "title": "slice: ActiveSessions",
       "commands": [],
       "events": [],
       "readmodels": [
         {
-          "id": "3458764581457259853",
-          "title": "ActiveTodos",
+          "id": "3458764581665769471",
+          "title": "ActiveSession",
+          "fields": [
+            {
+              "name": "name",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "sessionId",
+              "type": "String",
+              "example": "",
+              "mapping": "aggregateId",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL"
+        }
+      ],
+      "screens": [],
+      "automations": []
+    },
+    {
+      "id": "",
+      "title": "slice: ResolvedTodoReport",
+      "commands": [],
+      "events": [],
+      "readmodels": [
+        {
+          "id": "3458764581459072616",
+          "title": "ResolvedTodos",
           "fields": [
             {
               "name": "taskNames",
               "type": "String",
-              "example": "",
+              "example": "TODO 2",
               "mapping": "taskName",
-              "cardinality": "List"
+              "cardinality": "Single"
             },
             {
               "name": "aggregateId",
+              "type": "UUID",
               "example": "",
               "mapping": "",
-              "type": "UUID",
               "cardinality": "Single"
             }
           ],
@@ -31,103 +62,14 @@
       ],
       "screens": [
         {
-          "id": "3458764581458174121",
+          "id": "3458764581459881521",
           "title": "screen",
           "fields": [
             {
-              "name": "taskName",
+              "name": "taskNames",
               "type": "String",
               "example": "",
-              "mapping": "taskNames",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "example": "",
-              "mapping": "",
-              "type": "UUID",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "SCREEN"
-        }
-      ],
-      "automations": []
-    },
-    {
-      "id": "",
-      "title": "slice: AddTOdo",
-      "commands": [
-        {
-          "id": "3458764581457116724",
-          "title": "AddTodo",
-          "fields": [
-            {
-              "name": "taskName",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "createdDate",
-              "type": "Date",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "example": "",
-              "mapping": "",
-              "type": "UUID",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND"
-        }
-      ],
-      "events": [
-        {
-          "id": "3458764581457116249",
-          "title": "TodoAdded",
-          "fields": [
-            {
-              "name": "taskName",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "createdDate",
-              "type": "Date",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "example": "",
-              "mapping": "",
-              "type": "UUID",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT"
-        }
-      ],
-      "readmodels": [],
-      "screens": [
-        {
-          "id": "3458764581457362984",
-          "title": "screen",
-          "fields": [
-            {
-              "name": "taskName",
-              "type": "String",
-              "example": "",
-              "mapping": "",
+              "mapping": "taskName",
               "cardinality": "Single"
             }
           ],
@@ -160,9 +102,9 @@
             },
             {
               "name": "aggregateId",
+              "type": "UUID",
               "example": "",
               "mapping": "",
-              "type": "UUID",
               "cardinality": "Single"
             }
           ],
@@ -190,9 +132,9 @@
             },
             {
               "name": "aggregateId",
+              "type": "UUID",
               "example": "",
               "mapping": "",
-              "type": "UUID",
               "cardinality": "Single"
             }
           ],
@@ -205,26 +147,26 @@
     },
     {
       "id": "",
-      "title": "slice: ResolvedTodoReport",
+      "title": "slice: TodoReport",
       "commands": [],
       "events": [],
       "readmodels": [
         {
-          "id": "3458764581459072616",
-          "title": "ResolvedTodos",
+          "id": "3458764581457259853",
+          "title": "ActiveTodos",
           "fields": [
             {
               "name": "taskNames",
               "type": "String",
-              "example": "TODO 2",
+              "example": "",
               "mapping": "taskName",
-              "cardinality": "Single"
+              "cardinality": "List"
             },
             {
               "name": "aggregateId",
+              "type": "UUID",
               "example": "",
               "mapping": "",
-              "type": "UUID",
               "cardinality": "Single"
             }
           ],
@@ -233,14 +175,21 @@
       ],
       "screens": [
         {
-          "id": "3458764581459881521",
+          "id": "3458764581458174121",
           "title": "screen",
           "fields": [
             {
-              "name": "taskNames",
+              "name": "taskName",
               "type": "String",
               "example": "",
-              "mapping": "taskName",
+              "mapping": "taskNames",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
               "cardinality": "Single"
             }
           ],
@@ -251,22 +200,29 @@
     },
     {
       "id": "",
-      "title": "slice: slice",
+      "title": "slice: AddTOdo",
       "commands": [
         {
-          "id": "3458764581575741145",
-          "title": "command",
+          "id": "3458764581457116724",
+          "title": "AddTodo",
           "fields": [
             {
-              "name": "field1",
+              "name": "taskName",
               "type": "String",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
             },
             {
-              "name": "field2NotVisibleInUI",
-              "type": "String",
+              "name": "createdDate",
+              "type": "Date",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
@@ -277,36 +233,170 @@
       ],
       "events": [
         {
-          "id": "3458764581575741143",
-          "title": "event",
+          "id": "3458764581457116249",
+          "title": "TodoAdded",
+          "fields": [
+            {
+              "name": "taskName",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "createdDate",
+              "type": "Date",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
           "type": "EVENT"
         }
       ],
-      "readmodels": [
-        {
-          "id": "3458764581575741144",
-          "title": "readmodel",
-          "type": "READMODEL"
-        }
-      ],
+      "readmodels": [],
       "screens": [
         {
-          "id": "3458764581575888794",
+          "id": "3458764581457362984",
           "title": "screen",
+          "fields": [
+            {
+              "name": "taskName",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "sessionId",
+              "cardinality": "Single"
+            },
+            {
+              "name": "createdDate",
+              "type": "Date",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "name",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "SCREEN"
+        }
+      ],
+      "automations": []
+    },
+    {
+      "id": "",
+      "title": "slice: StartSession",
+      "commands": [
+        {
+          "id": "3458764581665640097",
+          "title": "StartSession",
+          "fields": [
+            {
+              "name": "name",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "sessionId",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND"
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764581665640098",
+          "title": "SessionStarted",
+          "fields": [
+            {
+              "name": "name",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "sessionId",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT"
+        }
+      ],
+      "readmodels": [],
+      "screens": [
+        {
+          "id": "3458764581666373225",
+          "title": "screen",
+          "fields": [
+            {
+              "name": "sessionId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "name",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
           "type": "SCREEN"
         }
       ],
       "automations": []
     }
   ],
+  "aggregates": [
+    {
+      "id": "3458764581699926675",
+      "title": "ToDo2",
+      "fields": [],
+      "type": "AGGREGATE"
+    }
+  ],
   "sliceDependencies": [
     {
-      "source": "slice: TodoReport",
-      "target": "slice: TodoReport"
+      "source": "slice: ActiveSessions",
+      "target": "slice: AddTOdo"
     },
     {
       "source": "slice: ResolvedTodoReport",
       "target": "slice: ResolvedTodoReport"
+    },
+    {
+      "source": "slice: TodoReport",
+      "target": "slice: TodoReport"
     }
   ]
 }

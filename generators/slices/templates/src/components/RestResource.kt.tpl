@@ -15,7 +15,7 @@ class <%= _controller%>Ressource {
     private lateinit var commandHandler: DelegatingCommandHandler
 
     @PostMapping("/<%= _slice%>")
-    fun processCommand(<%= _restVariables %>) {
-        commandHandler.handle(<%= _command%>(<%= _variables%>))
+    fun processCommand(<%- _restVariables %>) {
+        commandHandler.handle(<%- _command%>(<%= _variables%>))
     }
 }

@@ -29,7 +29,7 @@ abstract class BaseCommandHandler<U : AggregateRoot>(
 
 
 @Component
-class DelegatingCommandHandler<U:AggregateRoot>(var commandHandlers: List<CommandHandler>)  {
+class DelegatingCommandHandler(var commandHandlers: List<CommandHandler>)  {
     fun handle(command: Command): List<InternalEvent> {
         return commandHandlers.first { it.supports(command) }.handle(command)
     }

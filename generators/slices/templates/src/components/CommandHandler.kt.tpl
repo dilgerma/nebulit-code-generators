@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class <%= _name%>CommandHandler(
-    private var aggregateService: AggregateService<AGGREGATE>
-) : BaseCommandHandler<AGGREGATE>(aggregateService) {
+    private var aggregateService: AggregateService<<%= _aggregate%>>
+) : BaseCommandHandler<<%= _aggregate%>>(aggregateService) {
 
     override fun handle(inputCommand: Command): List<InternalEvent> {
         assert(inputCommand is <%= _commandType%>)

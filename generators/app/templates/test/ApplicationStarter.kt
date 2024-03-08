@@ -1,4 +1,4 @@
-package de.nebulit.todo
+package <%= rootPackageName%>
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.test.context.TestConfiguration
@@ -9,7 +9,7 @@ import org.testcontainers.utility.DockerImageName
 
 
 @TestConfiguration(proxyBeanMethods = false)
-internal class MyContainersConfiguration {
+internal class ContainerConfiguration {
 
     @Bean
     @ServiceConnection
@@ -23,11 +23,11 @@ internal class MyContainersConfiguration {
 
 }
 
-object TestMyApplication {
+object ApplicationStarter {
     @JvmStatic
     fun main(args: Array<String>) {
         SpringApplication.from(SpringApp::main)
-            .with(MyContainersConfiguration::class.java)
+            .with(ContainerConfiguration::class.java)
             .run(*args)
     }
 }

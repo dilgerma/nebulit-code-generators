@@ -4,13 +4,14 @@ import de.nebulit.todo.common.*
 import de.nebulit.todo.common.persistence.InternalEvent
 import org.springframework.stereotype.Component
 import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 import java.util.UUID
 
 
 @Component
 class AddTodoCommandCommandHandler(
-    private var aggregateService: AggregateService<AGGREGATE>
-) : BaseCommandHandler<AGGREGATE>(aggregateService) {
+    private var aggregateService: AggregateService<ToDo2Aggregate>
+) : BaseCommandHandler<ToDo2Aggregate>(aggregateService) {
 
     override fun handle(inputCommand: Command): List<InternalEvent> {
         assert(inputCommand is AddTodoCommand)

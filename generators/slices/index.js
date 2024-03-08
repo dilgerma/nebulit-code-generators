@@ -17,11 +17,12 @@ module.exports = class extends Generator {
     }
 
     async prompting() {
-
+        var aggregates = config.aggregates.map((item, idx) => item.title).sort()
+        aggregates.push("Keins")
         this.answers = await this.prompt([
             {
-                type: 'checkbox',
-                name: 'slices',
+                type: 'list',
+                name: 'slice',
                 message: 'Welche Slices soll generiert werden?',
                 choices: config.slices.map((item, idx) => item.title).sort()
             },
@@ -29,6 +30,12 @@ module.exports = class extends Generator {
                 type: 'confirm',
                 name: 'restendpoint',
                 message: 'Sollen Rest Endpunkte generiert werden?',
+            },
+            {
+                type: 'list',
+                name: 'aggregate',
+                message: `Aggregate auswählen?`,
+                choices: aggregates
             }]);
 
     }
@@ -58,25 +65,27 @@ module.exports = class extends Generator {
     // }
 
     writeCommandHandlers() {
-        this.answers.slices.forEach((slice) => {
-            this._writeCommandHandlers(slice)
-        });
+        //this.answers.slices.forEach((slice) => {
+        this._writeCommandHandlers(this.answers.slice)
+        //});
     }
 
     _writeCommandHandlers(sliceName) {
+
 
         var slice = this._findSlice(sliceName)
         var title = _sliceTitle(slice.title).toLowerCase()
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/CommandHandler.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${command.title}CommandHandler.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/slices/${command.title}CommandHandler.kt`),
                 {
                     _slice: title,
                     _commandType: this._commandTitle(command.title),
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: this._commandTitle(command.title),
-                    _typeImports: typeImports(command.fields)
+                    _typeImports: typeImports(command.fields),
+                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE"
                 }
             )
         })
@@ -84,11 +93,9 @@ module.exports = class extends Generator {
     }
 
     writeCommands() {
-        this.log(chalk.green(JSON.stringify(this.answers)))
-
-        this.answers.slices.forEach((slice) => {
-            this._writeCommands(slice)
-        });
+        //this.answers.slices.forEach((slice) => {
+        this._writeCommands(this.answers.slice)
+        //});
     }
 
     _writeCommands(sliceName) {
@@ -99,7 +106,7 @@ module.exports = class extends Generator {
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/Command.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${this._commandTitle(command.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/slices/${this._commandTitle(command.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -117,10 +124,11 @@ module.exports = class extends Generator {
 
     }
 
+
     writeEvents() {
-        this.answers.slices.forEach((slice) => {
-            this._writeEvents(slice)
-        });
+        //this.answers.slices.forEach((slice) => {
+        this._writeEvents(this.answers.slice)
+        //});
     }
 
     _writeEvents(sliceName) {
@@ -149,9 +157,9 @@ module.exports = class extends Generator {
     }
 
     writeReadModels() {
-        this.answers.slices.forEach((slice) => {
-            this._writeReadModels(slice)
-        });
+        //this.answers.slices.forEach((slice) => {
+        this._writeReadModels(this.answers.slice)
+        //});
     }
 
     _writeReadModels(sliceName) {
@@ -162,7 +170,7 @@ module.exports = class extends Generator {
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/ReadModel.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${this._readmodelTitle(readmodel.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/slices/${this._readmodelTitle(readmodel.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -180,9 +188,9 @@ module.exports = class extends Generator {
 
     writeRestControllers() {
         if (this.answers.restendpoint) {
-            this.answers.slices.forEach((slice) => {
-                this._writeRestControllers(slice)
-            });
+            //this.answers.slices.forEach((slice) => {
+            this._writeRestControllers(this.answers.slice)
+            //});
         }
 
     }
@@ -195,7 +203,7 @@ module.exports = class extends Generator {
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/RestResource.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${this._restResourceTitle(command.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/slices/${this._restResourceTitle(command.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -214,6 +222,10 @@ module.exports = class extends Generator {
         })
 
 
+    }
+
+    _aggregateTitle(title) {
+        return `${capitalizeFirstCharacter(title)}Aggregate`
     }
 
     _commandTitle(title) {
@@ -277,8 +289,12 @@ class VariablesGenerator {
 
     static generateRestParamInvocation(fields) {
         return fields?.map((variable) => {
+            if (variable.type?.toLowerCase() == "date") {
 
-            return `@RequestParam ${variable.name}:${typeMapping(variable.type, variable.cardinality)}`;
+                return `@DateTimeFormat(pattern = "dd.MM.yyyy") @RequestParam ${variable.name}:${typeMapping(variable.type, variable.cardinality)}`;
+            } else {
+                return `@RequestParam ${variable.name}:${typeMapping(variable.type, variable.cardinality)}`;
+            }
 
         }).filter((it) => it !== "").join(",")
     }
@@ -321,20 +337,20 @@ const typeImports = (fields) => {
     var imports = fields.map((field) => {
         switch (field.type?.toLowerCase()) {
             case "date":
-                return "import java.time.LocalDate"
+                return ["import java.time.LocalDate", "import org.springframework.format.annotation.DateTimeFormat"]
             case "uuid":
-                return "import java.util.UUID"
+                return ["import java.util.UUID"]
             default:
-                return ""
+                return []
         }
         switch (field.cardinality?.toLowerCase()) {
             case "LIST":
-                return "java.util.List"
+                return ["java.util.List"]
             default:
-                return ""
+                return []
         }
     })
-    return imports.filter((item) => item !== "").join(";\n")
+    return imports.flat().join(";\n")
 
 }
 

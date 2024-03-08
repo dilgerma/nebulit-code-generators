@@ -1,4 +1,4 @@
-package <%= rootPackageName%>
+package de.nebulit.todo
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
@@ -9,9 +9,13 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableJpaRepositories
 @SpringBootApplication
 @EnableScheduling
-@EntityScan(basePackages = ["<%= rootPackageName%>"])
-class SpringApp
+@EntityScan(basePackages = ["de.nebulit.todo"])
+class SpringApp {
+    companion object {
+        fun main(args: Array<String>) {
+            runApplication<SpringApp>(*args)
+        }
 
-fun main(args: Array<String>) {
-    runApplication<SpringApp>(*args)
+    }
 }
+

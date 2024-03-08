@@ -1,7 +1,7 @@
-package de.nebulit.todo.domain
+package <%= _rootPackageName%>.domain
 
-import de.nebulit.todo.common.AggregateRoot
-import de.nebulit.todo.common.persistence.InternalEvent
+import <%= _rootPackageName%>.common.AggregateRoot
+import <%= _rootPackageName%>.common.persistence.InternalEvent
 import jakarta.persistence.*
 import org.hibernate.annotations.JdbcTypeCode
 import java.sql.Types
@@ -9,14 +9,12 @@ import java.time.LocalDate
 import java.util.*
 import kotlin.jvm.Transient
 
-data class Todo(val name: String, val createdDate: LocalDate?, val resolvedDate: LocalDate? = null)
-
 @Entity
 @Table(name = "aggregates")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "Discriminator", discriminatorType = DiscriminatorType.STRING, length = 20)
-@DiscriminatorValue("TODO")
-class TodoAggregate(
+@DiscriminatorValue("<%= _name%>")
+class <%= _name%>(
     @JdbcTypeCode(Types.VARCHAR) @Id override var aggregateId: UUID
 ) : AggregateRoot {
 
@@ -25,17 +23,8 @@ class TodoAggregate(
     @Transient
     override var events: MutableList<InternalEvent> = mutableListOf()
 
-    @Transient
-    var todos = mutableListOf<Todo>()
-
     override fun applyEvents(events: List<InternalEvent>): AggregateRoot {
         return this
-    }
-
-    fun newTodo(aggregateId: UUID, name: String) {
-    }
-
-    fun newSession(name: String) {
     }
 
     companion object {

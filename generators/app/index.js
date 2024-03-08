@@ -29,7 +29,7 @@ module.exports = class extends Generator {
                 type: 'list',
                 name: 'generatorType',
                 message: 'Was soll generiert werden?',
-                choices: ['Skeleton', 'slices']
+                choices: ['Skeleton', 'slices', "aggregates"]
             }]);
     }
 
@@ -44,6 +44,12 @@ module.exports = class extends Generator {
         } else if (this.answers.generatorType === 'slices') {
             this.log(chalk.green('starting commands generation'))
             this.composeWith(require.resolve('../slices'), {
+                answers: this.answers,
+                appName: this.answers.appName ?? this.appName
+            });
+        } else if (this.answers.generatorType === 'aggregates') {
+            this.log(chalk.green('starting aggregates generation'))
+            this.composeWith(require.resolve('../aggregates'), {
                 answers: this.answers,
                 appName: this.answers.appName ?? this.appName
             });

@@ -8,8 +8,8 @@
         <version>3.2.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId><%= rootPackageName%></groupId>
-    <artifactId><%= appName%></artifactId>
+    <groupId>de.nebulit.todo</groupId>
+    <artifactId>ToDo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>demo</name>
     <properties>
@@ -18,18 +18,30 @@
         <kotlin.version>1.9.20</kotlin.version>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>io.github.microutils</groupId>
-            <artifactId>kotlin-logging-jvm</artifactId>
-            <version>2.0.11</version>
-        </dependency>
+        <!-- Spring Boot Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-kotlin</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+        </dependency>
+
+        <!-- Kotlin and Logging Dependencies -->
+        <dependency>
+            <groupId>io.github.microutils</groupId>
+            <artifactId>kotlin-logging-jvm</artifactId>
+            <version>2.0.11</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -39,12 +51,19 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
         </dependency>
+
+        <!-- Jackson and PostgreSQL Dependencies -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.1</version>
         </dependency>
 
+        <!-- XStream and Test Dependencies -->
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
@@ -69,18 +88,6 @@
             <scope>test</scope>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
-        <!-- spring modulith -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.modulith</groupId>
             <artifactId>spring-modulith-starter-jpa</artifactId>
@@ -102,27 +109,26 @@
             <artifactId>spring-modulith-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- spring modulith -->
+
+        <!-- Flyway and Awaitility Dependencies -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <scope>test</scope>
         </dependency>
 
+        <!-- Testcontainers Dependencies -->
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -135,16 +141,14 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!-- Spring Kafka Test Dependencies -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Mocking Dependencies -->
         <dependency>
             <groupId>io.mockk</groupId>
             <artifactId>mockk</artifactId>
@@ -157,18 +161,25 @@
             <version>4.0.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.0.3</version>
+        </dependency>
     </dependencies>
+
     <dependencyManagement>
-           <dependencies>
-               <dependency>
-                   <groupId>org.springframework.modulith</groupId>
-                   <artifactId>spring-modulith-bom</artifactId>
-                   <version>1.1.2</version>
-                   <scope>import</scope>
-                   <type>pom</type>
-               </dependency>
-           </dependencies>
-       </dependencyManagement>
+        <dependencies>
+            <!-- Spring Modulith BOM -->
+            <dependency>
+                <groupId>org.springframework.modulith</groupId>
+                <artifactId>spring-modulith-bom</artifactId>
+                <version>1.1.2</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
@@ -178,6 +189,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!-- Kotlin Maven Plugin -->
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
@@ -187,6 +199,7 @@
                     </args>
                     <compilerPlugins>
                         <plugin>spring</plugin>
+                        <plugin>jpa</plugin>
                     </compilerPlugins>
                 </configuration>
                 <dependencies>
@@ -195,96 +208,21 @@
                         <artifactId>kotlin-maven-allopen</artifactId>
                         <version>${kotlin.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-noarg</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
                 </dependencies>
             </plugin>
-            <!--            <plugin>-->
-            <!--                <groupId>org.codehaus.mojo</groupId>-->
-            <!--                <artifactId>build-helper-maven-plugin</artifactId>-->
-            <!--                <version>3.2.0</version>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <id>add-source</id>-->
-            <!--                        <phase>generate-sources</phase>-->
-            <!--                        <goals>-->
-            <!--                            <goal>add-source</goal>-->
-            <!--                        </goals>-->
-            <!--                        <configuration>-->
-            <!--                            <sources>-->
-            <!--                                <source>${project.build.directory}/generated-sources/avro</source>-->
-            <!--                            </sources>-->
-            <!--                        </configuration>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
-            <!--            <plugin>-->
-            <!--                <groupId>org.apache.avro</groupId>-->
-            <!--                <artifactId>avro-maven-plugin</artifactId>-->
-            <!--                <version>1.11.3</version>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <phase>generate-sources</phase>-->
-            <!--                        <goals>-->
-            <!--                            <goal>schema</goal>-->
-            <!--                            &lt;!&ndash; You can also use "protocol" or "idl" goals based on your needs &ndash;&gt;-->
-            <!--                        </goals>-->
-
-            <!--                        <configuration>-->
-            <!--                            <enableDecimalLogicalType>true</enableDecimalLogicalType>-->
-            <!--                            <sourceDirectory>${project.basedir}/src/main/avro</sourceDirectory>-->
-            <!--                            <outputDirectory>${project.build.directory}/generated-sources/avro</outputDirectory>-->
-            <!--                        </configuration>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
-
-
-            <!-- Frontend Maven Plugin -->
-            <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.12.0</version> <!-- Use the latest version available -->
-
-                <!-- Configuration for installing Node.js and npm -->
-                <executions>
-                    <execution>
-                        <id>install node and npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <configuration>
-                            <nodeVersion>v18.17.0</nodeVersion> <!-- Use the version you need -->
-                            <npmVersion>6.14.14</npmVersion> <!-- Use the version you need -->
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm install</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>install</arguments> <!-- Adjust based on your npm scripts -->
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm build</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>run export</arguments> <!-- Adjust based on your npm scripts -->
-                        </configuration>
-                    </execution>
-                </executions>
-
-                <!-- Configuration for npm install -->
-                <configuration>
-                    <workingDirectory>${project.basedir}/src/main/nextjs</workingDirectory>
-                </configuration>
-            </plugin>
         </plugins>
-
     </build>
+
     <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
         <!-- Confluent Maven Repository -->
         <repository>
             <id>confluent</id>
@@ -292,5 +230,55 @@
         </repository>
     </repositories>
 
-
+    <profiles>
+        <profile>
+            <id>frontend</id>
+            <build>
+                <!-- Frontend Maven Plugin -->
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>1.12.0</version>
+                        <executions>
+                            <!-- Install Node.js and npm -->
+                            <execution>
+                                <id>install node and npm</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                                <configuration>
+                                    <nodeVersion>v18.17.0</nodeVersion>
+                                    <npmVersion>6.14.14</npmVersion>
+                                </configuration>
+                            </execution>
+                            <!-- npm install -->
+                            <execution>
+                                <id>npm install</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                </configuration>
+                            </execution>
+                            <!-- npm build -->
+                            <execution>
+                                <id>npm build</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run export</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <workingDirectory>${project.basedir}/src/main/nextjs</workingDirectory>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

@@ -16,19 +16,19 @@ interface TodoRepository : CrudRepository<TodoAggregate, Long> {
 
 @Component
 class TodoAggregateService(
-    var challengeRepository: TodoRepository,
+    var todoRepository: TodoRepository,
     var eventsEntityRepository: EventsEntityRepository,
 ) : AggregateService<TodoAggregate> {
 
     @Transactional
     override fun persist(todo: TodoAggregate) {
-        challengeRepository.save(todo)
+        todoRepository.save(todo)
         eventsEntityRepository.saveAll(todo.events)
 
     }
 
     override fun findByAggregateId(aggregateId: UUID): TodoAggregate? {
-        return challengeRepository.findByAggregateId(aggregateId)
+        return todoRepository.findByAggregateId(aggregateId)
     }
 
     override fun findEventsByAggregateId(aggregateId: UUID): List<InternalEvent> {
