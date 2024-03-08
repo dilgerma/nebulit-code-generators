@@ -1,0 +1,48 @@
+-------------------------------------------------------------------------------
+Test set: de.nebulit.todo.ModuleTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.876 s <<< FAILURE! -- in de.nebulit.todo.ModuleTest
+de.nebulit.todo.ModuleTest.verifyModules -- Time elapsed: 0.864 s <<< ERROR!
+org.springframework.modulith.core.Violations: 
+- Cycle detected: Slice domain -> 
+                Slice slices -> 
+                Slice domain
+  1. Dependencies of Slice domain
+    - Method <de.nebulit.todo.domain.TodoAggregate.handle(de.nebulit.todo.slices.addtodo.AddTodoCommand)> has parameter of type <de.nebulit.todo.slices.addtodo.AddTodoCommand> in (TodoAggregate.kt:0)
+    - Method <de.nebulit.todo.domain.TodoAggregate.handle(de.nebulit.todo.slices.resolvetodo.CloseTodoCommand)> has parameter of type <de.nebulit.todo.slices.resolvetodo.CloseTodoCommand> in (TodoAggregate.kt:0)
+  2. Dependencies of Slice slices
+    - Class <de.nebulit.todo.slices.addtodo.AddTodoCommandCommandHandler> has generic superclass <de.nebulit.todo.common.BaseCommandHandler<de.nebulit.todo.domain.TodoAggregate>> with type argument depending on <de.nebulit.todo.domain.TodoAggregate> in (AddTodoCommandHandler.kt:0)
+    - Class <de.nebulit.todo.slices.resolvetodo.CloseTodoCommandCommandHandler> has generic superclass <de.nebulit.todo.common.BaseCommandHandler<de.nebulit.todo.domain.TodoAggregate>> with type argument depending on <de.nebulit.todo.domain.TodoAggregate> in (CloseTodoCommandHandler.kt:0)
+    - Constructor <de.nebulit.todo.slices.addtodo.AddTodoCommandCommandHandler.<init>(de.nebulit.todo.common.AggregateService)> has generic parameter type <de.nebulit.todo.common.AggregateService<de.nebulit.todo.domain.TodoAggregate>> with type argument depending on <de.nebulit.todo.domain.TodoAggregate> in (AddTodoCommandHandler.kt:0)
+    - Constructor <de.nebulit.todo.slices.resolvetodo.CloseTodoCommandCommandHandler.<init>(de.nebulit.todo.common.AggregateService)> has generic parameter type <de.nebulit.todo.common.AggregateService<de.nebulit.todo.domain.TodoAggregate>> with type argument depending on <de.nebulit.todo.domain.TodoAggregate> in (CloseTodoCommandHandler.kt:0)
+    - Field <de.nebulit.todo.slices.addtodo.AddTodoCommandCommandHandler.aggregateService> has generic type <de.nebulit.todo.common.AggregateService<de.nebulit.todo.domain.TodoAggregate>> with type argument depending on <de.nebulit.todo.domain.TodoAggregate> in (AddTodoCommandHandler.kt:0)
+    - Field <de.nebulit.todo.slices.resolvetodo.CloseTodoCommandCommandHandler.aggregateService> has generic type <de.nebulit.todo.common.AggregateService<de.nebulit.todo.domain.TodoAggregate>> with type argument depending on <de.nebulit.todo.domain.TodoAggregate> in (CloseTodoCommandHandler.kt:0)
+    - Method <de.nebulit.todo.slices.addtodo.AddTodoCommandCommandHandler.handle(de.nebulit.todo.common.Command)> calls method <de.nebulit.todo.domain.TodoAggregate.handle(de.nebulit.todo.slices.addtodo.AddTodoCommand)> in (AddTodoCommandHandler.kt:17)
+    - Method <de.nebulit.todo.slices.resolvetodo.CloseTodoCommandCommandHandler.handle(de.nebulit.todo.common.Command)> calls method <de.nebulit.todo.domain.TodoAggregate.handle(de.nebulit.todo.slices.resolvetodo.CloseTodoCommand)> in (CloseTodoCommandHandler.kt:17)
+    - Method <de.nebulit.todo.slices.addtodo.AddTodoCommandCommandHandler.handle(de.nebulit.todo.common.Command)> calls method <de.nebulit.todo.domain.TodoAggregate.getEvents()> in (AddTodoCommandHandler.kt:19)
+    - Method <de.nebulit.todo.slices.resolvetodo.CloseTodoCommandCommandHandler.handle(de.nebulit.todo.common.Command)> calls method <de.nebulit.todo.domain.TodoAggregate.getEvents()> in (CloseTodoCommandHandler.kt:19)
+- Module 'domain' depends on non-exposed type de.nebulit.todo.slices.addtodo.AddTodoCommand within module 'slices'!
+AddTodoCommand declares parameter AddTodoCommand.handle(AddTodoCommand) in (TodoAggregate.kt:0)
+- Module 'domain' depends on non-exposed type de.nebulit.todo.slices.resolvetodo.CloseTodoCommand within module 'slices'!
+CloseTodoCommand declares parameter CloseTodoCommand.handle(CloseTodoCommand) in (TodoAggregate.kt:0)
+- Module 'domain' depends on non-exposed type de.nebulit.todo.slices.addtodo.AddTodoCommand within module 'slices'!
+Method <de.nebulit.todo.domain.TodoAggregate.handle(de.nebulit.todo.slices.addtodo.AddTodoCommand)> has parameter of type <de.nebulit.todo.slices.addtodo.AddTodoCommand> in (TodoAggregate.kt:0)
+- Module 'domain' depends on non-exposed type de.nebulit.todo.slices.resolvetodo.CloseTodoCommand within module 'slices'!
+Method <de.nebulit.todo.domain.TodoAggregate.handle(de.nebulit.todo.slices.resolvetodo.CloseTodoCommand)> has parameter of type <de.nebulit.todo.slices.resolvetodo.CloseTodoCommand> in (TodoAggregate.kt:0)
+	at org.springframework.modulith.core.Violations.and(Violations.java:128)
+	at java.base/java.util.stream.ReduceOps$1ReducingSink.accept(ReduceOps.java:80)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.HashMap$ValueSpliterator.forEachRemaining(HashMap.java:1787)
+	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:735)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(ReduceOps.java:921)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.reduce(ReferencePipeline.java:657)
+	at org.springframework.modulith.core.ApplicationModules.detectViolations(ApplicationModules.java:404)
+	at org.springframework.modulith.core.ApplicationModules.verify(ApplicationModules.java:369)
+	at de.nebulit.todo.ModuleTest.verifyModules(ModuleTest.kt:13)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
