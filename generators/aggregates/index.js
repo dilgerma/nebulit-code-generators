@@ -17,20 +17,18 @@ module.exports = class extends Generator {
     }
 
     async prompting() {
-        var aggregates = config?.aggregates?.map((item, idx) => item.title).sort()
-        aggregates.push("Keins")
         this.answers = await this.prompt([
             {
                 type: 'checkbox',
                 name: 'aggregates',
                 message: 'Welche Aggregates soll generiert werden?',
-                choices: aggregates
+                choices: config?.aggregates?.map((item, idx) => item.title).sort()
             }]);
 
     }
 
     writeAggregates() {
-        this.answers.aggregates.filter(item => item !== "Keins").forEach((aggregate) => {
+        this.answers.aggregates.forEach((aggregate) => {
             this._writeAggregates(config.aggregates.find(item => item.title === aggregate))
         });
     }

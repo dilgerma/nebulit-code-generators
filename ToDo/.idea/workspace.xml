@@ -5,22 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43bb1381-c216-46c0-b3c1-1a47f22b06f8" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../generators/aggregates/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../generators/aggregates/templates/src/components/Aggregate.kt.tpl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../generators/aggregates/templates/src/components/AggregateService.kt.tpl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../generators/app/templates/src/domain/.gitkeep" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../generators/slices/templates/src/components/Aggregate.kt.tpl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.yo-rc.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.yo-rc.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../config.json" beforeDir="false" afterPath="$PROJECT_DIR$/../config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/root/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/root/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/SpringApp.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/src/SpringApp.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/app/templates/src/common/CommandHandler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/app/templates/src/common/CommandHandler.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../generators/app/templates/root/src/main/resources/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../generators/app/templates/root/src/main/resources/db/migration/V1__create_table.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../generators/aggregates/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/aggregates/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../generators/slices/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/slices/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/CommandHandler.kt.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/slices/templates/src/components/CommandHandler.kt.tpl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/Event.kt.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/slices/templates/src/components/Event.kt.tpl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../generators/slices/templates/src/components/RestResource.kt.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/../generators/slices/templates/src/components/RestResource.kt.tpl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -183,6 +172,7 @@
       <workItem from="1709935365677" duration="57000" />
       <workItem from="1709936119757" duration="14000" />
       <workItem from="1709936161467" duration="4000" />
+      <workItem from="1709936778768" duration="93000" />
     </task>
     <servers />
   </component>

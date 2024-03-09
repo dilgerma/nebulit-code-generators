@@ -1,4 +1,4 @@
-package <%= _rootPackageName%>.<%=_slice%>
+package <%= _rootPackageName%>.slices.<%=_slice%>
 
 import <%= _rootPackageName%>.common.DelegatingCommandHandler
 import <%= _rootPackageName%>.<%= _slice%>.<%= _command%>

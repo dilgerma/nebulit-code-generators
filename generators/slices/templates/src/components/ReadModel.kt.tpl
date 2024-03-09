@@ -1,4 +1,4 @@
-package <%= _rootPackageName%>.<%=_slice%>
+package <%= _rootPackageName%>.slices.<%=_slice%>
 
 import <%= _rootPackageName%>.common.ReadModel
 import <%= _rootPackageName%>.common.persistence.InternalEvent

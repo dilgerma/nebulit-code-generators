@@ -4,7 +4,7 @@ import com.thoughtworks.xstream.XStream
 import <%= rootPackageName%>.common.Event
 import jakarta.persistence.*
 import org.hibernate.annotations.JdbcTypeCode
-import org.springframework.data.annotation.CreatedDate
+import org.hibernate.annotations.CreationTimestamp
 import org.springframework.data.repository.CrudRepository
 import java.sql.Types
 import java.time.LocalDateTime
@@ -33,7 +33,7 @@ open class InternalEvent {
     @Version
     open var version: Int? = null
 
-    @CreatedDate
+    @CreationTimestamp
     open var created: LocalDateTime? = null
 
 }
