@@ -3,32 +3,32 @@ package de.nebulit.todo.support
 import de.nebulit.todo.common.AggregateService
 import de.nebulit.todo.common.persistence.EventsEntityRepository
 import de.nebulit.todo.common.persistence.InternalEvent
-import de.nebulit.todo.domain.TodoAggregate
+import de.nebulit.todo.domain.ToDoAggregate
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
-interface TodoRepository : CrudRepository<TodoAggregate, Long> {
-    fun findByAggregateId(aggregateId: UUID): TodoAggregate?
+interface ToDoAggregateRepository : CrudRepository<ToDoAggregate, Long> {
+    fun findByAggregateId(aggregateId: UUID): ToDoAggregate?
 }
 
 
 @Component
-class TodoAggregateService(
-    var todoRepository: TodoRepository,
+class ToDoAggregateService(
+    var repository: ToDoAggregateRepository,
     var eventsEntityRepository: EventsEntityRepository,
-) : AggregateService<TodoAggregate> {
+) : AggregateService<ToDoAggregate> {
 
     @Transactional
-    override fun persist(todo: TodoAggregate) {
-        todoRepository.save(todo)
-        eventsEntityRepository.saveAll(todo.events)
+    override fun persist(aggregate: ToDoAggregate) {
+        repository.save(aggregate)
+        eventsEntityRepository.saveAll(aggregate.events)
 
     }
 
-    override fun findByAggregateId(aggregateId: UUID): TodoAggregate? {
-        return todoRepository.findByAggregateId(aggregateId)
+    override fun findByAggregateId(aggregateId: UUID): ToDoAggregate? {
+        return repository.findByAggregateId(aggregateId)
     }
 
     override fun findEventsByAggregateId(aggregateId: UUID): List<InternalEvent> {

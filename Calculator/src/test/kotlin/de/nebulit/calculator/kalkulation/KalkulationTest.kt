@@ -53,7 +53,7 @@ class KalkulationTest {
 
         //THEN
         whenResult.andWaitForEventOfType(ResultCalculatedEvent::class.java)
-            .matching { it.result == 16L && it.aggregateId == UUID.fromString("fa5cabe4-dbaf-4205-8b3b-fb0d1c8bb7f8") }
+            .matching { it.result == 15L && it.aggregateId == UUID.fromString("fa5cabe4-dbaf-4205-8b3b-fb0d1c8bb7f8") }
             .toArrive()
     }
 

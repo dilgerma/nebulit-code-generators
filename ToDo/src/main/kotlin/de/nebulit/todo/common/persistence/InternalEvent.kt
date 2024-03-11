@@ -3,9 +3,8 @@ package de.nebulit.todo.common.persistence
 import com.thoughtworks.xstream.XStream
 import de.nebulit.todo.common.Event
 import jakarta.persistence.*
-import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.JdbcTypeCode
-import org.springframework.data.annotation.CreatedDate
+import org.hibernate.annotations.CreationTimestamp
 import org.springframework.data.repository.CrudRepository
 import java.sql.Types
 import java.time.LocalDateTime

@@ -1,0 +1,331 @@
+var Generator = require('yeoman-generator');
+var chalk = require('chalk');
+var slugify = require('slugify')
+var config = require('./../../config.json')
+const {answers} = require("../app");
+const {slice} = require("../slices");
+const {givenAnswers} = require("./index");
+const { v4: uuidv4 } = require('uuid');
+
+
+function _sliceTitle(title) {
+    return slugify(title.replace("slice:", "")).toLowerCase()
+}
+
+module.exports = class extends Generator {
+
+    constructor(args, opts) {
+        super(args, opts);
+        this.givenAnswers = opts.answers
+    }
+
+    async prompting() {
+        var specsFromSlice = config?.slices.filter((slice) => slice.title == this.givenAnswers.slice).flatMap(item => item.specifications)?.map(item => item.title)
+        if (specsFromSlice.length > 0) {
+            this.answers = await this.prompt([
+                {
+                    type: 'checkbox',
+                    name: 'specifications',
+                    message: 'Welche Specifications sollen generiert werden?',
+                    choices: specsFromSlice
+                }]);
+        } else {
+            this.log(chalk.blue('Keine Specifications definiert!'))
+        }
+
+    }
+
+    writeSpecifications() {
+        //this.answers.slices.forEach((slice) => {
+        if (this.answers.specifications.length > 0) {
+
+            this._writeSpecifications(this.answers.specifications);
+        }
+        //});
+    }
+
+    _writeSpecifications(specifications) {
+        var slice = this._findSlice(this.givenAnswers.slice)
+        var title = _sliceTitle(slice.title).toLowerCase()
+
+        slice.specifications?.filter((specification) => specifications.includes(specification.title)).forEach((specification) => {
+            var specificationName = _specificationTitle(capitalizeFirstCharacter(slugify(specification.title)))
+
+            var given = specification.given
+            var when = specification.when
+            var then = specification.then
+
+            var allElements = given.concat(when).concat(then)
+            var allFields = allElements.flatMap((item) => item.fields)
+            var _elementImports = generateImports(this.givenAnswers.rootPackageName, title, allElements)
+            var _typeImports = typeImports(allFields)
+            var aggregateId = uuidv4()
+            this.fs.copyTpl(
+                this.templatePath(`src/components/Specification.kt.tpl`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/test/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${specificationName}.kt`),
+                {
+                    _slice: title,
+                    _rootPackageName: this.givenAnswers.rootPackageName,
+                    _name: specificationName,
+                    _elementImports: _elementImports,
+                    _typeImports: _typeImports,
+                    _given: renderGiven(given),
+                    _when: renderWhen(when),
+                    _then: renderThen(then),
+                    _aggregate: _aggregateTitle(this.givenAnswers.aggregate),
+                    _aggregateId: aggregateId
+
+                }
+            )
+        })
+
+
+    }
+
+
+    _findSlice(sliceName) {
+        return config.slices.find((item) => item.title === sliceName)
+    }
+
+
+};
+
+
+const typeMapping = (fieldType, fieldCardinality) => {
+    var fieldType;
+    switch (fieldType?.toLowerCase()) {
+        case "string":
+            fieldType = "String";
+            break
+        case "double":
+            fieldType = "Double";
+            break
+        case "long":
+            fieldType = "Long";
+            break
+        case "boolean":
+            fieldType = "Boolean";
+            break
+        case "date":
+            fieldType = "LocalDate";
+            break
+        case "uuid":
+            fieldType = "UUID";
+            break
+        case "custom":
+            fieldType = "CUSTOM";
+            break
+        default:
+            fieldType = "String";
+            break
+    }
+    if (fieldCardinality?.toLowerCase() === "list") {
+        return `List<${fieldType}>`
+    } else {
+        return fieldType
+    }
+
+}
+
+const generateImports = (rootPackageName, sliceName, elements) => {
+    var imports = elements?.map((element) => {
+        switch (element.type?.toLowerCase()) {
+            case "spec_event":
+                return `import ${rootPackageName}.events.${_eventTitle(element.title)}`
+            case "spec_command":
+                return `import ${rootPackageName}.${sliceName}.internal.${_commandTitle(element.title)}`
+            case "spec_readmodel":
+                return `import ${rootPackageName}.${sliceName}.internal.${_readmodelTitle(element.title)}`
+            default:
+                console.log("Could not determine imports")
+                return ""
+        }
+    })
+    return Array.from(new Set(imports))?.flat()?.join(";\n")
+}
+
+const typeImports = (fields) => {
+    var imports = fields?.map((field) => {
+        switch (field?.type?.toLowerCase()) {
+            case "date":
+                return ["import java.time.LocalDate", "import org.springframework.format.annotation.DateTimeFormat"]
+            case "uuid":
+                return ["import java.util.UUID"]
+            default:
+                return []
+        }
+        switch (field?.cardinality?.toLowerCase()) {
+            case "LIST":
+                return ["java.util.List"]
+            default:
+                return []
+        }
+    })
+    return Array.from(new Set(imports?.flat()))?.join(";\n")
+
+}
+
+const invocation = (type, fields) => {
+    return `new ${type}(${fields.map((it) => variableNameOrMapping(it)).join(",")})`
+}
+
+const receiverInvocation = (type, receiver) => {
+    return `new ${type.title}(${type.fields.map((it) => receiver + "." + variableNameOrMapping(it)).join(",")})`
+}
+
+const variableNameOrMapping = (field) => {
+    return (field.mapping && field.mapping !== "") ? field.mapping : field.name
+}
+
+const packageName = (type) => {
+    switch (type.type) {
+        case "COMMAND":
+            return "commands"
+        case "EVENT":
+            return "events"
+        case "READMODEL":
+            return "readmodels"
+    }
+}
+
+
+const defaultValue = (type, cardinality = "single") => {
+    switch (type.toLowerCase()) {
+        case "string":
+            return cardinality.toLowerCase() === "list" ? "[]" : "\"\""
+        case "boolean":
+            return cardinality.toLowerCase() === "list" ? "[]" : "false"
+    }
+}
+
+
+function toCamelCase(prefix, variableName) {
+    return (prefix + variableName).replace(/_([a-z])/g, function (match, group1) {
+        return group1.toUpperCase();
+    });
+}
+
+function _specificationTitle(title) {
+    var adjustedTitle = title.replace("Spec:", "").replace("-", "").trim()
+    return `${capitalizeFirstCharacter(adjustedTitle)}Test`
+}
+
+function _aggregateTitle(title) {
+    return `${capitalizeFirstCharacter(title)}Aggregate`
+}
+
+function _commandTitle(title) {
+    return `${capitalizeFirstCharacter(title)}Command`
+}
+
+function _restResourceTitle(title) {
+    return `${capitalizeFirstCharacter(title)}RestController`
+}
+
+function _readmodelTitle(title) {
+    return `${capitalizeFirstCharacter(title)}ReadModel`
+}
+
+function _eventTitle(title) {
+    return `${capitalizeFirstCharacter(title)}Event`
+}
+
+function capitalizeFirstCharacter(inputString) {
+    // Check if the string is not empty
+    if (inputString.length > 0) {
+        // Capitalize the first character and concatenate the rest of the string
+        return inputString.charAt(0).toUpperCase() + inputString.slice(1);
+    } else {
+        // Return an empty string if the input is empty
+        return "";
+    }
+}
+
+function renderWhen(whenList) {
+    return whenList.map((command) => {
+        return `var whenResult = scenario.stimulate { _ ->
+            commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields)}))`
+    }).join("\n")
+}
+
+function renderThen(thenList) {
+    return thenList.map((item) => {
+        if (item.type == "SPEC_EVENT") {
+
+            return `whenResult.andWaitForEventOfType(${_eventTitle(item.title)}::class.java)
+                        ${assertionList(item.fields)}.toArrive()`
+
+        } else if (item.type == "SPEC_READMODEL") {
+
+        }
+
+    }).join("\n")
+}
+
+
+function renderWhen(whenList) {
+    return whenList.map((command) => {
+        return `var whenResult = scenario.stimulate { _ ->
+            commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields)}))}`
+    }).join("\n")
+}
+
+function renderGiven(givenList) {
+    return givenList.map((event) => {
+
+        return `
+         repository.save(RandomData.newInstance(listOf("value")) {
+                this.value = ${_eventTitle(event.title)}(
+                    ${randomizedInvocationParamterList(event.fields)}
+                )
+            })
+        `
+    }).join("\n")
+
+
+}
+
+function renderVariable(variableValue, variableType) {
+    switch (variableType.toLowerCase()) {
+        case "uuid":
+            return `UUID.fromString("${variableValue}")`
+        case "string":
+            return `"${variableValue}"`
+        case "date":
+            return `LocalDate.parse("${variableValue}")`
+        case "boolean":
+        case "long":
+            return `${variableValue}L`
+        case "double":
+        case "int":
+            return `${variableValue}`
+    }
+}
+
+function randomizedInvocationParamterList(variables, defaults) {
+
+    return variables.map((variable) => {
+        if (variable.example !== "") {
+            return `\t${variable.name} = ${renderVariable(variable.example, variable.type, defaults)}`;
+        } else {
+            return `\t${variable.name} = RandomData.newInstance {  }`;
+        }
+    }).join(",\n");
+
+}
+
+function assertionList(variables) {
+    if (variables.some((it) => it.example !== "")) {
+        var assertions = variables.map((variable) => {
+            if (variable.example !== "") {
+                return `\tit.${variable.name} == ${renderVariable(variable.example, variable.type)}`;
+            }
+        }).join("&&");
+        return `.matching { ${assertions} }`;
+    } else {
+        return ""
+    }
+
+
+}
+

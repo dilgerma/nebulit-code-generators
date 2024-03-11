@@ -7,7 +7,7 @@
   },
   "generator-prototype": {
     "promptValues": {
-      "appName": "Todo2",
+      "appName": "Todo",
       "rootPackage": "de.nebulit.test",
       "rootPackageName": "de.nebulit.todo"
     }

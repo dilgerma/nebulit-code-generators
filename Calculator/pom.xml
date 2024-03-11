@@ -141,13 +141,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Spring Kafka Test Dependencies -->
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Mocking Dependencies -->
         <dependency>
             <groupId>io.mockk</groupId>
@@ -188,6 +181,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
             </plugin>
             <!-- Kotlin Maven Plugin -->
             <plugin>

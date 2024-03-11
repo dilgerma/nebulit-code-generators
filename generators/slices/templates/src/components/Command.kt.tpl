@@ -1,4 +1,4 @@
-package <%= _rootPackageName%>.slices.<%=_slice%>
+package <%= _rootPackageName%>.<%=_slice%>.internal
 
 import <%= _rootPackageName%>.common.Command
 <%= _typeImports %>

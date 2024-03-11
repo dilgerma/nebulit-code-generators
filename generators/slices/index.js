@@ -34,8 +34,12 @@ module.exports = class extends Generator {
             {
                 type: 'list',
                 name: 'aggregate',
-                message: `Aggregate auswählen?`,
+                message: `Zugehöriges Aggregate auswählen?`,
                 choices: aggregates
+            }, {
+                type: 'confirm',
+                name: 'specifications',
+                message: 'Sollen Specifications generiert werden?',
             }]);
 
     }
@@ -78,7 +82,7 @@ module.exports = class extends Generator {
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/CommandHandler.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/slices/${title}/${command.title}CommandHandler.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${command.title}CommandHandler.kt`),
                 {
                     _slice: title,
                     _commandType: this._commandTitle(command.title),
@@ -106,7 +110,7 @@ module.exports = class extends Generator {
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/Command.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/slices/${title}/${this._commandTitle(command.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._commandTitle(command.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -170,7 +174,7 @@ module.exports = class extends Generator {
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/ReadModel.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/slices/${title}/${this._readmodelTitle(readmodel.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._readmodelTitle(readmodel.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -203,7 +207,7 @@ module.exports = class extends Generator {
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/RestResource.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/slices/${title}/${this._restResourceTitle(command.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._restResourceTitle(command.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -224,6 +228,16 @@ module.exports = class extends Generator {
 
     }
 
+    writeSpecifications() {
+        if (this.answers.specifications) {
+            this.log(chalk.green('starting Specification Generation'))
+            this.composeWith(require.resolve('../specifications'), {
+                answers: {...this.answers,...this.givenAnswers},
+                appName: this.answers.appName ?? this.appName
+            });
+        }
+    }
+
     _aggregateTitle(title) {
         return `${capitalizeFirstCharacter(title)}Aggregate`
     }
@@ -233,7 +247,7 @@ module.exports = class extends Generator {
     }
 
     _restResourceTitle(title) {
-        return `${capitalizeFirstCharacter(title)}RestController`
+        return `${capitalizeFirstCharacter(title)}Ressource`
     }
 
     _readmodelTitle(title) {

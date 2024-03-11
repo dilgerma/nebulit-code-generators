@@ -3,87 +3,10 @@
   "slices": [
     {
       "id": "",
-      "title": "slice: ActiveSessions",
-      "commands": [],
-      "events": [],
-      "readmodels": [
-        {
-          "id": "3458764581665769471",
-          "title": "ActiveSession",
-          "fields": [
-            {
-              "name": "name",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "sessionId",
-              "type": "String",
-              "example": "",
-              "mapping": "aggregateId",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "READMODEL"
-        }
-      ],
-      "screens": [],
-      "automations": []
-    },
-    {
-      "id": "",
-      "title": "slice: ResolvedTodoReport",
-      "commands": [],
-      "events": [],
-      "readmodels": [
-        {
-          "id": "3458764581459072616",
-          "title": "ResolvedTodos",
-          "fields": [
-            {
-              "name": "taskNames",
-              "type": "String",
-              "example": "TODO 2",
-              "mapping": "taskName",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "READMODEL"
-        }
-      ],
-      "screens": [
-        {
-          "id": "3458764581459881521",
-          "title": "screen",
-          "fields": [
-            {
-              "name": "taskNames",
-              "type": "String",
-              "example": "",
-              "mapping": "taskName",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "SCREEN"
-        }
-      ],
-      "automations": []
-    },
-    {
-      "id": "",
       "title": "slice: ResolveTODO",
       "commands": [
         {
-          "id": "3458764581458806531",
+          "id": "3458764581756874082",
           "title": "CloseTodo",
           "fields": [
             {
@@ -113,7 +36,7 @@
       ],
       "events": [
         {
-          "id": "3458764581457116252",
+          "id": "3458764581756874067",
           "title": "TodoDone",
           "fields": [
             {
@@ -143,7 +66,8 @@
       ],
       "readmodels": [],
       "screens": [],
-      "automations": []
+      "automations": [],
+      "specifications": []
     },
     {
       "id": "",
@@ -152,7 +76,7 @@
       "events": [],
       "readmodels": [
         {
-          "id": "3458764581457259853",
+          "id": "3458764581756874070",
           "title": "ActiveTodos",
           "fields": [
             {
@@ -175,7 +99,7 @@
       ],
       "screens": [
         {
-          "id": "3458764581458174121",
+          "id": "3458764581756874062",
           "title": "screen",
           "fields": [
             {
@@ -196,14 +120,15 @@
           "type": "SCREEN"
         }
       ],
-      "automations": []
+      "automations": [],
+      "specifications": []
     },
     {
       "id": "",
       "title": "slice: AddTOdo",
       "commands": [
         {
-          "id": "3458764581457116724",
+          "id": "3458764581756874068",
           "title": "AddTodo",
           "fields": [
             {
@@ -233,7 +158,7 @@
       ],
       "events": [
         {
-          "id": "3458764581457116249",
+          "id": "3458764581756874066",
           "title": "TodoAdded",
           "fields": [
             {
@@ -264,7 +189,7 @@
       "readmodels": [],
       "screens": [
         {
-          "id": "3458764581457362984",
+          "id": "3458764581756874071",
           "title": "screen",
           "fields": [
             {
@@ -299,14 +224,15 @@
           "type": "SCREEN"
         }
       ],
-      "automations": []
+      "automations": [],
+      "specifications": []
     },
     {
       "id": "",
       "title": "slice: StartSession",
       "commands": [
         {
-          "id": "3458764581665640097",
+          "id": "3458764581756874097",
           "title": "StartSession",
           "fields": [
             {
@@ -329,7 +255,7 @@
       ],
       "events": [
         {
-          "id": "3458764581665640098",
+          "id": "3458764581756874098",
           "title": "SessionStarted",
           "fields": [
             {
@@ -353,7 +279,7 @@
       "readmodels": [],
       "screens": [
         {
-          "id": "3458764581666373225",
+          "id": "3458764581756874104",
           "title": "screen",
           "fields": [
             {
@@ -374,29 +300,153 @@
           "type": "SCREEN"
         }
       ],
-      "automations": []
+      "automations": [],
+      "specifications": [
+        {
+          "sliceName": "slice: StartSession",
+          "title": "spec: StartSession",
+          "given": [],
+          "when": [
+            {
+              "title": "StartSession",
+              "id": "3458764581798862821",
+              "type": "SPEC_COMMAND",
+              "fields": [
+                {
+                  "name": "name",
+                  "type": "String",
+                  "example": "Martin"
+                },
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": "ebd0188e-41c5-4375-acfc-2f68bda208f9"
+                }
+              ]
+            }
+          ],
+          "then": [
+            {
+              "title": "SessionStarted",
+              "id": "3458764581798862822",
+              "type": "SPEC_EVENT",
+              "fields": [
+                {
+                  "name": "name",
+                  "type": "String",
+                  "example": "Martin"
+                },
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": "ebd0188e-41c5-4375-acfc-2f68bda208f9"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "",
+      "title": "slice: ResolvedTodoReport",
+      "commands": [],
+      "events": [],
+      "readmodels": [
+        {
+          "id": "3458764581756874085",
+          "title": "ResolvedTodos",
+          "fields": [
+            {
+              "name": "taskNames",
+              "type": "String",
+              "example": "TODO 2",
+              "mapping": "taskName",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL"
+        }
+      ],
+      "screens": [
+        {
+          "id": "3458764581756874087",
+          "title": "screen",
+          "fields": [
+            {
+              "name": "taskNames",
+              "type": "String",
+              "example": "",
+              "mapping": "taskName",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "SCREEN"
+        }
+      ],
+      "automations": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: ActiveSessions",
+      "commands": [],
+      "events": [],
+      "readmodels": [
+        {
+          "id": "3458764581756874100",
+          "title": "ActiveSession",
+          "fields": [
+            {
+              "name": "name",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "sessionId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "aggregateId",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL"
+        }
+      ],
+      "screens": [],
+      "automations": [],
+      "specifications": []
     }
   ],
   "aggregates": [
     {
-      "id": "3458764581699926675",
-      "title": "ToDo2",
+      "id": "3458764581756874054",
+      "title": "ToDo",
       "fields": [],
       "type": "AGGREGATE"
     }
   ],
   "sliceDependencies": [
     {
-      "source": "slice: ActiveSessions",
-      "target": "slice: AddTOdo"
+      "source": "slice: TodoReport",
+      "target": "slice: TodoReport"
     },
     {
       "source": "slice: ResolvedTodoReport",
       "target": "slice: ResolvedTodoReport"
     },
     {
-      "source": "slice: TodoReport",
-      "target": "slice: TodoReport"
+      "source": "slice: ActiveSessions",
+      "target": "slice: AddTOdo"
     }
   ]
 }
