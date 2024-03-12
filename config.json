@@ -320,7 +320,7 @@
                 {
                   "name": "aggregateId",
                   "type": "UUID",
-                  "example": "ebd0188e-41c5-4375-acfc-2f68bda208f9"
+                  "example": ""
                 }
               ]
             }
@@ -339,7 +339,7 @@
                 {
                   "name": "aggregateId",
                   "type": "UUID",
-                  "example": "ebd0188e-41c5-4375-acfc-2f68bda208f9"
+                  "example": ""
                 }
               ]
             }

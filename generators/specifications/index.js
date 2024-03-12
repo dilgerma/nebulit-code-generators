@@ -60,6 +60,9 @@ module.exports = class extends Generator {
             var _elementImports = generateImports(this.givenAnswers.rootPackageName, title, allElements)
             var _typeImports = typeImports(allFields)
             var aggregateId = uuidv4()
+            var defaults = {
+                "aggregateId": aggregateId
+            }
             this.fs.copyTpl(
                 this.templatePath(`src/components/Specification.kt.tpl`),
                 this.destinationPath(`${this.givenAnswers?.appName}/src/test/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${specificationName}.kt`),
@@ -69,9 +72,9 @@ module.exports = class extends Generator {
                     _name: specificationName,
                     _elementImports: _elementImports,
                     _typeImports: _typeImports,
-                    _given: renderGiven(given),
-                    _when: renderWhen(when),
-                    _then: renderThen(then),
+                    _given: renderGiven(given, defaults),
+                    _when: renderWhen(when, defaults),
+                    _then: renderThen(then, defaults),
                     _aggregate: _aggregateTitle(this.givenAnswers.aggregate),
                     _aggregateId: aggregateId
 
@@ -189,13 +192,16 @@ const packageName = (type) => {
 }
 
 
-const defaultValue = (type, cardinality = "single") => {
+const defaultValue = (type, cardinality = "single", name, defaults) => {
+    if (cardinality === "single" && defaults[name]) {
+        return renderVariable(defaults[name],type, name, defaults)
+    }
     switch (type.toLowerCase()) {
         case "string":
-            return cardinality.toLowerCase() === "list" ? "[]" : "\"\""
+            return cardinality.toLowerCase() === "list" ? "[]" : "\"\"";
         case "boolean":
-            return cardinality.toLowerCase() === "list" ? "[]" : "false"
-    }
+            return cardinality.toLowerCase() === "list" ? "[]" : "false";
+        }
 }
 
 
@@ -241,19 +247,13 @@ function capitalizeFirstCharacter(inputString) {
     }
 }
 
-function renderWhen(whenList) {
-    return whenList.map((command) => {
-        return `var whenResult = scenario.stimulate { _ ->
-            commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields)}))`
-    }).join("\n")
-}
 
-function renderThen(thenList) {
+function renderThen(thenList, defaults) {
     return thenList.map((item) => {
         if (item.type == "SPEC_EVENT") {
 
             return `whenResult.andWaitForEventOfType(${_eventTitle(item.title)}::class.java)
-                        ${assertionList(item.fields)}.toArrive()`
+                        ${assertionList(item.fields, defaults)}.toArrive()`
 
         } else if (item.type == "SPEC_READMODEL") {
 
@@ -263,20 +263,20 @@ function renderThen(thenList) {
 }
 
 
-function renderWhen(whenList) {
+function renderWhen(whenList, defaults) {
     return whenList.map((command) => {
         return `var whenResult = scenario.stimulate { _ ->
-            commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields)}))}`
+            commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}`
     }).join("\n")
 }
 
-function renderGiven(givenList) {
+function renderGiven(givenList, defaults) {
     return givenList.map((event) => {
 
         return `
          repository.save(RandomData.newInstance(listOf("value")) {
                 this.value = ${_eventTitle(event.title)}(
-                    ${randomizedInvocationParamterList(event.fields)}
+                    ${randomizedInvocationParamterList(event.fields, defaults)}
                 )
             })
         `
@@ -285,20 +285,24 @@ function renderGiven(givenList) {
 
 }
 
-function renderVariable(variableValue, variableType) {
+function renderVariable(variableValue, variableType, variableName, defaults) {
+    var value = variableValue
+    if (!variableValue && defaults[variableName]) {
+        value = defaults[variableName]
+    }
     switch (variableType.toLowerCase()) {
         case "uuid":
-            return `UUID.fromString("${variableValue}")`
+            return `UUID.fromString("${value}")`;
         case "string":
-            return `"${variableValue}"`
+            return `"${value}"`;
         case "date":
-            return `LocalDate.parse("${variableValue}")`
+            return `LocalDate.parse("${value}")`;
         case "boolean":
         case "long":
-            return `${variableValue}L`
+            return `${value}L`;
         case "double":
         case "int":
-            return `${variableValue}`
+            return `${value}`;
     }
 }
 
@@ -306,19 +310,25 @@ function randomizedInvocationParamterList(variables, defaults) {
 
     return variables.map((variable) => {
         if (variable.example !== "") {
-            return `\t${variable.name} = ${renderVariable(variable.example, variable.type, defaults)}`;
+            return `\t${variable.name} = ${renderVariable(variable.example, variable.type, variable.name, defaults)}`;
         } else {
-            return `\t${variable.name} = RandomData.newInstance {  }`;
+            if (Object.keys(defaults).includes(variable.name)) {
+                return `\t${variable.name} = ${defaultValue(variable.type, variable.cardinality, variable.name, defaults)}`;
+            } else {
+                return `\t${variable.name} = RandomData.newInstance {  }`;
+            }
         }
     }).join(",\n");
 
 }
 
-function assertionList(variables) {
+function assertionList(variables, defaults) {
     if (variables.some((it) => it.example !== "")) {
         var assertions = variables.map((variable) => {
             if (variable.example !== "") {
-                return `\tit.${variable.name} == ${renderVariable(variable.example, variable.type)}`;
+                return `\tit.${variable.name} == ${renderVariable(variable.example, variable.type, variable.name, defaults)}`;
+            } else if (variable.example === "" && defaults[variable.name]) {
+                return `\tit.${variable.name} == ${renderVariable(defaults[variable.name], variable.type, variable.name, defaults)}`;
             }
         }).join("&&");
         return `.matching { ${assertions} }`;

@@ -8,6 +8,7 @@ import <%= _rootPackageName%>.support.<%=_aggregate%>Repository
 <%= _elementImports%>
 <%= _typeImports%>
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import <%= _rootPackageName%>.common.support.RandomData
@@ -29,7 +30,7 @@ class <%=_name%> {
     @BeforeEach
     fun setUp() {
         aggregateRepository.save(RandomData.newInstance(listOf("events")) {
-            this.aggregateId = UUID.fromString(<%=_aggregateId%>)
+            this.aggregateId = UUID.fromString("<%=_aggregateId%>")
         })
     }
 
