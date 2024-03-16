@@ -3,24 +3,17 @@
   "slices": [
     {
       "id": "",
-      "title": "slice: ResolveTODO",
+      "title": "slice: Setze Operation",
       "commands": [
         {
-          "id": "3458764581756874082",
-          "title": "CloseTodo",
+          "id": "3458764581771485461",
+          "title": "SetzeOperation",
           "fields": [
             {
-              "name": "resolvedDate",
-              "type": "Date",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "taskName",
+              "name": "operation",
               "type": "String",
               "example": "",
-              "mapping": "taskName",
+              "mapping": "",
               "cardinality": "Single"
             },
             {
@@ -36,19 +29,140 @@
       ],
       "events": [
         {
-          "id": "3458764581756874067",
-          "title": "TodoDone",
+          "id": "3458764581771485356",
+          "title": "OperationGEsetzt",
           "fields": [
             {
-              "name": "taskName",
+              "name": "operation",
               "type": "String",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
             },
             {
-              "name": "resolvedDate",
-              "type": "Date",
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT"
+        }
+      ],
+      "readmodels": [],
+      "screens": [],
+      "automations": [],
+      "specifications": [
+        {
+          "sliceName": "slice: Setze Operation",
+          "title": "spec: scenario",
+          "given": [],
+          "when": [
+            {
+              "title": "SetzeOperation",
+              "id": "3458764582483636342",
+              "type": "SPEC_COMMAND",
+              "fields": [
+                {
+                  "name": "operation",
+                  "type": "String",
+                  "example": "+"
+                },
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": "foo"
+                }
+              ]
+            }
+          ],
+          "then": [
+            {
+              "title": "Error-Case",
+              "id": "3458764582483636343",
+              "type": "SPEC_ERROR"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "",
+      "title": "slice: SetzeZahl",
+      "commands": [
+        {
+          "id": "3458764581772151205",
+          "title": "SetzeZahl",
+          "fields": [
+            {
+              "name": "zahl",
+              "type": "Long",
+              "example": "5",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND"
+        },
+        {
+          "id": "3458764581770988197",
+          "title": "SetzeZahl",
+          "fields": [
+            {
+              "name": "zahl",
+              "type": "Long",
+              "example": "5",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND"
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764581770988105",
+          "title": "ZahlGesetzt",
+          "fields": [
+            {
+              "name": "zahl",
+              "type": "Long",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT"
+        },
+        {
+          "id": "3458764581772151204",
+          "title": "ZahlGesetzt",
+          "fields": [
+            {
+              "name": "zahl",
+              "type": "Long",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
@@ -71,76 +185,75 @@
     },
     {
       "id": "",
-      "title": "slice: TodoReport",
+      "title": "slice: slice",
       "commands": [],
       "events": [],
       "readmodels": [
         {
-          "id": "3458764581756874070",
-          "title": "ActiveTodos",
+          "id": "3458764581785608200",
+          "title": "OperationInput",
           "fields": [
             {
-              "name": "taskNames",
+              "name": "operation",
               "type": "String",
               "example": "",
-              "mapping": "taskName",
-              "cardinality": "List"
+              "mapping": "",
+              "cardinality": "Single"
             },
             {
               "name": "aggregateId",
               "type": "UUID",
               "example": "",
               "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "zahl1",
+              "type": "Long",
+              "example": "",
+              "mapping": "zahl",
+              "cardinality": "Single"
+            },
+            {
+              "name": "zahl2",
+              "type": "Long",
+              "example": "",
+              "mapping": "zahl",
               "cardinality": "Single"
             }
           ],
           "type": "READMODEL"
         }
       ],
-      "screens": [
-        {
-          "id": "3458764581756874062",
-          "title": "screen",
-          "fields": [
-            {
-              "name": "taskName",
-              "type": "String",
-              "example": "",
-              "mapping": "taskNames",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "SCREEN"
-        }
-      ],
+      "screens": [],
       "automations": [],
       "specifications": []
     },
     {
       "id": "",
-      "title": "slice: AddTOdo",
+      "title": "slice:Kalkulation",
       "commands": [
         {
-          "id": "3458764581756874068",
-          "title": "AddTodo",
+          "id": "3458764581772596309",
+          "title": "Calculate",
           "fields": [
             {
-              "name": "taskName",
-              "type": "String",
+              "name": "zahl1",
+              "type": "Long",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
             },
             {
-              "name": "createdDate",
-              "type": "Date",
+              "name": "zahl2",
+              "type": "Long",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "operation",
+              "type": "String",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
@@ -158,21 +271,14 @@
       ],
       "events": [
         {
-          "id": "3458764581756874066",
-          "title": "TodoAdded",
+          "id": "3458764581772596047",
+          "title": "ResultCalculated",
           "fields": [
             {
-              "name": "taskName",
-              "type": "String",
+              "name": "result",
+              "type": "Long",
               "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "createdDate",
-              "type": "Date",
-              "example": "",
-              "mapping": "",
+              "mapping": "operation",
               "cardinality": "Single"
             },
             {
@@ -187,66 +293,23 @@
         }
       ],
       "readmodels": [],
-      "screens": [
-        {
-          "id": "3458764581756874071",
-          "title": "screen",
-          "fields": [
-            {
-              "name": "taskName",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "sessionId",
-              "cardinality": "Single"
-            },
-            {
-              "name": "createdDate",
-              "type": "Date",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "name",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "SCREEN"
-        }
-      ],
+      "screens": [],
       "automations": [],
       "specifications": []
     },
     {
       "id": "",
-      "title": "slice: StartSession",
+      "title": "slice: SessionStart",
       "commands": [
         {
-          "id": "3458764581756874097",
-          "title": "StartSession",
+          "id": "3458764581775227584",
+          "title": "StarteSession",
           "fields": [
-            {
-              "name": "name",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
             {
               "name": "aggregateId",
               "type": "UUID",
               "example": "",
-              "mapping": "sessionId",
+              "mapping": "",
               "cardinality": "Single"
             }
           ],
@@ -255,21 +318,14 @@
       ],
       "events": [
         {
-          "id": "3458764581756874098",
+          "id": "3458764581775290134",
           "title": "SessionStarted",
           "fields": [
             {
-              "name": "name",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
               "name": "aggregateId",
               "type": "UUID",
               "example": "",
-              "mapping": "sessionId",
+              "mapping": "",
               "cardinality": "Single"
             }
           ],
@@ -277,91 +333,50 @@
         }
       ],
       "readmodels": [],
-      "screens": [
-        {
-          "id": "3458764581756874104",
-          "title": "screen",
-          "fields": [
-            {
-              "name": "sessionId",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "name",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "SCREEN"
-        }
-      ],
+      "screens": [],
       "automations": [],
-      "specifications": [
-        {
-          "sliceName": "slice: StartSession",
-          "title": "spec: StartSession",
-          "given": [],
-          "when": [
-            {
-              "title": "StartSession",
-              "id": "3458764581798862821",
-              "type": "SPEC_COMMAND",
-              "fields": [
-                {
-                  "name": "name",
-                  "type": "String",
-                  "example": "Martin"
-                },
-                {
-                  "name": "aggregateId",
-                  "type": "UUID",
-                  "example": ""
-                }
-              ]
-            }
-          ],
-          "then": [
-            {
-              "title": "SessionStarted",
-              "id": "3458764581798862822",
-              "type": "SPEC_EVENT",
-              "fields": [
-                {
-                  "name": "name",
-                  "type": "String",
-                  "example": "Martin"
-                },
-                {
-                  "name": "aggregateId",
-                  "type": "UUID",
-                  "example": ""
-                }
-              ]
-            }
-          ]
-        }
-      ]
+      "specifications": []
     },
     {
       "id": "",
-      "title": "slice: ResolvedTodoReport",
+      "title": "slice: Anzeige Ergebnis",
       "commands": [],
       "events": [],
       "readmodels": [
         {
-          "id": "3458764581756874085",
-          "title": "ResolvedTodos",
+          "id": "3458764581772894000",
+          "title": "ResultModel",
           "fields": [
             {
-              "name": "taskNames",
-              "type": "String",
-              "example": "TODO 2",
-              "mapping": "taskName",
+              "name": "result",
+              "type": "Long",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL"
+        }
+      ],
+      "screens": [],
+      "automations": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: Anzeige Zah",
+      "commands": [],
+      "events": [],
+      "readmodels": [
+        {
+          "id": "3458764581771343314",
+          "title": "AktuelleZahl",
+          "fields": [
+            {
+              "name": "zahl",
+              "type": "Long",
+              "example": "",
+              "mapping": "",
               "cardinality": "Single"
             },
             {
@@ -375,47 +390,25 @@
           "type": "READMODEL"
         }
       ],
-      "screens": [
-        {
-          "id": "3458764581756874087",
-          "title": "screen",
-          "fields": [
-            {
-              "name": "taskNames",
-              "type": "String",
-              "example": "",
-              "mapping": "taskName",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "SCREEN"
-        }
-      ],
+      "screens": [],
       "automations": [],
       "specifications": []
     },
     {
       "id": "",
-      "title": "slice: ActiveSessions",
+      "title": "slice: Anzeige Operation",
       "commands": [],
       "events": [],
       "readmodels": [
         {
-          "id": "3458764581756874100",
-          "title": "ActiveSession",
+          "id": "3458764581771708811",
+          "title": "AktuelleOperation",
           "fields": [
             {
-              "name": "name",
+              "name": "operation",
               "type": "String",
               "example": "",
               "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "sessionId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "aggregateId",
               "cardinality": "Single"
             }
           ],
@@ -429,24 +422,11 @@
   ],
   "aggregates": [
     {
-      "id": "3458764581756874054",
-      "title": "ToDo",
+      "id": "3458764581773477902",
+      "title": "Calculation",
       "fields": [],
       "type": "AGGREGATE"
     }
   ],
-  "sliceDependencies": [
-    {
-      "source": "slice: TodoReport",
-      "target": "slice: TodoReport"
-    },
-    {
-      "source": "slice: ResolvedTodoReport",
-      "target": "slice: ResolvedTodoReport"
-    },
-    {
-      "source": "slice: ActiveSessions",
-      "target": "slice: AddTOdo"
-    }
-  ]
+  "sliceDependencies": []
 }

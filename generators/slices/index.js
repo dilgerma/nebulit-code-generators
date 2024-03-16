@@ -6,7 +6,7 @@ const {answers} = require("../app");
 const {givenAnswers} = require("./index");
 
 function _sliceTitle(title) {
-    return slugify(title.replace("slice:", "")).toLowerCase()
+    return slugify(title.replace("slice:", "")).replaceAll("-","").toLowerCase()
 }
 
 module.exports = class extends Generator {

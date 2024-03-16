@@ -201,7 +201,12 @@
                         <plugin>spring</plugin>
                         <plugin>jpa</plugin>
                     </compilerPlugins>
+                    <pluginOptions>
+                        <!-- Call instance initializers in the synthetic constructor -->
+                        <option>no-arg:invokeInitializers=true</option>
+                    </pluginOptions>
                 </configuration>
+
                 <dependencies>
                     <dependency>
                         <groupId>org.jetbrains.kotlin</groupId>

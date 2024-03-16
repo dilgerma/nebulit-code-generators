@@ -5,11 +5,11 @@ var config = require('./../../config.json')
 const {answers} = require("../app");
 const {slice} = require("../slices");
 const {givenAnswers} = require("./index");
-const { v4: uuidv4 } = require('uuid');
+const {v4: uuidv4} = require('uuid');
 
 
 function _sliceTitle(title) {
-    return slugify(title.replace("slice:", "")).toLowerCase()
+    return slugify(title.replace("slice:", "")).replaceAll("-","").toLowerCase()
 }
 
 module.exports = class extends Generator {
@@ -37,7 +37,7 @@ module.exports = class extends Generator {
 
     writeSpecifications() {
         //this.answers.slices.forEach((slice) => {
-        if (this.answers.specifications.length > 0) {
+        if (this.answers?.specifications?.length > 0) {
 
             this._writeSpecifications(this.answers.specifications);
         }
@@ -73,7 +73,7 @@ module.exports = class extends Generator {
                     _elementImports: _elementImports,
                     _typeImports: _typeImports,
                     _given: renderGiven(given, defaults),
-                    _when: renderWhen(when, defaults),
+                    _when: renderWhen(when, then, defaults),
                     _then: renderThen(then, defaults),
                     _aggregate: _aggregateTitle(this.givenAnswers.aggregate),
                     _aggregateId: aggregateId
@@ -194,14 +194,14 @@ const packageName = (type) => {
 
 const defaultValue = (type, cardinality = "single", name, defaults) => {
     if (cardinality === "single" && defaults[name]) {
-        return renderVariable(defaults[name],type, name, defaults)
+        return renderVariable(defaults[name], type, name, defaults)
     }
     switch (type.toLowerCase()) {
         case "string":
             return cardinality.toLowerCase() === "list" ? "[]" : "\"\"";
         case "boolean":
             return cardinality.toLowerCase() === "list" ? "[]" : "false";
-        }
+    }
 }
 
 
@@ -255,7 +255,7 @@ function renderThen(thenList, defaults) {
             return `whenResult.andWaitForEventOfType(${_eventTitle(item.title)}::class.java)
                         ${assertionList(item.fields, defaults)}.toArrive()`
 
-        } else if (item.type == "SPEC_READMODEL") {
+        } else if (item.type === "SPEC_READMODEL") {
 
         }
 
@@ -263,11 +263,19 @@ function renderThen(thenList, defaults) {
 }
 
 
-function renderWhen(whenList, defaults) {
-    return whenList.map((command) => {
-        return `var whenResult = scenario.stimulate { _ ->
-            commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}`
-    }).join("\n")
+function renderWhen(whenList, thenList, defaults) {
+    if (thenList.some((error) => error.type === "SPEC_ERROR")) {
+        return whenList.map((command) => {
+            return `Assertions.assertThrows(CommandException::class.java) {scenario.stimulate { _ ->
+                          commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}}`
+        }).join("\n");
+    } else {
+        return whenList.map((command) => {
+            return `var whenResult = scenario.stimulate { _ ->
+                  commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}`
+        }).join("\n");
+    }
+
 }
 
 function renderGiven(givenList, defaults) {
@@ -308,7 +316,7 @@ function renderVariable(variableValue, variableType, variableName, defaults) {
 
 function randomizedInvocationParamterList(variables, defaults) {
 
-    return variables.map((variable) => {
+    return variables?.map((variable) => {
         if (variable.example !== "") {
             return `\t${variable.name} = ${renderVariable(variable.example, variable.type, variable.name, defaults)}`;
         } else {

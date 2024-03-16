@@ -23,7 +23,9 @@ class <%= _aggregate%>Service(
     @Transactional
     override fun persist(aggregate: <%= _aggregate%>) {
         repository.save(aggregate)
-        eventsEntityRepository.saveAll(aggregate.events)
+        if (aggregate.events.isNotEmpty()) {
+            eventsEntityRepository.saveAll(aggregate.events)
+        }
 
     }
 
