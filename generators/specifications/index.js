@@ -266,8 +266,8 @@ function renderThen(thenList, defaults) {
 function renderWhen(whenList, thenList, defaults) {
     if (thenList.some((error) => error.type === "SPEC_ERROR")) {
         return whenList.map((command) => {
-            return `Assertions.assertThrows(CommandException::class.java) {scenario.stimulate { _ ->
-                          commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}}`
+            return `Assertions.assertThrows(CommandException::class.java) {
+                          commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}`
         }).join("\n");
     } else {
         return whenList.map((command) => {

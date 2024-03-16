@@ -3,92 +3,6 @@
   "slices": [
     {
       "id": "",
-      "title": "slice: Setze Operation",
-      "commands": [
-        {
-          "id": "3458764581771485461",
-          "title": "SetzeOperation",
-          "fields": [
-            {
-              "name": "operation",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND"
-        }
-      ],
-      "events": [
-        {
-          "id": "3458764581771485356",
-          "title": "OperationGEsetzt",
-          "fields": [
-            {
-              "name": "operation",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT"
-        }
-      ],
-      "readmodels": [],
-      "screens": [],
-      "automations": [],
-      "specifications": [
-        {
-          "sliceName": "slice: Setze Operation",
-          "title": "spec: scenario",
-          "given": [],
-          "when": [
-            {
-              "title": "SetzeOperation",
-              "id": "3458764582483636342",
-              "type": "SPEC_COMMAND",
-              "fields": [
-                {
-                  "name": "operation",
-                  "type": "String",
-                  "example": "+"
-                },
-                {
-                  "name": "aggregateId",
-                  "type": "UUID",
-                  "example": "foo"
-                }
-              ]
-            }
-          ],
-          "then": [
-            {
-              "title": "Error-Case",
-              "id": "3458764582483636343",
-              "type": "SPEC_ERROR"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "",
       "title": "slice: SetzeZahl",
       "commands": [
         {
@@ -336,6 +250,92 @@
       "screens": [],
       "automations": [],
       "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: Setze Operation",
+      "commands": [
+        {
+          "id": "3458764581771485461",
+          "title": "SetzeOperation",
+          "fields": [
+            {
+              "name": "operation",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND"
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764581771485356",
+          "title": "OperationGEsetzt",
+          "fields": [
+            {
+              "name": "operation",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT"
+        }
+      ],
+      "readmodels": [],
+      "screens": [],
+      "automations": [],
+      "specifications": [
+        {
+          "sliceName": "slice: Setze Operation",
+          "title": "spec: scenario",
+          "given": [],
+          "when": [
+            {
+              "title": "SetzeOperation",
+              "id": "3458764582483636342",
+              "type": "SPEC_COMMAND",
+              "fields": [
+                {
+                  "name": "operation",
+                  "type": "String",
+                  "example": "+"
+                },
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": ""
+                }
+              ]
+            }
+          ],
+          "then": [
+            {
+              "title": "Error-Case",
+              "id": "3458764582483636343",
+              "type": "SPEC_ERROR"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "",
