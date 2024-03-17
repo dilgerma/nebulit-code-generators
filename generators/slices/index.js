@@ -6,7 +6,7 @@ const {answers} = require("../app");
 const {givenAnswers} = require("./index");
 
 function _sliceTitle(title) {
-    return slugify(title.replace("slice:", "")).replaceAll("-","").toLowerCase()
+    return slugify(title.replace("slice:", "")).replaceAll("-", "").toLowerCase()
 }
 
 module.exports = class extends Generator {
@@ -30,16 +30,25 @@ module.exports = class extends Generator {
                 type: 'confirm',
                 name: 'restendpoint',
                 message: 'Sollen Rest Endpunkte generiert werden?',
+                when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.commands?.length > 0) ?? false,
             },
             {
                 type: 'list',
                 name: 'aggregate',
                 message: `Zugehöriges Aggregate auswählen?`,
-                choices: aggregates
+                choices: aggregates,
+                when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.commands?.length > 0) ?? false,
             }, {
                 type: 'confirm',
                 name: 'specifications',
                 message: 'Sollen Specifications generiert werden?',
+                when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.specifications?.length > 0) ?? false,
+            }, {
+                type: 'checkbox',
+                name: 'processTriggers',
+                message: 'Wähle Trigger Events',
+                when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.processors?.length > 0) ?? false,
+                choices: config.slices.flatMap((slice) => slice.events).map(item => item.title)
             }]);
 
     }
@@ -215,8 +224,8 @@ module.exports = class extends Generator {
                     _variables: VariablesGenerator.generateInvocation(
                         command.fields
                     ),
-                    _controller: capitalizeFirstCharacter(title),
                     _command: this._commandTitle(command.title),
+                    _controller: capitalizeFirstCharacter(title),
                     _restVariables: VariablesGenerator.generateRestParamInvocation(
                         command.fields
                     ),
@@ -232,10 +241,59 @@ module.exports = class extends Generator {
         if (this.answers.specifications) {
             this.log(chalk.green('starting Specification Generation'))
             this.composeWith(require.resolve('../specifications'), {
-                answers: {...this.answers,...this.givenAnswers},
+                answers: {...this.answers, ...this.givenAnswers},
                 appName: this.answers.appName ?? this.appName
             });
         }
+    }
+
+    writeProcessors() {
+        //this.answers.slices.forEach((slice) => {
+        this._writeProcessors(this.answers.slice)
+        //});
+    }
+
+    _writeProcessors(sliceName) {
+        var slice = this._findSlice(sliceName)
+        var title = _sliceTitle(slice.title).toLowerCase()
+        var command = slice.commands.length > 0 ? slice.commands[0] : null
+
+        slice.processors?.filter((processor) => processor.title).forEach((processor) => {
+            this.fs.copyTpl(
+                this.templatePath(`src/components/Processor.kt.tpl`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._processorTitle(processor.title)}.kt`),
+                {
+                    _slice: title,
+                    _rootPackageName: this.givenAnswers.rootPackageName,
+                    _name: this._processorTitle(processor.title),
+                    _eventsImports: this._eventsImports(this.answers.processTriggers),
+                    _triggers: this._renderTriggers(this.answers.processTriggers),
+                    _variables: command ? VariablesGenerator.generateInvocation(
+                                           command.fields
+                                       ): "",
+                    _command: command ? this._commandTitle(command.title) :""
+
+                }
+            )
+        })
+
+
+    }
+
+    _eventsImports(triggers) {
+        return triggers.map((trigger) => {
+            return `import ${this.givenAnswers.rootPackageName}.events.${this._eventTitle(trigger)}`
+        }).join("\n")
+    }
+
+
+    _renderTriggers(triggers) {
+        return triggers.map((trigger) => {
+            return `\t@ApplicationModuleListener
+\tfun on(event: ${this._eventTitle(trigger)}) {
+\t     //TODO handle trigger           
+\t}`
+        }).join("\n\n")
     }
 
     _aggregateTitle(title) {
@@ -244,6 +302,11 @@ module.exports = class extends Generator {
 
     _commandTitle(title) {
         return `${capitalizeFirstCharacter(title)}Command`
+    }
+
+
+    _processorTitle(title) {
+        return `${capitalizeFirstCharacter(title)}Processor`
     }
 
     _restResourceTitle(title) {

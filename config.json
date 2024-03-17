@@ -1,4 +1,3 @@
-
 {
   "slices": [
     {
@@ -6,7 +5,7 @@
       "title": "slice: SetzeZahl",
       "commands": [
         {
-          "id": "3458764581772151205",
+          "id": "3458764581770988197",
           "title": "SetzeZahl",
           "fields": [
             {
@@ -27,7 +26,7 @@
           "type": "COMMAND"
         },
         {
-          "id": "3458764581770988197",
+          "id": "3458764582562536621",
           "title": "SetzeZahl",
           "fields": [
             {
@@ -75,8 +74,94 @@
           "title": "ZahlGesetzt",
           "fields": [
             {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
               "name": "zahl",
               "type": "Long",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT"
+        }
+      ],
+      "readmodels": [],
+      "screens": [],
+      "processors": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: Anzeige Zah",
+      "commands": [],
+      "events": [],
+      "readmodels": [
+        {
+          "id": "3458764581771343314",
+          "title": "AktuelleZahl",
+          "fields": [
+            {
+              "name": "zahl",
+              "type": "Long",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL"
+        }
+      ],
+      "screens": [],
+      "processors": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: Setze Operation",
+      "commands": [
+        {
+          "id": "3458764581771485461",
+          "title": "SetzeOperation",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "operation",
+              "type": "String",
+              "example": "+",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND"
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764581771485356",
+          "title": "OperationGEsetzt",
+          "fields": [
+            {
+              "name": "operation",
+              "type": "String",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
@@ -94,45 +179,56 @@
       ],
       "readmodels": [],
       "screens": [],
-      "automations": [],
-      "specifications": []
+      "processors": [],
+      "specifications": [
+        {
+          "sliceName": "slice: Setze Operation",
+          "title": "spec: scenario",
+          "given": [],
+          "when": [
+            {
+              "title": "SetzeOperation",
+              "id": "3458764582483636342",
+              "type": "SPEC_COMMAND",
+              "fields": [
+                {
+                  "name": "operation",
+                  "type": "String",
+                  "example": "+"
+                },
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": ""
+                }
+              ]
+            }
+          ],
+          "then": [
+            {
+              "title": "Error-Case",
+              "id": "3458764582483636343",
+              "type": "SPEC_ERROR"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "",
-      "title": "slice: slice",
+      "title": "slice: Anzeige Operation",
       "commands": [],
       "events": [],
       "readmodels": [
         {
-          "id": "3458764581785608200",
-          "title": "OperationInput",
+          "id": "3458764581771708811",
+          "title": "AktuelleOperation",
           "fields": [
             {
               "name": "operation",
               "type": "String",
-              "example": "",
+              "example": "+",
               "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "zahl1",
-              "type": "Long",
-              "example": "",
-              "mapping": "zahl",
-              "cardinality": "Single"
-            },
-            {
-              "name": "zahl2",
-              "type": "Long",
-              "example": "",
-              "mapping": "zahl",
               "cardinality": "Single"
             }
           ],
@@ -140,7 +236,7 @@
         }
       ],
       "screens": [],
-      "automations": [],
+      "processors": [],
       "specifications": []
     },
     {
@@ -208,7 +304,32 @@
       ],
       "readmodels": [],
       "screens": [],
-      "automations": [],
+      "processors": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: Anzeige Ergebnis",
+      "commands": [],
+      "events": [],
+      "readmodels": [
+        {
+          "id": "3458764581772894000",
+          "title": "ResultModel",
+          "fields": [
+            {
+              "name": "result",
+              "type": "Long",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL"
+        }
+      ],
+      "screens": [],
+      "processors": [],
       "specifications": []
     },
     {
@@ -248,16 +369,18 @@
       ],
       "readmodels": [],
       "screens": [],
-      "automations": [],
+      "processors": [],
       "specifications": []
     },
     {
       "id": "",
-      "title": "slice: Setze Operation",
-      "commands": [
+      "title": "slice: slice",
+      "commands": [],
+      "events": [],
+      "readmodels": [
         {
-          "id": "3458764581771485461",
-          "title": "SetzeOperation",
+          "id": "3458764581785608200",
+          "title": "OperationInput",
           "fields": [
             {
               "name": "operation",
@@ -269,6 +392,78 @@
             {
               "name": "aggregateId",
               "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "zahl1",
+              "type": "Long",
+              "example": "",
+              "mapping": "zahl",
+              "cardinality": "Single"
+            },
+            {
+              "name": "zahl2",
+              "type": "Long",
+              "example": "",
+              "mapping": "zahl",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL"
+        },
+        {
+          "id": "3458764582532725477",
+          "title": "CurrentSession",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL"
+        }
+      ],
+      "screens": [],
+      "processors": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: OpenAI",
+      "commands": [
+        {
+          "id": "3458764582531584382",
+          "title": "SendToOpenAI",
+          "fields": [
+            {
+              "name": "operation",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "result",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "zahl2",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "zahl1",
+              "type": "String",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
@@ -279,8 +474,8 @@
       ],
       "events": [
         {
-          "id": "3458764581771485356",
-          "title": "OperationGEsetzt",
+          "id": "3458764582532530917",
+          "title": "CalculationExecuted",
           "fields": [
             {
               "name": "operation",
@@ -290,8 +485,22 @@
               "cardinality": "Single"
             },
             {
-              "name": "aggregateId",
-              "type": "UUID",
+              "name": "result",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "zahl1",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "zahl2",
+              "type": "String",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
@@ -302,107 +511,10 @@
       ],
       "readmodels": [],
       "screens": [],
-      "automations": [],
-      "specifications": [
+      "processors": [
         {
-          "sliceName": "slice: Setze Operation",
-          "title": "spec: scenario",
-          "given": [],
-          "when": [
-            {
-              "title": "SetzeOperation",
-              "id": "3458764582483636342",
-              "type": "SPEC_COMMAND",
-              "fields": [
-                {
-                  "name": "operation",
-                  "type": "String",
-                  "example": "+"
-                },
-                {
-                  "name": "aggregateId",
-                  "type": "UUID",
-                  "example": ""
-                }
-              ]
-            }
-          ],
-          "then": [
-            {
-              "title": "Error-Case",
-              "id": "3458764582483636343",
-              "type": "SPEC_ERROR"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "",
-      "title": "slice: Anzeige Ergebnis",
-      "commands": [],
-      "events": [],
-      "readmodels": [
-        {
-          "id": "3458764581772894000",
-          "title": "ResultModel",
-          "fields": [
-            {
-              "name": "result",
-              "type": "Long",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "READMODEL"
-        }
-      ],
-      "screens": [],
-      "automations": [],
-      "specifications": []
-    },
-    {
-      "id": "",
-      "title": "slice: Anzeige Zah",
-      "commands": [],
-      "events": [],
-      "readmodels": [
-        {
-          "id": "3458764581771343314",
-          "title": "AktuelleZahl",
-          "fields": [
-            {
-              "name": "zahl",
-              "type": "Long",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "READMODEL"
-        }
-      ],
-      "screens": [],
-      "automations": [],
-      "specifications": []
-    },
-    {
-      "id": "",
-      "title": "slice: Anzeige Operation",
-      "commands": [],
-      "events": [],
-      "readmodels": [
-        {
-          "id": "3458764581771708811",
-          "title": "AktuelleOperation",
+          "id": "3458764582530811146",
+          "title": "automation",
           "fields": [
             {
               "name": "operation",
@@ -410,13 +522,32 @@
               "example": "",
               "mapping": "",
               "cardinality": "Single"
+            },
+            {
+              "name": "result",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "zahl1",
+              "type": "String",
+              "example": "",
+              "mapping": "zahl",
+              "cardinality": "Single"
+            },
+            {
+              "name": "zahl2",
+              "type": "String",
+              "example": "",
+              "mapping": "zahl",
+              "cardinality": "Single"
             }
           ],
-          "type": "READMODEL"
+          "type": "AUTOMATION"
         }
       ],
-      "screens": [],
-      "automations": [],
       "specifications": []
     }
   ],

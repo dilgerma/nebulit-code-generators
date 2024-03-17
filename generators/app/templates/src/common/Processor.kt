@@ -1,6 +1,6 @@
 package <%= rootPackageName%>.common
 
-interface Processor<T>: EventState<T> {
+interface Processor {
 
     fun process()
 
