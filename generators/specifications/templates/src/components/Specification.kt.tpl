@@ -43,13 +43,17 @@ class <%=_name%> {
     fun `<%=_name%>`(scenario: Scenario) {
 
         //GIVEN
-        <%-_given%>
+    <%-_given%>
 
         //WHEN
-        <%-_when%>
+    <%-_when%>
 
         //THEN
-        <%-_then%>
+    <%-_then%>
+    }
+
+    companion object {
+        var AGGREGATE_ID = UUID.fromString("<%=_aggregateId%>")
     }
 
 }

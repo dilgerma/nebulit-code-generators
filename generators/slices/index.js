@@ -3,7 +3,7 @@ var chalk = require('chalk');
 var slugify = require('slugify')
 var config = require('./../../config.json')
 const {answers} = require("../app");
-const {givenAnswers} = require("./index");
+const {givenAnswers, _commandTitle, _readmodelTitle} = require("./index");
 
 function _sliceTitle(title) {
     return slugify(title.replace("slice:", "")).replaceAll("-", "").toLowerCase()
@@ -23,6 +23,7 @@ module.exports = class extends Generator {
             {
                 type: 'list',
                 name: 'slice',
+                loop: false,
                 message: 'Welche Slices soll generiert werden?',
                 choices: config.slices.map((item, idx) => item.title).sort()
             },
@@ -30,17 +31,17 @@ module.exports = class extends Generator {
                 type: 'confirm',
                 name: 'restendpoint',
                 message: 'Sollen Rest Endpunkte generiert werden?',
-                when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.commands?.length > 0) ?? false,
+                when: (input) => ((config.slices.find((slice) => slice.title === input.slice)?.commands?.length > 0) || (config.slices.find((slice) => slice.title === input.slice)?.readmodels?.length > 0)) ?? false,
             },
             {
                 type: 'list',
                 name: 'aggregate',
                 message: `Zugehöriges Aggregate auswählen?`,
                 choices: aggregates,
-                when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.commands?.length > 0) ?? false,
             }, {
                 type: 'confirm',
                 name: 'specifications',
+                loop: false,
                 message: 'Sollen Specifications generiert werden?',
                 when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.specifications?.length > 0) ?? false,
             }, {
@@ -221,20 +222,55 @@ module.exports = class extends Generator {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: title,
-                    _variables: VariablesGenerator.generateInvocation(
-                        command.fields
-                    ),
                     _command: this._commandTitle(command.title),
                     _controller: capitalizeFirstCharacter(title),
-                    _restVariables: VariablesGenerator.generateRestParamInvocation(
+                    _typeImports: typeImports(command.fields),
+                    _endpoint: this._generatePostRestCall(title, VariablesGenerator.generateRestParamInvocation(
                         command.fields
-                    ),
-                    _typeImports: typeImports(command.fields)
+                    ), this._commandTitle(command.title), VariablesGenerator.generateInvocation(
+                        command.fields
+                    ))
+                }
+            )
+        })
+        slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
+            this.fs.copyTpl(
+                this.templatePath(`src/components/ReadOnlyRestResource.kt.tpl`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/ReadOnly${this._restResourceTitle(readmodel.title)}.kt`),
+                {
+                    _slice: title,
+                    _rootPackageName: this.givenAnswers.rootPackageName,
+                    _name: title,
+                    _readModel: this._readmodelTitle(readmodel.title),
+                    _controller: capitalizeFirstCharacter(title),
+                    _typeImports: typeImports(readmodel.fields),
+                    _endpoint: this._generateGetRestCall(title, VariablesGenerator.generateRestParamInvocation(
+                        //only provide aggregateId (so that proper imports are generated)
+                        readmodel.fields.filter(item=>item.name === "aggregateId")
+                    ), this._readmodelTitle(readmodel.title))
                 }
             )
         })
 
 
+    }
+
+    _generatePostRestCall(slice, restVariables, command, variables) {
+        return `
+    @PostMapping("${slice}")
+    fun processCommand(${restVariables}) {
+        commandHandler.handle(${command}(${variables}))
+    }
+    `
+    }
+
+    _generateGetRestCall(slice, restVariables, readModel) {
+        return `@GetMapping("/${slice}")
+    fun findInformation(${restVariables}):ReadModel<${readModel}> {
+        return ${readModel}().applyEvents(repository.findByAggregateId(aggregateId))
+        
+    }
+      `
     }
 
     writeSpecifications() {
@@ -269,9 +305,9 @@ module.exports = class extends Generator {
                     _eventsImports: this._eventsImports(this.answers.processTriggers),
                     _triggers: this._renderTriggers(this.answers.processTriggers),
                     _variables: command ? VariablesGenerator.generateInvocation(
-                                           command.fields
-                                       ): "",
-                    _command: command ? this._commandTitle(command.title) :""
+                        command.fields
+                    ) : "",
+                    _command: command ? this._commandTitle(command.title) : ""
 
                 }
             )
@@ -297,28 +333,28 @@ module.exports = class extends Generator {
     }
 
     _aggregateTitle(title) {
-        return `${capitalizeFirstCharacter(title)}Aggregate`
+        return `${slugify(capitalizeFirstCharacter(title), "")}Aggregate`
     }
 
     _commandTitle(title) {
-        return `${capitalizeFirstCharacter(title)}Command`
+        return `${slugify(capitalizeFirstCharacter(title), "")}Command`
     }
 
 
     _processorTitle(title) {
-        return `${capitalizeFirstCharacter(title)}Processor`
+        return `${slugify(capitalizeFirstCharacter(title), "")}Processor`
     }
 
     _restResourceTitle(title) {
-        return `${capitalizeFirstCharacter(title)}Ressource`
+        return `${slugify(capitalizeFirstCharacter(title), "")}Ressource`
     }
 
     _readmodelTitle(title) {
-        return `${capitalizeFirstCharacter(title)}ReadModel`
+        return `${slugify(capitalizeFirstCharacter(title), "")}ReadModel`
     }
 
     _eventTitle(title) {
-        return `${capitalizeFirstCharacter(title)}Event`
+        return `${slugify(capitalizeFirstCharacter(title), "")}Event`
     }
 
 

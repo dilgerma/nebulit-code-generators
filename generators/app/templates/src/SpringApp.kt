@@ -9,13 +9,13 @@ import org.springframework.modulith.Modulith
 
 @Modulith(
         systemName = "System",
-        sharedModules =["<%= rootPackageName%>.support","<%= rootPackageName%>.domain"],
+        sharedModules =["<%= rootPackageName%>.support","<%= rootPackageName%>.common","<%= rootPackageName%>.domain"],
         useFullyQualifiedModuleNames = true
 )
 @EnableJpaRepositories
 @SpringBootApplication
 @EnableScheduling
-@EntityScan(basePackages = ["<%= rootPackageName%>", "org.springframework.modulith.events.jpa"])
+@EntityScan(basePackages = ["<%= rootPackageName%>","org.springframework.modulith.events.jpa"])
 class SpringApp {
     companion object {
         fun main(args: Array<String>) {

@@ -7,9 +7,9 @@
   },
   "generator-prototype": {
     "promptValues": {
-      "appName": "Calculator",
+      "appName": "Calc",
       "rootPackage": "de.nebulit.test",
-      "rootPackageName": "de.nebulut.calculator"
+      "rootPackageName": "de.nebulit.calculator"
     }
   }
 }

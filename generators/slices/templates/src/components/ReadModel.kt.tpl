@@ -12,7 +12,10 @@ class <%= _name%> : ReadModel<<%= _name%>> {
 
     override fun applyEvents(events: List<InternalEvent>): <%= _name%> {
         events.forEach({
-            //TODO
+            when(it.value) {
+                //TODO
+                // is Event -> {}
+            }
         })
         return this
     }

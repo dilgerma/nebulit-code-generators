@@ -9,7 +9,7 @@ const {v4: uuidv4} = require('uuid');
 
 
 function _sliceTitle(title) {
-    return slugify(title.replace("slice:", "")).replaceAll("-","").toLowerCase()
+    return slugify(title.replace("slice:", ""),"").replaceAll("-","").toLowerCase()
 }
 
 module.exports = class extends Generator {
@@ -49,7 +49,7 @@ module.exports = class extends Generator {
         var title = _sliceTitle(slice.title).toLowerCase()
 
         slice.specifications?.filter((specification) => specifications.includes(specification.title)).forEach((specification) => {
-            var specificationName = _specificationTitle(capitalizeFirstCharacter(slugify(specification.title)))
+            var specificationName = _specificationTitle(capitalizeFirstCharacter(slugify(specification.title,"")))
 
             var given = specification.given
             var when = specification.when
@@ -193,7 +193,7 @@ const packageName = (type) => {
 
 
 const defaultValue = (type, cardinality = "single", name, defaults) => {
-    if (cardinality === "single" && defaults[name]) {
+    if (cardinality?.toLowerCase() !== "list" && defaults[name]) {
         return renderVariable(defaults[name], type, name, defaults)
     }
     switch (type.toLowerCase()) {
@@ -213,27 +213,27 @@ function toCamelCase(prefix, variableName) {
 
 function _specificationTitle(title) {
     var adjustedTitle = title.replace("Spec:", "").replace("-", "").trim()
-    return `${capitalizeFirstCharacter(adjustedTitle)}Test`
+    return `${slugify(capitalizeFirstCharacter(adjustedTitle),"")}Test`
 }
 
 function _aggregateTitle(title) {
-    return `${capitalizeFirstCharacter(title)}Aggregate`
+    return `${slugify(capitalizeFirstCharacter(title),"")}Aggregate`
 }
 
 function _commandTitle(title) {
-    return `${capitalizeFirstCharacter(title)}Command`
+    return `${slugify(capitalizeFirstCharacter(title),"")}Command`
 }
 
 function _restResourceTitle(title) {
-    return `${capitalizeFirstCharacter(title)}RestController`
+    return `${slugify(capitalizeFirstCharacter(title),"")}RestController`
 }
 
 function _readmodelTitle(title) {
-    return `${capitalizeFirstCharacter(title)}ReadModel`
+    return `${slugify(capitalizeFirstCharacter(title),"")}ReadModel`
 }
 
 function _eventTitle(title) {
-    return `${capitalizeFirstCharacter(title)}Event`
+    return `${slugify(capitalizeFirstCharacter(title),"")}Event`
 }
 
 function capitalizeFirstCharacter(inputString) {
@@ -249,17 +249,23 @@ function capitalizeFirstCharacter(inputString) {
 
 
 function renderThen(thenList, defaults) {
-    return thenList.map((item) => {
-        if (item.type == "SPEC_EVENT") {
+    var then = thenList.map((item) => {
 
-            return `whenResult.andWaitForEventOfType(${_eventTitle(item.title)}::class.java)
+        if (item.type === "SPEC_EVENT") {
+
+            return `\twhenResult.andWaitForEventOfType(${_eventTitle(item.title)}::class.java)
                         ${assertionList(item.fields, defaults)}.toArrive()`
 
         } else if (item.type === "SPEC_READMODEL") {
-
+            return `\tvar readModel = ${_readmodelTitle(item.title)}().applyEvents(repository.findByAggregateId(AGGREGATE_ID))`
         }
 
     }).join("\n")
+
+    if (thenList?.length === 0) {
+        return "Assertions.fail<Unit>(\"No assertion defined in Model. Manual implementation required\")"
+    }
+    return then
 }
 
 
@@ -280,9 +286,9 @@ function renderWhen(whenList, thenList, defaults) {
 
 function renderGiven(givenList, defaults) {
     return givenList.map((event) => {
-
         return `
          repository.save(RandomData.newInstance(listOf("value")) {
+                ${randomizedInvocationParamterList(event.fields.filter((it)=>it.name == "aggregateId"), defaults)}
                 this.value = ${_eventTitle(event.title)}(
                     ${randomizedInvocationParamterList(event.fields, defaults)}
                 )
@@ -294,6 +300,7 @@ function renderGiven(givenList, defaults) {
 }
 
 function renderVariable(variableValue, variableType, variableName, defaults) {
+
     var value = variableValue
     if (!variableValue && defaults[variableName]) {
         value = defaults[variableName]
