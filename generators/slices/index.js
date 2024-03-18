@@ -21,11 +21,19 @@ module.exports = class extends Generator {
         aggregates.push("Keins")
         this.answers = await this.prompt([
             {
-                type: 'list',
+                type: 'checkbox',
+                name: 'context',
+                loop: false,
+                message: 'Welchen Kontexte (keine Auswahl für alle)?',
+                choices: Array.from(new Set(config.slices.map((item) => item.context).filter(item=>item))).sort(),
+                when: ()=>Array.from(new Set(config.slices.map((item) => item.context).filter(item=>item))).length>0,
+            },
+            {
+                type: 'checkbox',
                 name: 'slice',
                 loop: false,
                 message: 'Welche Slices soll generiert werden?',
-                choices: config.slices.map((item, idx) => item.title).sort()
+                choices: (items)=>config.slices.filter((slice)=>items.context.length === 0 || items.context.includes(slice.context)).map((item, idx) => item.title).sort()
             },
             {
                 type: 'confirm',
@@ -246,7 +254,7 @@ module.exports = class extends Generator {
                     _typeImports: typeImports(readmodel.fields),
                     _endpoint: this._generateGetRestCall(title, VariablesGenerator.generateRestParamInvocation(
                         //only provide aggregateId (so that proper imports are generated)
-                        readmodel.fields.filter(item=>item.name === "aggregateId")
+                        readmodel.fields.filter(item => item.name === "aggregateId")
                     ), this._readmodelTitle(readmodel.title))
                 }
             )
