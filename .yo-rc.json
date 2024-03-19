@@ -17,5 +17,11 @@
       "appName": "",
       "rootPackageName": ""
     }
+  },
+  "@dilgerma/generator-nebulit-spring-boot": {
+    "promptValues": {
+      "appName": "goo",
+      "rootPackageName": "dfg"
+    }
   }
 }
