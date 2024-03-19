@@ -11,5 +11,11 @@
       "rootPackage": "de.nebulit.test",
       "rootPackageName": "de.nebulit.calculator"
     }
+  },
+  "@dilgerma/generator-prototype": {
+    "promptValues": {
+      "appName": "",
+      "rootPackageName": ""
+    }
   }
 }

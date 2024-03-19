@@ -1,5 +1,5 @@
 {
-  "name": "@dilgerma/generator-prototype",
+  "name": "@dilgerma/generator-nebulit-spring-boot",
   "version": "0.1.0",
   "description": "scaffold example project",
   "repository": "https://github.com/dilgerma/generator-spring-boot.git",
@@ -21,6 +21,6 @@
     "yeoman-generator": "^3.2.0"
   },
   "publishConfig": {
-     "registry": "https://npm.pkg.github.com"
-   }
+    "registry": "https://npm.pkg.github.com"
+  }
 }
