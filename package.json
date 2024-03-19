@@ -1,5 +1,5 @@
 {
-  "name": "generator-prototype",
+  "name": "@nebulit/generator-prototype",
   "version": "0.1.0",
   "description": "scaffold example project",
   "repository": "https://github.com/dilgerma/generator-spring-boot.git",
