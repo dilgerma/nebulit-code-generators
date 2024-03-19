@@ -1,4 +1,5 @@
 var Generator = require('yeoman-generator');
+const { ensureDirSync } = require("fs-extra");
 var chalk = require('chalk');
 var slugify = require('slugify')
 const config = require("../../config.json");
@@ -8,7 +9,6 @@ module.exports = class extends Generator {
     constructor(args, opts) {
         super(args, opts);
         this.argument('appname', {type: String, required: false});
-        //this.destinationRoot('/tmp')
     }
 
     // Async Await
@@ -36,6 +36,7 @@ module.exports = class extends Generator {
     install() {
         this.npmInstall();
     }
+
 
     writing() {
 

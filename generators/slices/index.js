@@ -1,5 +1,6 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
+const { ensureDirSync } = require("fs-extra");
 var slugify = require('slugify')
 var config = require('./../../config.json')
 const {answers} = require("../app");
@@ -29,7 +30,7 @@ module.exports = class extends Generator {
                 when: ()=>Array.from(new Set(config.slices.map((item) => item.context).filter(item=>item))).length>0,
             },
             {
-                type: 'checkbox',
+                type: 'list',
                 name: 'slice',
                 loop: false,
                 message: 'Welche Slices soll generiert werden?',
@@ -62,6 +63,7 @@ module.exports = class extends Generator {
 
     }
 
+
     // writePages() {
     //     this.answers.slices.forEach((slice) => {
     //         this._writePage(slice)
@@ -93,8 +95,6 @@ module.exports = class extends Generator {
     }
 
     _writeCommandHandlers(sliceName) {
-
-
         var slice = this._findSlice(sliceName)
         var title = _sliceTitle(slice.title).toLowerCase()
         slice.commands?.filter((command) => command.title).forEach((command) => {

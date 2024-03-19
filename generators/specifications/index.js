@@ -1,6 +1,7 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var slugify = require('slugify')
+const { ensureDirSync } = require("fs-extra");
 var config = require('./../../config.json')
 const {answers} = require("../app");
 const {slice} = require("../slices");
@@ -9,7 +10,7 @@ const {v4: uuidv4} = require('uuid');
 
 
 function _sliceTitle(title) {
-    return slugify(title.replace("slice:", ""),"").replaceAll("-","").toLowerCase()
+    return slugify(title.replace("slice:", ""), "").replaceAll("-", "").toLowerCase()
 }
 
 module.exports = class extends Generator {
@@ -49,7 +50,7 @@ module.exports = class extends Generator {
         var title = _sliceTitle(slice.title).toLowerCase()
 
         slice.specifications?.filter((specification) => specifications.includes(specification.title)).forEach((specification) => {
-            var specificationName = _specificationTitle(capitalizeFirstCharacter(slugify(specification.title,"")))
+            var specificationName = _specificationTitle(capitalizeFirstCharacter(slugify(specification.title, "")))
 
             var given = specification.given
             var when = specification.when
@@ -213,27 +214,27 @@ function toCamelCase(prefix, variableName) {
 
 function _specificationTitle(title) {
     var adjustedTitle = title.replace("Spec:", "").replace("-", "").trim()
-    return `${slugify(capitalizeFirstCharacter(adjustedTitle),"")}Test`
+    return `${slugify(capitalizeFirstCharacter(adjustedTitle), "")}Test`
 }
 
 function _aggregateTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title),"")}Aggregate`
+    return `${slugify(capitalizeFirstCharacter(title), "")}Aggregate`
 }
 
 function _commandTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title),"")}Command`
+    return `${slugify(capitalizeFirstCharacter(title), "")}Command`
 }
 
 function _restResourceTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title),"")}RestController`
+    return `${slugify(capitalizeFirstCharacter(title), "")}RestController`
 }
 
 function _readmodelTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title),"")}ReadModel`
+    return `${slugify(capitalizeFirstCharacter(title), "")}ReadModel`
 }
 
 function _eventTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title),"")}Event`
+    return `${slugify(capitalizeFirstCharacter(title), "")}Event`
 }
 
 function capitalizeFirstCharacter(inputString) {
@@ -288,7 +289,7 @@ function renderGiven(givenList, defaults) {
     return givenList.map((event) => {
         return `
          repository.save(RandomData.newInstance(listOf("value")) {
-                ${randomizedInvocationParamterList(event.fields.filter((it)=>it.name == "aggregateId"), defaults)}
+                ${randomizedInvocationParamterList(event.fields.filter((it) => it.name == "aggregateId"), defaults)}
                 this.value = ${_eventTitle(event.title)}(
                     ${randomizedInvocationParamterList(event.fields, defaults)}
                 )
