@@ -2,7 +2,7 @@ var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 const { ensureDirSync } = require("fs-extra");
 var slugify = require('slugify')
-const config = require(__dirname + "config.json");
+const config = require("/config.json");
 const {answers} = require("../app");
 const {givenAnswers, _commandTitle, _readmodelTitle} = require("./index");
 
