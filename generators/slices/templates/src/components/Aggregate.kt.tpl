@@ -8,6 +8,8 @@ import java.sql.Types
 import java.time.LocalDate
 import java.util.*
 import kotlin.jvm.Transient
+import mu.KotlinLogging
+
 
 @Entity
 @Table(name = "aggregates")
@@ -19,6 +21,8 @@ class <%= _name%>Aggregate(
 ) : AggregateRoot {
 
     override var version: Long? = 0
+    var logger = KotlinLogging.logger {}
+
 
     @Transient
     override var events: MutableList<InternalEvent> = mutableListOf()

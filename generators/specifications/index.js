@@ -1,8 +1,7 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var slugify = require('slugify')
-const { ensureDirSync } = require("fs-extra");
-const config = require("./config.json");
+const {ensureDirSync} = require("fs-extra");
 const {answers} = require("../app");
 const {slice} = require("../slices");
 const {givenAnswers} = require("./index");
@@ -13,11 +12,14 @@ function _sliceTitle(title) {
     return slugify(title.replace("slice:", ""), "").replaceAll("-", "").toLowerCase()
 }
 
+var config = {}
+
 module.exports = class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
         this.givenAnswers = opts.answers
+        config = require(this.env.cwd + "/config.json");
     }
 
     async prompting() {

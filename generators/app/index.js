@@ -2,18 +2,19 @@ var Generator = require('yeoman-generator');
 const { ensureDirSync } = require("fs-extra");
 var chalk = require('chalk');
 var slugify = require('slugify')
-const config = require("./config.json");
+
+let config = {}
 
 module.exports = class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
         this.argument('appname', {type: String, required: false});
+        config = require(this.env.cwd + "/config.json");
     }
 
     // Async Await
     async prompting() {
-
         this.answers = await this.prompt([{
             type: 'input',
             name: 'appName',

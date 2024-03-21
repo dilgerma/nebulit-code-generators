@@ -5,6 +5,7 @@ import <%= _rootPackageName%>.common.DelegatingCommandHandler
 import <%= _rootPackageName%>.common.persistence.EventsEntityRepository
 import org.springframework.modulith.events.ApplicationModuleListener
 import org.springframework.stereotype.Component
+import mu.KotlinLogging
 
 <%= _eventsImports %>
 
@@ -14,6 +15,8 @@ class <%= _name%>(
  val commandHandler: DelegatingCommandHandler): Processor {
 
 <%- _triggers%>
+
+   var logger = KotlinLogging.logger {}
 
    override fun process() {
      //TODO process readModel from events

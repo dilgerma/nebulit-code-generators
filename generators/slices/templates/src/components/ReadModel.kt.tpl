@@ -4,9 +4,12 @@ import <%= _rootPackageName%>.common.ReadModel
 import <%= _rootPackageName%>.common.persistence.InternalEvent
 import java.util.*
 <%= _typeImports %>
+import mu.KotlinLogging
 
 
 class <%= _name%> : ReadModel<<%= _name%>> {
+
+    var logger = KotlinLogging.logger {}
 
 <%- _fields%>
 

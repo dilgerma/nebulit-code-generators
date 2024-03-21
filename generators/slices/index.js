@@ -2,10 +2,10 @@ var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 const { ensureDirSync } = require("fs-extra");
 var slugify = require('slugify')
-const config = require("./config.json");
 const {answers} = require("../app");
 const {givenAnswers, _commandTitle, _readmodelTitle} = require("./index");
 
+let config = {}
 function _sliceTitle(title) {
     return slugify(title.replace("slice:", "")).replaceAll("-", "").toLowerCase()
 }
@@ -15,11 +15,12 @@ module.exports = class extends Generator {
     constructor(args, opts) {
         super(args, opts);
         this.givenAnswers = opts.answers
+        config = require(this.env.cwd + "/config.json");
+
     }
 
     async prompting() {
-        var aggregates = config.aggregates.map((item, idx) => item.title).sort()
-        aggregates.push("Keins")
+        var aggregates = config.aggregates?.map((item, idx) => item.title).sort()
         this.answers = await this.prompt([
             {
                 type: 'checkbox',
@@ -33,8 +34,8 @@ module.exports = class extends Generator {
                 type: 'list',
                 name: 'slice',
                 loop: false,
-                message: 'Welche Slices soll generiert werden?',
-                choices: (items)=>config.slices.filter((slice)=>items.context.length === 0 || items.context.includes(slice.context)).map((item, idx) => item.title).sort()
+                message: 'Welcher Slices soll generiert werden?',
+                choices: (items)=>config.slices.filter((slice)=>!items.context || items.context?.length === 0 || items.context?.includes(slice.context)).map((item, idx) => item.title).sort()
             },
             {
                 type: 'confirm',
@@ -58,7 +59,7 @@ module.exports = class extends Generator {
                 name: 'processTriggers',
                 message: 'Wähle Trigger Events',
                 when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.processors?.length > 0) ?? false,
-                choices: config.slices.flatMap((slice) => slice.events).map(item => item.title)
+                choices: (items) => config.slices.filter((slice)=>!items.context || items.context?.length === 0 || items.context?.includes(slice.context)).flatMap((slice) => slice.events).map(item => item.title)
             }]);
 
     }
@@ -335,7 +336,8 @@ module.exports = class extends Generator {
         return triggers.map((trigger) => {
             return `\t@ApplicationModuleListener
 \tfun on(event: ${this._eventTitle(trigger)}) {
-\t     //TODO handle trigger           
+\t     logger.info("Processing ${this._eventTitle(trigger)}")
+\t     process()     
 \t}`
         }).join("\n\n")
     }

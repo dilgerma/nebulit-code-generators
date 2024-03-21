@@ -1,9 +1,10 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var slugify = require('slugify')
-var config = require('./../../config.json')
 const {answers} = require("../app");
 const {givenAnswers} = require("./index");
+
+let config = {}
 
 
 module.exports = class extends Generator {
@@ -11,6 +12,10 @@ module.exports = class extends Generator {
     constructor(args, opts) {
         super(args, opts);
         this.givenAnswers = opts.answers
+        config = require(this.env.cwd + "/config.json");
+    }
+
+    init(){
     }
 
     async prompting() {
@@ -142,7 +147,7 @@ const typeMapping = (fieldType, fieldCardinality) => {
 }
 
 const typeImports = (fields) => {
-    var imports = fields.map((field) => {
+    var imports = fields?.map((field) => {
         switch (field.type?.toLowerCase()) {
             case "date":
                 return ["import java.time.LocalDate", "import org.springframework.format.annotation.DateTimeFormat"]
@@ -158,7 +163,7 @@ const typeImports = (fields) => {
                 return []
         }
     })
-    return imports.flat().join(";\n")
+    return imports?.flat().join(";\n")
 
 }
 
