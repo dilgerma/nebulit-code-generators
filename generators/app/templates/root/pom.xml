@@ -9,11 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>de.nebulit.todo</groupId>
-    <artifactId>ToDo</artifactId>
+    <artifactId><%-appName></artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>demo</name>
+    <name><%-appName></name>
     <properties>
-        <axon.version>4.4</axon.version>
         <java.version>17</java.version>
         <kotlin.version>1.9.20</kotlin.version>
     </properties>
@@ -200,6 +199,7 @@
                     <compilerPlugins>
                         <plugin>spring</plugin>
                         <plugin>jpa</plugin>
+                        <plugin>no-arg</plugin>
                     </compilerPlugins>
                     <pluginOptions>
                         <!-- Call instance initializers in the synthetic constructor -->
