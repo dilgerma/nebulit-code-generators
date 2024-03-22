@@ -32,11 +32,6 @@ module.exports = class extends Generator {
             }]);
     }
 
-    install() {
-        this.npmInstall();
-    }
-
-
     writing() {
 
         if (this.answers.generatorType === 'Skeleton') {
