@@ -18,11 +18,11 @@ module.exports = class extends Generator {
         this.answers = await this.prompt([{
             type: 'input',
             name: 'appName',
-            message: 'Your project name?',
+            message: 'Projektname?',
         }, {
             type: 'input',
             name: 'rootPackageName',
-            message: 'Your rootPackageName name?',
+            message: 'Root Package?',
         },
             {
                 type: 'list',
