@@ -1,22 +1,33 @@
-## Nebulit GmbH - Eventmodeling, CRQS & Eventsourcing Workshop
+## Nebulit GmbH - Eventmodeling Template
 
-Diese Applikation ist ein Beispiel für die Umsetzung mit CQRS und Eventsourcing.
-Die Applikation verwendet Live-Models (In Memory Projections) und eine Postgres Datenbank zur persistierung der Events.
+### Setup
 
-[Eventmodeling / Eventsourcing / CQRS Training](https://nebulit.de/schulungen)
+Slices sind im _root_ Package (wie im Generator angegeben) als Packages definiert.
 
-Die Anwendung basiert Spring Boot und verwendet keinerlei _Eventsourcing-Frameworks_
+### Todos nach der initialen Generierung
 
-Das Eventmodel definiert 13 Slices
+Im Code sind TODOs definiert für die Stellen die angepasst werden müssen.
+Der Generator trifft bestimmte Grundannahmen (aggregateIds sind UUIDs beispielsweise).
 
-![Slices](/assets/eventmodel.png)
+Wird von diesen Annahmen abgewichen kompiliert der Code ggf. nicht sofort sondern muss leicht
+angepasst werden.
 
-Alles was für die Umsetzung notwendig ist ist ein Miro Board und eine einfache Relationale Datenbank.
+Ihre Code Richtlinien sind natürlich führend, daher ist es erwartungskonform dass Code
+nicht sofort kompiliert (es sollten aber wirklich nur kleine Anpassungen notwendig sein).
 
-Slices aus dem Eventmodel sind unter "src/kotlin/de/nebulit/eventsourcing/challenge/slices"
+### Start der Applikation
 
-![Slices](/assets/slices.png)
+Zum Start des Services kann die Klasse _ApplicationStarter_ verwendet werden in _src/test/kotlin_.
+Warum in _test_?
 
-Wenn dir die Applikation gefällt, folge mir auf [LinkedIn](https://www.linkedin.com/in/martindilger/)
+Diese Klasse startet die komplette Umgebung (inkl. Postgres und ggf. Kafka über TestContainers)
 
-[Website](https://www.nebulit.de)
+### Package Struktur
+
+Events sind im Package "events"
+
+Aggregates liegen im Package "domain"
+
+Slices haben jeweils ein isoliertes Package <sliceName>
+
+Package "common" enthält einige Interfaces für die generelle Struktur.

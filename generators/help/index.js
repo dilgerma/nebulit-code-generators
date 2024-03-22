@@ -24,18 +24,15 @@ module.exports = class extends Generator {
                 type: 'confirm',
                 name: 'config',
                 message: 'Bevor du startest kopierst du dir die JSON-Konfiguration aus dem Miro Plugin in dein lokales Arbeitsverzeichnis.',
-                store: true,
             },
             {
                 type: 'confirm',
                 name: 'generator',
                 message: 'Der Generator erwartet die Konfiguration im Root des Projektes für die Generierung.',
-                store: true,
             }, {
                 type: 'confirm',
                 name: 'appName',
                 message: 'Zuerst wirst du einige Fragen zur Anwendung beantworten (Name des Service, Root Package etc.)?',
-                store: true,
             },
             {
                 type: 'confirm',

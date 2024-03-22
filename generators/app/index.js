@@ -19,12 +19,10 @@ module.exports = class extends Generator {
             type: 'input',
             name: 'appName',
             message: 'Your project name?',
-            store: true,
         }, {
             type: 'input',
             name: 'rootPackageName',
             message: 'Your rootPackageName name?',
-            store: true,
         },
             {
                 type: 'list',
