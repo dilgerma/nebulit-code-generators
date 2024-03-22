@@ -1,1 +1,1 @@
-package <%= rootPackageName%>.support
+package <%= rootPackageName%>.support;
