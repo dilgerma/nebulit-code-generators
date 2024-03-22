@@ -9,6 +9,6 @@ COPY --chmod=0755 entrypoint.sh /
 
 RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm install
 RUN npm install -g yo@4.3.1
-RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm install -g @dilgerma/generator-nebulit-spring-boot@0.1.13
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm install -g @dilgerma/generator-nebulit-spring-boot
 RUN chmod -R g+rwx ${APP_HOME}
 ENTRYPOINT /entrypoint.sh

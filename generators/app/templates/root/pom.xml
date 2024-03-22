@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>de.nebulit.todo</groupId>
-    <artifactId><%-appName></artifactId>
+    <artifactId><%-appName%></artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name><%-appName></name>
+    <name><%-appName%></name>
     <properties>
         <java.version>17</java.version>
         <kotlin.version>1.9.20</kotlin.version>
