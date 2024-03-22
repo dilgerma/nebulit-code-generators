@@ -1,8 +1,0 @@
-{
-  "@dilgerma/generator-nebulit-spring-boot": {
-    "promptValues": {
-      "appName": "foo",
-      "rootPackageName": "bar"
-    }
-  }
-}

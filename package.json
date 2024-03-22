@@ -4,10 +4,7 @@
   "description": "scaffold example project",
   "repository": "https://github.com/dilgerma/generator-spring-boot.git",
   "files": [
-    "app",
-    "generators",
-    "commands",
-    "package.json"
+    "generators"
   ],
   "keywords": [
     "yeoman-generator"
