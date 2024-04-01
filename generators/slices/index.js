@@ -473,7 +473,7 @@ const typeImports = (fields) => {
                 return []
         }
     })
-    return imports.flat().join(";\n")
+    return Array.from([...new Set(imports)]).flat().join(";\n")
 
 }
 
