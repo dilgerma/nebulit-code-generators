@@ -1,1 +1,361 @@
-{"slices":[{"id":"","title":"slice: ViewCart","commands":[],"events":[],"readmodels":[{"id":"3458764584099471667","title":"CartItems","fields":[{"name":"productName","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"price","type":"Double","example":"","mapping":"","cardinality":"Single"},{"name":"quantity","type":"Int","example":"","mapping":"","cardinality":"Single"},{"name":"productimage","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"totalPrice","type":"Double","example":"","mapping":"price","cardinality":"Single"},{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"cartItemId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"READMODEL"}],"screens":[{"id":"3458764584099149631","title":"screen","type":"SCREEN"}],"processors":[],"specifications":[]},{"id":"","title":"slice: ClearCart","commands":[{"id":"3458764584100080846","title":"ClearCart","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"COMMAND"}],"events":[{"id":"3458764584100080914","title":"CartCleared","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"EVENT"}],"readmodels":[],"screens":[{"id":"3458764584100080749","title":"screen","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"SCREEN"}],"processors":[],"specifications":[]},{"id":"","title":"slice: SubmitCart","commands":[{"id":"3458764584100418044","title":"SubmitCart","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"cartItems","type":"UUID","example":"","mapping":"","cardinality":"List"}],"type":"COMMAND"}],"events":[{"id":"3458764584100418046","title":"CartSubmitted","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"cartItems","type":"String","example":"","mapping":"","cardinality":"Single"}],"type":"EVENT"}],"readmodels":[],"screens":[{"id":"3458764584100418030","title":"screen","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"SCREEN"}],"processors":[],"specifications":[]},{"id":"","title":"slice: InventoryChange","commands":[{"id":"3458764584114637705","title":"ChangeInventory","fields":[{"name":"aggregateId","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"productId","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"quantity","type":"String","example":"","mapping":"","cardinality":"Single"}],"type":"COMMAND"}],"events":[{"id":"3458764584101068231","title":"InventoryChanged","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"quantity","type":"Int","example":"","mapping":"","cardinality":"Single"},{"name":"productId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"EVENT"}],"readmodels":[],"screens":[],"processors":[{"id":"3458764584100976849","title":"automation","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"quantity","type":"Int","example":"","mapping":"","cardinality":"Single"},{"name":"productId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"AUTOMATION"}],"specifications":[]},{"id":"","title":"slice: Inventory","commands":[],"events":[],"readmodels":[{"id":"3458764584101318212","title":"ProductInventory","fields":[{"name":"productId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"quantity","type":"Int","example":"","mapping":"","cardinality":"Single"},{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"READMODEL"}],"screens":[{"id":"3458764584114744115","title":"screen","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"SCREEN"}],"processors":[],"specifications":[]},{"id":"","title":"slice: Removeitem","commands":[{"id":"3458764584115718377","title":"RemoveItem","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"cartItemId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"COMMAND"}],"events":[{"id":"3458764584115718379","title":"CartItemRemoved","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"cartItemId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"EVENT"}],"readmodels":[],"screens":[{"id":"3458764584115718364","title":"screen","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"cartItemId","type":"String","example":"","mapping":"","cardinality":"Single"}],"type":"SCREEN"}],"processors":[],"specifications":[]},{"id":"","title":"slice: PriceChange","commands":[{"id":"3458764584127822893","title":"ChangePrice","fields":[{"name":"aggregateId","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"oldPrice","type":"Double","example":"","mapping":"","cardinality":"Single"},{"name":"newPrice","example":"","mapping":"","type":"Double","cardinality":"Single"}],"type":"COMMAND"}],"events":[{"id":"3458764584128065142","title":"PriceChanged","fields":[{"name":"aggregateId","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"oldPrice","type":"Double","example":"","mapping":"","cardinality":"Single"},{"name":"newPrice","example":"","mapping":"","type":"Double","cardinality":"Single"}],"type":"EVENT"}],"readmodels":[],"screens":[],"processors":[{"id":"3458764584127822584","title":"automation","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"oldPrice","example":"","mapping":"","type":"Double","cardinality":"Single"},{"name":"price","example":"","mapping":"","type":"Double","cardinality":"Single"}],"type":"AUTOMATION"}],"specifications":[]},{"id":"","title":"slice: ActiveCartSessions","commands":[],"events":[],"readmodels":[{"id":"3458764584128812202","title":"ActiveCartSessions","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"READMODEL"},{"id":"3458764584135447953","title":"CartProducts","fields":[{"name":"aggregateId","example":"","mapping":"","type":"UUID","cardinality":"Single"},{"name":"productIds","example":"","mapping":"productId","type":"UUID","cardinality":"List"}],"type":"READMODEL"}],"screens":[],"processors":[],"specifications":[]},{"id":"","title":"slice: RevokeProductAfterPriceChange","commands":[{"id":"3458764584132555283","title":"ExpireProductAfterPriceChange","fields":[{"name":"aggregateId","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"productId","example":"","mapping":"productIds","type":"Double","cardinality":"Single"}],"type":"COMMAND"}],"events":[{"id":"3458764584132555744","title":"CartItemRevoked","fields":[{"name":"aggregateId","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"productId","example":"","mapping":"","type":"UUID","cardinality":"Single"}],"type":"EVENT"}],"readmodels":[],"screens":[],"processors":[{"id":"3458764584132555168","title":"automation","fields":[{"name":"aggregateId","example":"","mapping":"","type":"UUID","cardinality":"Single"},{"name":"productIds","example":"","mapping":"","type":"UUID","cardinality":"List"}],"type":"AUTOMATION"}],"specifications":[]},{"id":"","title":"slice: RevokedCartItems","commands":[],"events":[],"readmodels":[{"id":"3458764584133035758","title":"RevokedCartItems","fields":[{"name":"aggregateId","example":"","mapping":"","type":"UUID","cardinality":"Single"},{"name":"productId","example":"","mapping":"","type":"UUID","cardinality":"Single"}],"type":"READMODEL"}],"screens":[],"processors":[],"specifications":[]},{"id":"","title":"slice: NotifyCustomerOfProductRevoke","commands":[{"id":"3458764584133332196","title":"NotifiyCustomerByMail","fields":[{"name":"aggregateId","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"productId","example":"","mapping":"","type":"UUID","cardinality":"Single"}],"type":"COMMAND"}],"events":[{"id":"3458764584133332198","title":"CartItemRevoked","fields":[{"name":"aggregateId","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"productId","example":"","mapping":"","type":"UUID","cardinality":"Single"}],"type":"EVENT"}],"readmodels":[],"screens":[],"processors":[{"id":"3458764584133332195","title":"automation","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"productId","example":"","mapping":"","type":"UUID","cardinality":"Single"}],"type":"AUTOMATION"}],"specifications":[]},{"id":"","title":"slice: AddItem","commands":[{"id":"3458764584135698767","title":"AddItem","fields":[{"name":"productName","example":"","mapping":"","type":"String","cardinality":"Single"},{"name":"price","example":"","mapping":"","type":"Double","cardinality":"Single"},{"name":"aggregateId","example":"","mapping":"","type":"UUID","cardinality":"Single"},{"name":"quantity","example":"","mapping":"","type":"Int","cardinality":"Single"},{"name":"productimage","example":"","mapping":"","type":"String","cardinality":"Single"},{"name":"productId","example":"","mapping":"","type":"UUID","cardinality":"Single"}],"type":"COMMAND"}],"events":[{"id":"3458764584094984137","title":"CarttemAdded","fields":[{"name":"productName","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"price","type":"Double","example":"","mapping":"","cardinality":"Single"},{"name":"quantity","type":"Int","example":"","mapping":"","cardinality":"Single"},{"name":"productimage","type":"String","example":"","mapping":"","cardinality":"Single"},{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"cartItemId","type":"UUID","example":"","mapping":"","cardinality":"Single"},{"name":"productId","example":"","mapping":"","type":"UUID","cardinality":"Single"}],"type":"EVENT"},{"id":"3458764584101177505","title":"CartSessionStarted","fields":[{"name":"aggregateId","type":"UUID","example":"","mapping":"","cardinality":"Single"}],"type":"EVENT"}],"readmodels":[],"screens":[],"processors":[],"specifications":[]}],"aggregates":[{"id":"3458764584137788395","title":"Cart","fields":[],"type":"AGGREGATE"}],"sliceDependencies":[{"source":"slice: ViewCart","target":"slice: ViewCart"},{"source":"slice: ViewCart","target":"slice: Removeitem"},{"source":"slice: Inventory","target":"slice: Inventory"}]}
+{
+  "slices": [
+    {
+      "id": "",
+      "title": "slice: slice1",
+      "context": "",
+      "commands": [
+        {
+          "id": "3458764583134208590",
+          "title": "command",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "field1",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND"
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764583134208454",
+          "title": "event",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT"
+        }
+      ],
+      "readmodels": [],
+      "screens": [
+        {
+          "id": "3458764583136258780",
+          "title": "screen",
+          "type": "SCREEN"
+        }
+      ],
+      "processors": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: slice3",
+      "context": "",
+      "commands": [
+        {
+          "id": "3458764583134208859",
+          "title": "command",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "foo2",
+              "type": "String",
+              "example": "",
+              "mapping": "aggregateId",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND"
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764583134208455",
+          "title": "Element2",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "foo2",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT"
+        }
+      ],
+      "readmodels": [],
+      "screens": [
+        {
+          "id": "3458764583136317987",
+          "title": "screen",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "foo",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "SCREEN"
+        }
+      ],
+      "processors": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: slice5",
+      "context": "",
+      "commands": [
+        {
+          "id": "3458764583134208922",
+          "title": "command",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND"
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764583134208456",
+          "title": "Element3",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT"
+        }
+      ],
+      "readmodels": [],
+      "screens": [
+        {
+          "id": "3458764583136318007",
+          "title": "screen",
+          "type": "SCREEN"
+        }
+      ],
+      "processors": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: slice4",
+      "context": "",
+      "commands": [],
+      "events": [],
+      "readmodels": [
+        {
+          "id": "3458764583134452354",
+          "title": "readmodel",
+          "type": "READMODEL"
+        }
+      ],
+      "screens": [],
+      "processors": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: slice2",
+      "context": "",
+      "commands": [],
+      "events": [],
+      "readmodels": [
+        {
+          "id": "3458764583134452621",
+          "title": "readmodel",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "foo",
+              "type": "String",
+              "example": "",
+              "mapping": "aggregateId",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL"
+        }
+      ],
+      "screens": [],
+      "processors": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: slice6",
+      "context": "",
+      "commands": [],
+      "events": [],
+      "readmodels": [
+        {
+          "id": "3458764583134452689",
+          "title": "readmodel",
+          "fields": [
+            {
+              "name": "foo1",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "foo2",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL"
+        }
+      ],
+      "screens": [],
+      "processors": [],
+      "specifications": []
+    },
+    {
+      "id": "",
+      "title": "slice: 8",
+      "context": "",
+      "commands": [
+        {
+          "id": "3458764583135385966",
+          "title": "command",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND"
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764583135385965",
+          "title": "Element4",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT"
+        }
+      ],
+      "readmodels": [],
+      "screens": [],
+      "processors": [
+        {
+          "id": "3458764583135386416",
+          "title": "automation",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "AUTOMATION"
+        }
+      ],
+      "specifications": []
+    }
+  ],
+  "aggregates": [
+    {
+      "id": "3458764584412245111",
+      "title": "aggregate",
+      "type": "AGGREGATE"
+    },
+    {
+      "id": "3458764583565931328",
+      "title": "            aggregate",
+      "fields": [],
+      "type": "AGGREGATE"
+    },
+    {
+      "id": "3458764583565931043",
+      "title": "aggregate",
+      "type": "AGGREGATE"
+    }
+  ],
+  "sliceDependencies": [
+    {
+      "source": "slice: slice4",
+      "target": "slice: slice5"
+    },
+    {
+      "source": "slice: slice2",
+      "target": "slice: slice3"
+    }
+  ],
+  "context": "Demo",
+  "codeGen": {
+    "application": "ApplicationFoo",
+    "rootPackage": "de.nebulit"
+  }
+}

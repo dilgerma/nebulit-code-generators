@@ -15,7 +15,7 @@ module.exports = class extends Generator {
         config = require(this.env.cwd + "/config.json");
     }
 
-    init(){
+    init() {
     }
 
     async prompting() {
@@ -124,6 +124,9 @@ const typeMapping = (fieldType, fieldCardinality) => {
             break
         case "long":
             fieldType = "Long";
+            break
+        case "int":
+            fieldType = "Int";
             break
         case "boolean":
             fieldType = "Boolean";

@@ -1,5 +1,5 @@
 var Generator = require('yeoman-generator');
-const { ensureDirSync } = require("fs-extra");
+const {ensureDirSync} = require("fs-extra");
 var chalk = require('chalk');
 var slugify = require('slugify')
 
@@ -19,10 +19,12 @@ module.exports = class extends Generator {
             type: 'input',
             name: 'appName',
             message: 'Projektname?',
+            when: () => !config?.codeGen?.application,
         }, {
             type: 'input',
             name: 'rootPackageName',
             message: 'Root Package?',
+            when: () => !config?.codeGen?.rootPackage,
         },
             {
                 type: 'list',
@@ -30,6 +32,15 @@ module.exports = class extends Generator {
                 message: 'Was soll generiert werden?',
                 choices: ['Skeleton', 'slices', "aggregates"]
             }]);
+    }
+
+    setDefaults() {
+        if (!this.answers.appName) {
+            this.answers.appName = config?.codeGen?.application
+        }
+        if (!this.answers.rootPackageName) {
+            this.answers.rootPackageName = config?.codeGen?.rootPackage
+        }
     }
 
     writing() {
