@@ -86,8 +86,8 @@ module.exports = class extends Generator {
             }
         )
         this.fs.copyTpl(
-            this.templatePath('root/.gitignore'),
-            this.destinationPath(`${slugify(this.answers.appName)}`),
+            this.templatePath('root/gitignore'),
+            this.destinationPath(`${slugify(this.answers.appName)}/.gitignore`),
             {
                 rootPackageName: this.answers.rootPackageName
             }
