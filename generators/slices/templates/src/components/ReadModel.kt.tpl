@@ -1,11 +1,21 @@
-package <%= _rootPackageName%>.<%=_slice%>.internal
+package <%= _rootPackageName%>.<%=_slice%>
 
+import <%= _rootPackageName%>.common.AggregateService
+import <%= _rootPackageName%>.common.Query
+import <%= _rootPackageName%>.common.QueryHandler
 import <%= _rootPackageName%>.common.ReadModel
+import <%= _rootPackageName%>.domain.<%= _aggregate%>
 import <%= _rootPackageName%>.common.persistence.InternalEvent
-import java.util.*
+import org.springframework.stereotype.Component
 <%= _typeImports %>
 import mu.KotlinLogging
 
+//TODO adjust the query to the necessary parameters
+class <%= _name%>Query(var aggregateId: UUID) : Query<UUID> {
+    override fun toParam(): UUID {
+        return aggregateId
+    }
+}
 
 class <%= _name%> : ReadModel<<%= _name%>> {
 
@@ -24,6 +34,4 @@ class <%= _name%> : ReadModel<<%= _name%>> {
     }
 
 }
-
-
 

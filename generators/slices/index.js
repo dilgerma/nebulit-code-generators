@@ -170,6 +170,7 @@ module.exports = class extends Generator {
                     _fields: ConstructorGenerator.generateConstructorVariables(
                         event.fields
                     ),
+                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
                     _typeImports: typeImports(event.fields)
 
                 }
@@ -189,11 +190,10 @@ module.exports = class extends Generator {
         var slice = this._findSlice(sliceName)
         var title = _sliceTitle(slice.title).toLowerCase()
 
-
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/ReadModel.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._readmodelTitle(readmodel.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${this._readmodelTitle(readmodel.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -201,6 +201,7 @@ module.exports = class extends Generator {
                     _fields: VariablesGenerator.generateVariables(
                         readmodel.fields
                     ),
+                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
                     _typeImports: typeImports(readmodel.fields)
                 }
             )
@@ -274,11 +275,10 @@ module.exports = class extends Generator {
     }
 
     _generateGetRestCall(slice, restVariables, readModel) {
-        return `@GetMapping("/${slice}")
+
+     return `@GetMapping("/${slice}")
     fun findInformation(${restVariables}):ReadModel<${readModel}> {
-        return ${readModel}().applyEvents(repository.findByAggregateId(aggregateId))
-        
-    }
+    return delegatingQueryHandler.handleQuery<UUID, ${readModel}>(CartItemsReadModelQuery(aggregateId))    }
       `
     }
 

@@ -141,7 +141,7 @@ const generateImports = (rootPackageName, sliceName, elements) => {
             case "spec_command":
                 return `import ${rootPackageName}.${sliceName}.internal.${_commandTitle(element.title)}`
             case "spec_readmodel":
-                return `import ${rootPackageName}.${sliceName}.internal.${_readmodelTitle(element.title)}`
+                return `import ${rootPackageName}.${sliceName}.${_readmodelTitle(element.title)}`
             default:
                 console.log("Could not determine imports")
                 return ""
