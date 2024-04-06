@@ -280,25 +280,36 @@ function renderWhen(whenList, thenList, defaults) {
         }).join("\n");
     } else {
         return whenList.map((command) => {
-            return `var whenResult = scenario.stimulate { _ ->
-                  commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}`
+            return `commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))`
         }).join("\n");
     }
 
 }
 
 function renderGiven(givenList, defaults) {
-    return givenList.map((event) => {
+    var givens = givenList.map((event) => {
         return `
-         repository.save(RandomData.newInstance(listOf("value")) {
-                ${randomizedInvocationParamterList(event.fields.filter((it) => it.name == "aggregateId"), defaults)}
-                this.value = ${_eventTitle(event.title)}(
-                    ${randomizedInvocationParamterList(event.fields, defaults)}
-                )
-            })
+        events.add(RandomData.newInstance(listOf("value")) {
+                        ${randomizedInvocationParamterList(event.fields.filter((it) => it.name == "aggregateId"), defaults)}
+                        this.value = ${_eventTitle(event.title)}(
+                            ${randomizedInvocationParamterList(event.fields, defaults)}
+                        )
+                    })
         `
     }).join("\n")
 
+    var given = `
+    var events = mutableListOf<InternalEvent>()
+     ${givens}
+     
+      events.forEach { event ->
+                        run {
+                            repository.save(event)
+                            event.value?.let { eventPublisher.publishEvent(it) }
+                        }
+                    }
+    `
+    return given
 
 }
 

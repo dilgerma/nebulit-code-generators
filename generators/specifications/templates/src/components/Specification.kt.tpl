@@ -6,6 +6,8 @@ import <%= _rootPackageName%>.common.CommandException
 import <%= _rootPackageName%>.common.DelegatingCommandHandler
 import <%= _rootPackageName%>.common.persistence.EventsEntityRepository
 import <%= _rootPackageName%>.support.<%=_aggregate%>Repository
+import <%= _rootPackageName%>.common.persistence.InternalEvent
+
 
 <%= _elementImports%>
 <%= _typeImports%>
@@ -42,11 +44,16 @@ class <%=_name%> {
     @Test
     fun `<%=_name%>`(scenario: Scenario) {
 
-        //GIVEN
-    <%-_given%>
+       var whenResult = scenario.stimulate { stimulus, eventPublisher ->
+                run {
+                    stimulus.executeWithoutResult {
+                        //GIVEN
+                        <%-_given%>
 
-        //WHEN
-    <%-_when%>
+                        //WHEN
+                        <%-_when%>
+                    }
+                }}
 
         //THEN
     <%-_then%>
