@@ -1,11 +1,12 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
-const { ensureDirSync } = require("fs-extra");
+const {ensureDirSync} = require("fs-extra");
 var slugify = require('slugify')
 const {answers} = require("../app");
 const {givenAnswers, _commandTitle, _readmodelTitle} = require("./index");
 
 let config = {}
+
 function _sliceTitle(title) {
     return slugify(title.replace("slice:", "")).replaceAll("-", "").toLowerCase()
 }
@@ -27,15 +28,15 @@ module.exports = class extends Generator {
                 name: 'context',
                 loop: false,
                 message: 'Welchen Kontexte (keine Auswahl für alle)?',
-                choices: Array.from(new Set(config.slices.map((item) => item.context).filter(item=>item))).sort(),
-                when: ()=>Array.from(new Set(config.slices.map((item) => item.context).filter(item=>item))).length>0,
+                choices: Array.from(new Set(config.slices.map((item) => item.context).filter(item => item))).sort(),
+                when: () => Array.from(new Set(config.slices.map((item) => item.context).filter(item => item))).length > 0,
             },
             {
                 type: 'list',
                 name: 'slice',
                 loop: false,
                 message: 'Welcher Slices soll generiert werden?',
-                choices: (items)=>config.slices.filter((slice)=>!items.context || items.context?.length === 0 || items.context?.includes(slice.context)).map((item, idx) => item.title).sort()
+                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).map((item, idx) => item.title).sort()
             },
             {
                 type: 'confirm',
@@ -59,7 +60,7 @@ module.exports = class extends Generator {
                 name: 'processTriggers',
                 message: 'Wähle Trigger Events',
                 when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.processors?.length > 0) ?? false,
-                choices: (items) => config.slices.filter((slice)=>!items.context || items.context?.length === 0 || items.context?.includes(slice.context)).flatMap((slice) => slice.events).map(item => item.title)
+                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).flatMap((slice) => slice.events).map(item => item.title)
             }]);
 
     }
@@ -207,6 +208,18 @@ module.exports = class extends Generator {
             )
         })
 
+        this.fs.copyTpl(
+            this.templatePath(`src/components/QueryHandler.kt.tpl`),
+            this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._readmodelTitle(processor.title)}QueryHandler.kt`),
+            {
+                _slice: title,
+                _rootPackageName: this.givenAnswers.rootPackageName,
+                _name: this._readmodelTitle(readmodel.title),
+                _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
+
+            }
+        )
+
 
     }
 
@@ -276,7 +289,7 @@ module.exports = class extends Generator {
 
     _generateGetRestCall(slice, restVariables, readModel) {
 
-     return `@GetMapping("/${slice}")
+        return `@GetMapping("/${slice}")
     fun findInformation(${restVariables}):ReadModel<${readModel}> {
     return delegatingQueryHandler.handleQuery<UUID, ${readModel}>(${readModel}Query(aggregateId))    }
       `
