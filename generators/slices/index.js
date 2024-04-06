@@ -206,19 +206,19 @@ module.exports = class extends Generator {
                     _typeImports: typeImports(readmodel.fields)
                 }
             )
+
+            this.fs.copyTpl(
+                this.templatePath(`src/components/QueryHandler.kt.tpl`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._readmodelTitle(readmodel.title)}QueryHandler.kt`),
+                {
+                    _slice: title,
+                    _rootPackageName: this.givenAnswers.rootPackageName,
+                    _name: this._readmodelTitle(readmodel.title),
+                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
+
+                }
+            )
         })
-
-        this.fs.copyTpl(
-            this.templatePath(`src/components/QueryHandler.kt.tpl`),
-            this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._readmodelTitle(readmodel.title)}QueryHandler.kt`),
-            {
-                _slice: title,
-                _rootPackageName: this.givenAnswers.rootPackageName,
-                _name: this._readmodelTitle(readmodel.title),
-                _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
-
-            }
-        )
 
 
     }
