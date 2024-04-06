@@ -215,6 +215,7 @@ module.exports = class extends Generator {
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: this._readmodelTitle(readmodel.title),
                     _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
+                    _typeImports: typeImports(readmodel.fields)
 
                 }
             )
