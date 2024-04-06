@@ -278,7 +278,7 @@ module.exports = class extends Generator {
 
      return `@GetMapping("/${slice}")
     fun findInformation(${restVariables}):ReadModel<${readModel}> {
-    return delegatingQueryHandler.handleQuery<UUID, ${readModel}>(CartItemsReadModelQuery(aggregateId))    }
+    return delegatingQueryHandler.handleQuery<UUID, ${readModel}>(${readModel}Query(aggregateId))    }
       `
     }
 
