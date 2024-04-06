@@ -210,7 +210,7 @@ module.exports = class extends Generator {
 
         this.fs.copyTpl(
             this.templatePath(`src/components/QueryHandler.kt.tpl`),
-            this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._readmodelTitle(processor.title)}QueryHandler.kt`),
+            this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._readmodelTitle(readmodel.title)}QueryHandler.kt`),
             {
                 _slice: title,
                 _rootPackageName: this.givenAnswers.rootPackageName,
