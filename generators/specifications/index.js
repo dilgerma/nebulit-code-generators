@@ -260,7 +260,11 @@ function renderThen(thenList, defaults) {
                         ${assertionList(item.fields, defaults)}.toArrive()`
 
         } else if (item.type === "SPEC_READMODEL") {
-            return `\tvar readModel = ${_readmodelTitle(item.title)}().applyEvents(repository.findByAggregateId(AGGREGATE_ID))`
+            return `\twhenResult.andWaitForStateChange {
+            \t\tvar readModel: ${_readmodelTitle(item.title)} =
+                            queryHandler.handleQuery(${_readmodelTitle(item.title)}Query(AGGREGATE_ID))
+    \t\t//assertThat(readModel.data).contains(..)
+    \t}`
         }
 
     }).join("\n")

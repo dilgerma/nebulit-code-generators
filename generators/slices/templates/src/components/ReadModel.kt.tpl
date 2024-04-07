@@ -4,7 +4,6 @@ import <%= _rootPackageName%>.common.AggregateService
 import <%= _rootPackageName%>.common.Query
 import <%= _rootPackageName%>.common.QueryHandler
 import <%= _rootPackageName%>.common.ReadModel
-import <%= _rootPackageName%>.domain.<%= _aggregate%>
 import <%= _rootPackageName%>.common.persistence.InternalEvent
 import org.springframework.stereotype.Component
 <%= _typeImports %>

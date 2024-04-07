@@ -1,6 +1,5 @@
 package <%= _rootPackageName%>.<%=_slice%>.internal
 
-import <%= _rootPackageName%>.common.DelegatingCommandHandler
 import <%= _rootPackageName%>.common.DelegatingQueryHandler
 import <%= _rootPackageName%>.<%= _slice%>.<%= _readModel%>
 import <%= _rootPackageName%>.<%= _slice%>.<%= _readModel%>Query

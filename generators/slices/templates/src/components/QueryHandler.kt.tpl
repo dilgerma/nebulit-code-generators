@@ -22,4 +22,8 @@ class <%= _name%>QueryHandler(
          return <%= _name%>().applyEvents(aggregateService.findEventsByAggregateId(query.toParam()))
     }
 
+     override fun <T> canHandle(query: Query<T>): Boolean {
+            return query is <%= _name%>Query
+     }
+
 }
