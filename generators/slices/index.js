@@ -399,7 +399,7 @@ class ConstructorGenerator {
 
 //(: {name, type, example, mapping}
     static generateConstructorVariables(fields, overrides) {
-        return `${fields?.map((field) => (overrides?.includes(field.name) ? "override " : "") + "var " + field.name + ":" + typeMapping(field.type)).join(",")}`
+        return `${fields?.map((field) => (overrides?.includes(field.name) ? "override " : "") + "var " + field.name + ":" + typeMapping(field.type)).filter(it=>it).join(",")??""}`
     }
 }
 
@@ -421,7 +421,7 @@ class VariablesGenerator {
 
             return `${variable.name}`;
 
-        }).filter((it) => it !== "").join(",")
+        }).filter((it) => it !== "").join(",")??""
     }
 
     static generateRestParamInvocation(fields) {
@@ -433,7 +433,7 @@ class VariablesGenerator {
                 return `@RequestParam ${variable.name}:${typeMapping(variable.type, variable.cardinality)}`;
             }
 
-        }).filter((it) => it !== "").join(",")
+        }).filter((it) => it !== "").join(",")??""
     }
 }
 
@@ -471,7 +471,10 @@ const typeMapping = (fieldType, fieldCardinality) => {
 }
 
 const typeImports = (fields) => {
-    var imports = fields.map((field) => {
+    if(!fields || fields.length === 0) {
+        return []
+    }
+    var imports = fields?.map((field) => {
         switch (field.type?.toLowerCase()) {
             case "date":
                 return ["import java.time.LocalDate", "import org.springframework.format.annotation.DateTimeFormat"]
@@ -487,16 +490,16 @@ const typeImports = (fields) => {
                 return []
         }
     })
-    return Array.from([...new Set(imports.flat())]).flat().join(";\n")
+    return Array.from([...new Set(imports?.flat()??[])]).flat().join(";\n")
 
 }
 
 const invocation = (type, fields) => {
-    return `new ${type}(${fields.map((it) => variableNameOrMapping(it)).join(",")})`
+    return `new ${type}(${fields.map((it) => variableNameOrMapping(it)).filter(it=>it).join(",")})`
 }
 
 const receiverInvocation = (type, receiver) => {
-    return `new ${type.title}(${type.fields.map((it) => receiver + "." + variableNameOrMapping(it)).join(",")})`
+    return `new ${type.title}(${type.fields?.map((it) => receiver + "." + variableNameOrMapping(it)).filter(it=>it).join(",")})`
 }
 
 const variableNameOrMapping = (field) => {

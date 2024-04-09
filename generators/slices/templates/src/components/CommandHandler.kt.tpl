@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher
 import <%= _rootPackageName%>.domain.<%= _aggregate%>
 <%= _typeImports %>
 import mu.KotlinLogging
+import org.springframework.transaction.annotation.Transactional
 
 
 @Component
@@ -17,6 +18,7 @@ class <%= _name%>CommandHandler(
 
     var logger = KotlinLogging.logger {}
 
+    @Transactional
     override fun handle(inputCommand: Command): List<InternalEvent> {
         assert(inputCommand is <%= _commandType%>)
         val command = inputCommand as <%= _commandType%>

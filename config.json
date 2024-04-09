@@ -59,6 +59,13 @@
               "example": "",
               "mapping": "",
               "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
             }
           ],
           "type": "READMODEL"
@@ -79,7 +86,7 @@
           "given": [
             {
               "title": "CarttemAdded",
-              "id": "3458764584193639045",
+              "id": "3458764584193639044",
               "type": "SPEC_EVENT",
               "fields": [
                 {
@@ -90,12 +97,12 @@
                 {
                   "name": "price",
                   "type": "Double",
-                  "example": "3.0"
+                  "example": "5.0"
                 },
                 {
                   "name": "quantity",
                   "type": "Int",
-                  "example": "1"
+                  "example": "2"
                 },
                 {
                   "name": "productimage",
@@ -121,7 +128,7 @@
             },
             {
               "title": "CarttemAdded",
-              "id": "3458764584193639044",
+              "id": "3458764584193639045",
               "type": "SPEC_EVENT",
               "fields": [
                 {
@@ -132,12 +139,12 @@
                 {
                   "name": "price",
                   "type": "Double",
-                  "example": "5.0"
+                  "example": "3.0"
                 },
                 {
                   "name": "quantity",
                   "type": "Int",
-                  "example": "2"
+                  "example": "1"
                 },
                 {
                   "name": "productimage",
@@ -203,6 +210,176 @@
                   "name": "cartItemId",
                   "type": "UUID",
                   "example": ""
+                },
+                {
+                  "name": "productId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sliceName": "slice: ViewCart",
+          "title": "spec:  ViewCart after revocation",
+          "given": [
+            {
+              "title": "CartSessionStarted",
+              "id": "3458764584863980054",
+              "type": "SPEC_EVENT",
+              "fields": [
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                }
+              ]
+            },
+            {
+              "title": "CarttemAdded",
+              "id": "3458764584863980055",
+              "type": "SPEC_EVENT",
+              "fields": [
+                {
+                  "name": "productName",
+                  "type": "String",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "price",
+                  "type": "Double",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "quantity",
+                  "type": "Int",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "productimage",
+                  "type": "String",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "cartItemId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "productId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                }
+              ]
+            },
+            {
+              "title": "ProductRevoked",
+              "id": "3458764584863980056",
+              "type": "SPEC_EVENT",
+              "fields": [
+                {
+                  "name": "productId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                }
+              ]
+            }
+          ],
+          "when": [],
+          "then": [
+            {
+              "title": "CartItems",
+              "id": "3458764584863980057",
+              "type": "SPEC_READMODEL",
+              "fields": [
+                {
+                  "name": "productName",
+                  "type": "String",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "price",
+                  "type": "Double",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "quantity",
+                  "type": "Int",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "productimage",
+                  "type": "String",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "totalPrice",
+                  "type": "Double",
+                  "example": "",
+                  "mapping": "price",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "cartItemId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "productId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
                 }
               ]
             }
@@ -800,27 +977,6 @@
               ]
             },
             {
-              "title": "InventoryChanged",
-              "id": "3458764584398547062",
-              "type": "SPEC_EVENT",
-              "fields": [
-                {
-                  "name": "aggregateId",
-                  "type": "UUID",
-                  "example": "",
-                  "mapping": "",
-                  "cardinality": "Single"
-                },
-                {
-                  "name": "quantity",
-                  "type": "Int",
-                  "example": "",
-                  "mapping": "",
-                  "cardinality": "Single"
-                }
-              ]
-            },
-            {
               "title": "CarttemAdded",
               "id": "3458764584398547061",
               "type": "SPEC_EVENT",
@@ -870,6 +1026,27 @@
                 {
                   "name": "productId",
                   "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                }
+              ]
+            },
+            {
+              "title": "InventoryChanged",
+              "id": "3458764584398547062",
+              "type": "SPEC_EVENT",
+              "fields": [
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "quantity",
+                  "type": "Int",
                   "example": "",
                   "mapping": "",
                   "cardinality": "Single"
@@ -993,7 +1170,7 @@
           "given": [
             {
               "title": "CarttemAdded",
-              "id": "3458764584194213117",
+              "id": "3458764584194213116",
               "type": "SPEC_EVENT",
               "fields": [
                 {
@@ -1049,7 +1226,7 @@
             },
             {
               "title": "CarttemAdded",
-              "id": "3458764584194213116",
+              "id": "3458764584194213117",
               "type": "SPEC_EVENT",
               "fields": [
                 {
@@ -1539,27 +1716,6 @@
           "title": "spec:  ActiveCartSessions",
           "given": [
             {
-              "title": "CartItemRemoved",
-              "id": "3458764584217812320",
-              "type": "SPEC_EVENT",
-              "fields": [
-                {
-                  "name": "aggregateId",
-                  "type": "UUID",
-                  "example": "",
-                  "mapping": "",
-                  "cardinality": "Single"
-                },
-                {
-                  "name": "cartItemId",
-                  "type": "UUID",
-                  "example": "",
-                  "mapping": "",
-                  "cardinality": "Single"
-                }
-              ]
-            },
-            {
               "title": "CarttemAdded",
               "id": "3458764584217812318",
               "type": "SPEC_EVENT",
@@ -1608,6 +1764,27 @@
                 },
                 {
                   "name": "productId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                }
+              ]
+            },
+            {
+              "title": "CartItemRemoved",
+              "id": "3458764584217812320",
+              "type": "SPEC_EVENT",
+              "fields": [
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "cartItemId",
                   "type": "UUID",
                   "example": "",
                   "mapping": "",
@@ -1771,23 +1948,6 @@
               ]
             },
             {
-              "title": "ProductRevocationRequested",
-              "id": "3458764584797797377",
-              "type": "SPEC_EVENT",
-              "fields": [
-                {
-                  "name": "productId",
-                  "type": "UUID",
-                  "example": "e3ede415-f60e-4711-bb4d-dbcd6191309a"
-                },
-                {
-                  "name": "aggregateId",
-                  "type": "UUID",
-                  "example": "030f7413-4335-4ff5-8ab5-f754ec823180"
-                }
-              ]
-            },
-            {
               "title": "CarttemAdded",
               "id": "3458764584797797376",
               "type": "SPEC_EVENT",
@@ -1826,6 +1986,23 @@
                   "name": "productId",
                   "type": "UUID",
                   "example": "e3ede415-f60e-4711-bb4d-dbcd6191309a"
+                }
+              ]
+            },
+            {
+              "title": "ProductRevocationRequested",
+              "id": "3458764584797797377",
+              "type": "SPEC_EVENT",
+              "fields": [
+                {
+                  "name": "productId",
+                  "type": "UUID",
+                  "example": "e3ede415-f60e-4711-bb4d-dbcd6191309a"
+                },
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": "030f7413-4335-4ff5-8ab5-f754ec823180"
                 }
               ]
             }
@@ -2061,20 +2238,6 @@
       ],
       "events": [
         {
-          "id": "3458764584101177505",
-          "title": "CartSessionStarted",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT"
-        },
-        {
           "id": "3458764584094984137",
           "title": "CarttemAdded",
           "fields": [
@@ -2122,6 +2285,20 @@
             },
             {
               "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT"
+        },
+        {
+          "id": "3458764584101177505",
+          "title": "CartSessionStarted",
+          "fields": [
+            {
+              "name": "aggregateId",
               "type": "UUID",
               "example": "",
               "mapping": "",
@@ -2594,34 +2771,6 @@
               ]
             },
             {
-              "title": "PriceChanged",
-              "id": "3458764584723845533",
-              "type": "SPEC_EVENT",
-              "fields": [
-                {
-                  "name": "oldPrice",
-                  "type": "Double",
-                  "example": "",
-                  "mapping": "",
-                  "cardinality": "Single"
-                },
-                {
-                  "name": "newPrice",
-                  "type": "Double",
-                  "example": "",
-                  "mapping": "",
-                  "cardinality": "Single"
-                },
-                {
-                  "name": "aggregateId",
-                  "type": "UUID",
-                  "example": "",
-                  "mapping": "",
-                  "cardinality": "Single"
-                }
-              ]
-            },
-            {
               "title": "CarttemAdded",
               "id": "3458764584723845532",
               "type": "SPEC_EVENT",
@@ -2670,6 +2819,34 @@
                 },
                 {
                   "name": "productId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                }
+              ]
+            },
+            {
+              "title": "PriceChanged",
+              "id": "3458764584723845533",
+              "type": "SPEC_EVENT",
+              "fields": [
+                {
+                  "name": "oldPrice",
+                  "type": "Double",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "newPrice",
+                  "type": "Double",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                },
+                {
+                  "name": "aggregateId",
                   "type": "UUID",
                   "example": "",
                   "mapping": "",
@@ -2730,6 +2907,20 @@
           "title": "spec:  Request Product Revoke",
           "given": [
             {
+              "title": "CartSessionStarted",
+              "id": "3458764584734077520",
+              "type": "SPEC_EVENT",
+              "fields": [
+                {
+                  "name": "aggregateId",
+                  "type": "UUID",
+                  "example": "",
+                  "mapping": "",
+                  "cardinality": "Single"
+                }
+              ]
+            },
+            {
               "title": "CarttemAdded",
               "id": "3458764584734077521",
               "type": "SPEC_EVENT",
@@ -2778,20 +2969,6 @@
                 },
                 {
                   "name": "productId",
-                  "type": "UUID",
-                  "example": "",
-                  "mapping": "",
-                  "cardinality": "Single"
-                }
-              ]
-            },
-            {
-              "title": "CartSessionStarted",
-              "id": "3458764584734077520",
-              "type": "SPEC_EVENT",
-              "fields": [
-                {
-                  "name": "aggregateId",
                   "type": "UUID",
                   "example": "",
                   "mapping": "",
@@ -2880,17 +3057,9 @@
   ],
   "aggregates": [
     {
-      "id": "3458764584455835021",
-      "title": "ProductPricing",
-      "fields": [
-        {
-          "name": "aggregateId",
-          "type": "UUID",
-          "example": "",
-          "mapping": "",
-          "cardinality": "Single"
-        }
-      ],
+      "id": "3458764584137788395",
+      "title": "Cart",
+      "fields": [],
       "type": "AGGREGATE"
     },
     {
@@ -2908,9 +3077,17 @@
       "type": "AGGREGATE"
     },
     {
-      "id": "3458764584137788395",
-      "title": "Cart",
-      "fields": [],
+      "id": "3458764584455835021",
+      "title": "ProductPricing",
+      "fields": [
+        {
+          "name": "aggregateId",
+          "type": "UUID",
+          "example": "",
+          "mapping": "",
+          "cardinality": "Single"
+        }
+      ],
       "type": "AGGREGATE"
     }
   ],
