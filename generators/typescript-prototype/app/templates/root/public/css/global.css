@@ -1,0 +1,49 @@
+html,
+body {
+  height: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.padding {
+  margin-top: 20px
+}
+
+.container {
+}
+
+.select {
+  min-width: 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.padding {
+  margin-left: 10px;
+}
+
+.left-margin {
+  margin-left: 10px;
+}
+
+.debug {
+  z-index: 100 !important;
+  position: absolute;
+  width: 450px;
+  top:15px;
+  right: 20px;
+  max-height: 500px;
+  overflow-y: scroll;
+}

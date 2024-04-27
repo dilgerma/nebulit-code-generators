@@ -16,90 +16,20 @@ module.exports = class extends Generator {
     // Async Await
     async prompting() {
         this.answers = await this.prompt([{
-            type: 'input',
-            name: 'appName',
-            message: 'Projektname?',
-            when: () => !config?.codeGen?.application,
-        }, {
-            type: 'input',
-            name: 'rootPackageName',
-            message: 'Root Package?',
-            when: () => !config?.codeGen?.rootPackage,
-        },
-            {
-                type: 'list',
-                name: 'generatorType',
-                message: 'Was soll generiert werden?',
-                choices: ['Skeleton', 'slices', "aggregates"]
-            }]);
+            type: 'list',
+            name: 'generator',
+            message: 'Welcher Generator?',
+            choices: ["springboot","typescript-prototype","eventcatalog"]
+        }]);
     }
 
-    setDefaults() {
-        if (!this.answers.appName) {
-            this.answers.appName = config?.codeGen?.application
-        }
-        if (!this.answers.rootPackageName) {
-            this.answers.rootPackageName = config?.codeGen?.rootPackage
-        }
+
+    generators() {
+
+        this.composeWith(require.resolve(`../${this.answers.generator}/app`), {
+            answers: this.answers,
+            appName: this.answers.appName ?? this.appName
+        });
     }
 
-    writing() {
-
-        if (this.answers.generatorType === 'Skeleton') {
-            this._writeReactSkeleton();
-        } else if (this.answers.generatorType === 'slices') {
-            this.log(chalk.green('starting commands generation'))
-            this.composeWith(require.resolve('../slices'), {
-                answers: this.answers,
-                appName: this.answers.appName ?? this.appName
-            });
-        } else if (this.answers.generatorType === 'aggregates') {
-            this.log(chalk.green('starting aggregates generation'))
-            this.composeWith(require.resolve('../aggregates'), {
-                answers: this.answers,
-                appName: this.answers.appName ?? this.appName
-            });
-        }
-    }
-
-    _writeReactSkeleton() {
-        this.fs.copyTpl(
-            this.templatePath('root'),
-            this.destinationPath(slugify(this.answers.appName)),
-            {
-                rootPackageName: this.answers.rootPackageName,
-                appName: this.answers.appName,
-            }
-        )
-        this.fs.copyTpl(
-            this.templatePath('src'),
-            this.destinationPath(`${slugify(this.answers.appName)}/src/main/kotlin/${this.answers.rootPackageName.split(".").join("/")}`),
-            {
-                rootPackageName: this.answers.rootPackageName
-            }
-        )
-        this.fs.copyTpl(
-            this.templatePath('test'),
-            this.destinationPath(`${slugify(this.answers.appName)}/src/test/kotlin/${this.answers.rootPackageName.split(".").join("/")}`),
-            {
-                rootPackageName: this.answers.rootPackageName
-            }
-        )
-        this.fs.copyTpl(
-            this.templatePath('git/gitignore'),
-            this.destinationPath(`${slugify(this.answers.appName)}/.gitignore`),
-            {
-                rootPackageName: this.answers.rootPackageName
-            }
-        )
-
-    }
-
-    end() {
-        this.log(chalk.green('------------'))
-        this.log(chalk.magenta('***---***'))
-        this.log(chalk.blue('Jobs is Done!'))
-        this.log(chalk.green('------------'))
-        this.log(chalk.magenta('***---***'))
-    }
 };
