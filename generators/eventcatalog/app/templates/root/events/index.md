@@ -1,19 +1,13 @@
 ---
 name: <%=name%>
-version: 0.0.1
+version: 0.0.0
 summary: |
-    TODO - summary
+  <%-_description%>
 producers:
     <%=_producers%>
 ---
 
-<Admonition>
-TODO - admonition
-</Admonition>
-
 ### Details
-
-TODO - details
 
 <NodeGraph title="Consumer / Producer Diagram" />
 

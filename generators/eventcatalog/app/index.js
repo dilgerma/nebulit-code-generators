@@ -89,6 +89,7 @@ module.exports = class extends Generator {
                 this.destinationPath(`${slugify(this.answers.appName)}/domains/${aggregate?.title}/index.md`),
                 {
                     name: aggregate?.title,
+                    _description: aggregate.description??""
                 }
             )
         })
@@ -96,12 +97,13 @@ module.exports = class extends Generator {
     }
 
     _writeActors() {
-        config.aggregates?.forEach((aggregate) => {
+        config.aggregates?.forEach((actor) => {
             this.fs.copyTpl(
                 this.templatePath('root/domains/domainname/index.md'),
-                this.destinationPath(`${slugify(this.answers.appName)}/domains/${aggregate?.title}/index.md`),
+                this.destinationPath(`${slugify(this.answers.appName)}/domains/${actor?.title}/index.md`),
                 {
-                    name: aggregate?.title,
+                    name: actor?.title,
+                    _description: actor.description??""
                 }
             )
         })
@@ -116,6 +118,7 @@ module.exports = class extends Generator {
                     this.destinationPath(`${slugify(this.answers.appName)}/services/${command?.title}/index.md`),
                     {
                         name: command?.title,
+                        _description: command.description??""
                     }
                 )
             })
@@ -134,7 +137,8 @@ module.exports = class extends Generator {
                         this.destinationPath(`${slugify(this.answers.appName)}/domains/${event.aggregate}/events/${event.title}/index.md`),
                         {
                             name: event?.title,
-                            _producers: slice.commands.map((command) => toListElement(command.title))
+                            _producers: slice.commands.map((command) => toListElement(command.title)),
+                            _description: event.description??"TODO - beschreibung"
                         }
                     )
                 } else {
@@ -143,6 +147,7 @@ module.exports = class extends Generator {
                         this.destinationPath(`${slugify(this.answers.appName)}/events/${event.title}/index.md`),
                         {
                             name: event?.title,
+                            _description: event.description??"TODO - beschreibung",
                             _producers: slice.commands.map((command) => toListElement(command.title))
                         }
                     )

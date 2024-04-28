@@ -1,13 +1,9 @@
 ---
 name: <%=name%>
 summary: |
-  Domain Description
+  <%-_description%>
 ---
 
-<Admonition>TODO - add description</Admonition>
-
 ### Details
-
-TODO - add details
 
 <NodeGraph title="Domain Graph" />

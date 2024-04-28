@@ -1,9 +1,9 @@
 ---
 name: <%=name%>
 summary: |
-    TODO: summary
+  <%-_description%>
 ---
 
-TODO describe command
+### Details
 
 <NodeGraph />
