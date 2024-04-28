@@ -195,13 +195,16 @@ module.exports = class extends Generator {
         config.slices?.filter(slice => slice.commands?.length > 0).forEach((slice) => {
             slice.events?.forEach((event) => {
 
+                console.log("###" + JSON.stringify(event))
+
                 if (event.aggregate) {
                     this.fs.copyTpl(
                         this.templatePath('root/events/index.md'),
                         this.destinationPath(`${slugify(this.answers.appName)}/domains/${event.aggregate}/events/${event.title}/index.md`),
                         {
                             name: event?.title,
-                            _producers: slice.commands.map((command) => toListElement(command.title)),
+                            _producers: renderProducers(event.dependencies?.filter(it => it.type === "INBOUND").filter(item => item.elementType === "COMMAND").map(elementDependency => toListElement(elementDependency.title))),
+                            _consumers: renderConsumers(event.dependencies?.filter(it => it.type === "OUTBOUND").map(elementDependency => toListElement(elementDependency.title))),
                             _description: event.description ?? "TODO - beschreibung"
                         }
                     )
@@ -212,7 +215,8 @@ module.exports = class extends Generator {
                         {
                             name: event?.title,
                             _description: event.description ?? "TODO - beschreibung",
-                            _producers: slice.commands.map((command) => toListElement(command.title))
+                            _producers: renderProducers(event.dependencies?.filter(it => it.type === "INBOUND").filter(item => item.elementType === "COMMAND").map(elementDependency => toListElement(elementDependency.title))),
+                            _consumers: renderConsumers(event.dependencies?.filter(it => it.type === "OUTBOUND").map(elementDependency => toListElement(elementDependency.title))),
                         }
                     )
                 }
@@ -229,6 +233,16 @@ module.exports = class extends Generator {
     }
 };
 
+function renderProducers(items){
+    return items.length > 0 ? `producers:
+${items.join("\n")}` : "";
+}
+
+function renderConsumers(items) {
+    return items.length > 0 ? `consumers:
+${items.join("\n")}` : "";
+}
+
 function toListElement(item) {
-    return `- ${item}`
+    return `\t- ${item}`
 }
