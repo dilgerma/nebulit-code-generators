@@ -1,6 +1,8 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var slugify = require('slugify')
+const schema = require('fluent-json-schema')
+
 
 let config = {}
 
@@ -60,7 +62,7 @@ module.exports = class extends Generator {
 
     _writeApp() {
 
-        let actorsNames = config.slices.filter((slice) => slice.actors.length > 0).flatMap((slice) => slice.actors).map(it => it.name).filter(it=>it)
+        let actorsNames = config.slices.filter((slice) => slice.actors.length > 0).flatMap((slice) => slice.actors).map(it => it.name).filter(it => it)
 
 
         var actors = Array.from(new Set(actorsNames)).map(actor => {
@@ -89,7 +91,7 @@ module.exports = class extends Generator {
                 this.destinationPath(`${slugify(this.answers.appName)}/domains/${aggregate?.title}/index.md`),
                 {
                     name: aggregate?.title,
-                    _description: aggregate.description??""
+                    _description: aggregate.description ?? ""
                 }
             )
         })
@@ -103,7 +105,7 @@ module.exports = class extends Generator {
                 this.destinationPath(`${slugify(this.answers.appName)}/domains/${actor?.title}/index.md`),
                 {
                     name: actor?.title,
-                    _description: actor.description??""
+                    _description: actor.description ?? ""
                 }
             )
         })
@@ -118,7 +120,7 @@ module.exports = class extends Generator {
                     this.destinationPath(`${slugify(this.answers.appName)}/services/${command?.title}/index.md`),
                     {
                         name: command?.title,
-                        _description: command.description??""
+                        _description: command.description ?? ""
                     }
                 )
             })
@@ -127,8 +129,70 @@ module.exports = class extends Generator {
 
     }
 
+    _writeSchema(event) {
+        //schema https://github.com/fastify/fluent-json-schema/blob/master/docs/API.md
+        //https://github.com/fastify/fluent-json-schema?tab=readme-ov-file
+        //FORMATS: https://github.com/fastify/fluent-json-schema/blob/master/types/FluentJSONSchema.d.ts
+        //DEFINE array items - https://stackoverflow.com/questions/59294320/how-to-return-array-in-fluent-schema
+        let element = schema.object()
+        element = element.title(event.title)
+            .description(event.description)
+        event.fields?.forEach(field => {
+            element = element.prop(field.name, this._fieldType(field.type, field.cardinality))
+        })
+        let destinationPath = event.aggregate ? `${slugify(this.answers.appName)}/domains/${event.aggregate}/events/${event.title}/schema.json` : `${slugify(this.answers.appName)}/events/${event.title}/schema.json`;
+        this.fs.copyTpl(
+            this.templatePath('root/events/schema.tpl.json'),
+            this.destinationPath(destinationPath),
+            {
+                _schema: JSON.stringify(element.valueOf(), null, 2)
+            }
+        )
+
+    }
+
+    _fieldType(type, cardinality) {
+
+        /*
+        * String = "String",
+            UUID = "UUID",
+            Boolean = "Boolean",
+            Double = "Double",
+            Date = "Date",
+            Long = "Long",
+            Int = "Int",
+            Custom = "Custom",
+        * */
+        if (cardinality === "Single") {
+            switch (type) {
+                case "String":
+                    return schema.string()
+                case "Boolean":
+                    return schema.boolean()
+                case "Double":
+                    return schema.number()
+                case "Long":
+                    return schema.number()
+                case "Integer":
+                    return schema.integer()
+                case "UUID":
+                    return schema.string().format("uuid")
+                case "Date":
+                    return schema.string().format("date-time")
+                case "Custom":
+                    return schema.object().additionalProperties(true)
+                default:
+                    return schema.string()
+            }
+        } else {
+            return schema.array().items(
+                _fieldType(type, "Single")
+            )
+        }
+    }
+
     _writeEvents() {
-        var events = config.slices?.filter(slice=>slice.commands?.length > 0).forEach((slice) => {
+        config.slices?.filter(slice => slice.commands?.length > 0).forEach((slice) => {
             slice.events?.forEach((event) => {
 
                 if (event.aggregate) {
@@ -138,7 +202,7 @@ module.exports = class extends Generator {
                         {
                             name: event?.title,
                             _producers: slice.commands.map((command) => toListElement(command.title)),
-                            _description: event.description??"TODO - beschreibung"
+                            _description: event.description ?? "TODO - beschreibung"
                         }
                     )
                 } else {
@@ -147,15 +211,18 @@ module.exports = class extends Generator {
                         this.destinationPath(`${slugify(this.answers.appName)}/events/${event.title}/index.md`),
                         {
                             name: event?.title,
-                            _description: event.description??"TODO - beschreibung",
+                            _description: event.description ?? "TODO - beschreibung",
                             _producers: slice.commands.map((command) => toListElement(command.title))
                         }
                     )
                 }
+                this._writeSchema(event)
             })
         })
 
+
     }
+
 
     end() {
         this.log(chalk.blue('Jobs is Done!'))
