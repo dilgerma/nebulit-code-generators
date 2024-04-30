@@ -36,12 +36,19 @@ module.exports = class extends Generator {
 
     writing() {
 
-            this._writeReactSkeleton();
-            this.log(chalk.green('starting commands generation'))
-            this.composeWith(require.resolve('../slices'), {
-                answers: this.answers,
-                appName: this.answers.appName ?? this.appName
-            });
+        this._writeReactSkeleton();
+        this.composeWith(require.resolve('../aggregates'), {
+            answers: this.answers,
+            appName: this.answers.appName ?? this.appName
+        });
+        this.composeWith(require.resolve('../events'), {
+                  answers: this.answers,
+                  appName: this.answers.appName ?? this.appName
+              });
+        this.composeWith(require.resolve('../slices'), {
+            answers: this.answers,
+            appName: this.answers.appName ?? this.appName
+        });
         //
         // if (this.answers.generatorType === 'aggregates') {
         //     this.log(chalk.green('starting aggregates generation'))

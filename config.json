@@ -2,664 +2,10 @@
   "slices": [
     {
       "id": "",
-      "title": "slice: no",
+      "title": "slice: ViewCart",
       "context": "",
       "commands": [],
       "events": [
-        {
-          "id": "3458764584719299200",
-          "title": "ProductRevocationRequested",
-          "fields": [
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "Cart",
-          "dependencies": [
-            {
-              "id": "3458764584719449725",
-              "type": "OUTBOUND",
-              "title": "Spring Event Registry",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584719299198",
-              "type": "INBOUND",
-              "title": "RequestProductRevocationAfterPriceChange",
-              "elementType": "COMMAND"
-            }
-          ]
-        },
-        {
-          "id": "3458764584132555744",
-          "title": "ProductRevoked",
-          "fields": [
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "Cart",
-          "dependencies": [
-            {
-              "id": "3458764584133035758",
-              "type": "OUTBOUND",
-              "title": "SpringEventRegistry",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584132555283",
-              "type": "INBOUND",
-              "title": "RevokeProductAfterPriceChange",
-              "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
-      "readmodels": [
-        {
-          "id": "3458764584719449725",
-          "title": "Spring Event Registry",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "READMODEL",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584132555168",
-              "type": "OUTBOUND",
-              "title": "automation",
-              "elementType": "AUTOMATION"
-            },
-            {
-              "id": "3458764584719299200",
-              "type": "INBOUND",
-              "title": "ProductRevocationRequested",
-              "elementType": "EVENT"
-            }
-          ]
-        },
-        {
-          "id": "3458764584133035758",
-          "title": "SpringEventRegistry",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "READMODEL",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584133332195",
-              "type": "OUTBOUND",
-              "title": "automation",
-              "elementType": "AUTOMATION"
-            },
-            {
-              "id": "3458764584132555744",
-              "type": "INBOUND",
-              "title": "ProductRevoked",
-              "elementType": "EVENT"
-            }
-          ]
-        }
-      ],
-      "screens": [],
-      "processors": [
-        {
-          "id": "3458764584133332195",
-          "title": "automation",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "AUTOMATION",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584133332196",
-              "type": "OUTBOUND",
-              "title": "NotifiyCustomerByMail",
-              "elementType": "COMMAND"
-            },
-            {
-              "id": "3458764584133035758",
-              "type": "INBOUND",
-              "title": "SpringEventRegistry",
-              "elementType": "READMODEL"
-            }
-          ]
-        }
-      ],
-      "specifications": [],
-      "actors": []
-    },
-    {
-      "id": "",
-      "title": "slice: Removeitem",
-      "context": "",
-      "commands": [
-        {
-          "id": "3458764584115718377",
-          "title": "RemoveItem",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "cartItemId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND",
-          "description": "Das ist die Beschreibung",
-          "dependencies": [
-            {
-              "id": "3458764584115718379",
-              "type": "OUTBOUND",
-              "title": "CartItemRemoved",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764584115718364",
-              "type": "INBOUND",
-              "title": "screen",
-              "elementType": "SCREEN"
-            }
-          ]
-        }
-      ],
-      "events": [
-        {
-          "id": "3458764584115718379",
-          "title": "CartItemRemoved",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "cartItemId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "Cart",
-          "dependencies": [
-            {
-              "id": "3458764584135447953",
-              "type": "OUTBOUND",
-              "title": "ActiveCartProductsWithProducts",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584101318212",
-              "type": "OUTBOUND",
-              "title": "ProductInventory",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584115718377",
-              "type": "INBOUND",
-              "title": "RemoveItem",
-              "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
-      "readmodels": [],
-      "screens": [
-        {
-          "id": "3458764584115718364",
-          "title": "screen",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "cartItemId",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "SCREEN",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584115718377",
-              "type": "OUTBOUND",
-              "title": "RemoveItem",
-              "elementType": "COMMAND"
-            },
-            {
-              "id": "3458764584099471667",
-              "type": "INBOUND",
-              "title": "CartItems",
-              "elementType": "READMODEL"
-            }
-          ]
-        }
-      ],
-      "processors": [],
-      "specifications": [
-        {
-          "sliceName": "slice: Removeitem",
-          "title": "spec:  Removeitem",
-          "given": [],
-          "when": [],
-          "then": []
-        },
-        {
-          "sliceName": "slice: Removeitem",
-          "title": "spec:  RemoveitemAlreadyExisting",
-          "given": [],
-          "when": [],
-          "then": []
-        }
-      ],
-      "actors": [
-        {
-          "name": "User",
-          "authzRequired": false
-        }
-      ]
-    },
-    {
-      "id": "",
-      "title": "slice: NotifyCustomerOfProductRevoke",
-      "context": "",
-      "commands": [
-        {
-          "id": "3458764584133332196",
-          "title": "NotifiyCustomerByMail",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584133332198",
-              "type": "OUTBOUND",
-              "title": "CartItemRevoked",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764584133332195",
-              "type": "INBOUND",
-              "title": "automation",
-              "elementType": "AUTOMATION"
-            }
-          ]
-        }
-      ],
-      "events": [
-        {
-          "id": "3458764584133332198",
-          "title": "CartItemRevoked",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584133332196",
-              "type": "INBOUND",
-              "title": "NotifiyCustomerByMail",
-              "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
-      "readmodels": [],
-      "screens": [],
-      "processors": [
-        {
-          "id": "3458764584133332195",
-          "title": "automation",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "AUTOMATION",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584133332196",
-              "type": "OUTBOUND",
-              "title": "NotifiyCustomerByMail",
-              "elementType": "COMMAND"
-            },
-            {
-              "id": "3458764584133035758",
-              "type": "INBOUND",
-              "title": "SpringEventRegistry",
-              "elementType": "READMODEL"
-            }
-          ]
-        }
-      ],
-      "specifications": [
-        {
-          "sliceName": "slice: NotifyCustomerOfProductRevoke",
-          "title": "spec:  NotifyCustomerOfProductRevoke",
-          "given": [],
-          "when": [],
-          "then": []
-        }
-      ],
-      "actors": []
-    },
-    {
-      "id": "",
-      "title": "slice: Request Product Revoke",
-      "context": "",
-      "commands": [
-        {
-          "id": "3458764584719299198",
-          "title": "RequestProductRevocationAfterPriceChange",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "changedProductId",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584719299200",
-              "type": "OUTBOUND",
-              "title": "ProductRevocationRequested",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764584719299197",
-              "type": "INBOUND",
-              "title": "automation",
-              "elementType": "AUTOMATION"
-            }
-          ]
-        }
-      ],
-      "events": [
-        {
-          "id": "3458764584719299200",
-          "title": "ProductRevocationRequested",
-          "fields": [
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "Cart",
-          "dependencies": [
-            {
-              "id": "3458764584719449725",
-              "type": "OUTBOUND",
-              "title": "Spring Event Registry",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584719299198",
-              "type": "INBOUND",
-              "title": "RequestProductRevocationAfterPriceChange",
-              "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
-      "readmodels": [],
-      "screens": [],
-      "processors": [
-        {
-          "id": "3458764584719299197",
-          "title": "automation",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "changedProductId",
-              "cardinality": "List"
-            }
-          ],
-          "type": "AUTOMATION",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584719299198",
-              "type": "OUTBOUND",
-              "title": "RequestProductRevocationAfterPriceChange",
-              "elementType": "COMMAND"
-            },
-            {
-              "id": "3458764584135447953",
-              "type": "INBOUND",
-              "title": "ActiveCartProductsWithProducts",
-              "elementType": "READMODEL"
-            }
-          ]
-        }
-      ],
-      "specifications": [
-        {
-          "sliceName": "slice: Request Product Revoke",
-          "title": "spec:  Request Product Revoke",
-          "given": [],
-          "when": [],
-          "then": []
-        },
-        {
-          "sliceName": "slice: Request Product Revoke",
-          "title": "spec:  Request Product Revoke",
-          "given": [],
-          "when": [],
-          "then": []
-        }
-      ],
-      "actors": []
-    },
-    {
-      "id": "",
-      "title": "slice: ActiveCartSessions",
-      "context": "",
-      "commands": [],
-      "events": [
-        {
-          "id": "3458764584115718379",
-          "title": "CartItemRemoved",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "cartItemId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "Cart",
-          "dependencies": [
-            {
-              "id": "3458764584135447953",
-              "type": "OUTBOUND",
-              "title": "ActiveCartProductsWithProducts",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584101318212",
-              "type": "OUTBOUND",
-              "title": "ProductInventory",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584115718377",
-              "type": "INBOUND",
-              "title": "RemoveItem",
-              "elementType": "COMMAND"
-            }
-          ]
-        },
         {
           "id": "3458764584094984137",
           "title": "CarttemAdded",
@@ -719,12 +65,6 @@
           "aggregate": "Cart",
           "dependencies": [
             {
-              "id": "3458764584101068231",
-              "type": "OUTBOUND",
-              "title": "InventoryChanged",
-              "elementType": "EVENT"
-            },
-            {
               "id": "3458764584099471667",
               "type": "OUTBOUND",
               "title": "CartItems",
@@ -743,23 +83,46 @@
               "elementType": "COMMAND"
             }
           ]
-        },
+        }
+      ],
+      "readmodels": [
         {
-          "id": "3458764584128065142",
-          "title": "PriceChanged",
+          "id": "3458764584099471667",
+          "title": "CartItems",
           "fields": [
             {
-              "name": "oldPrice",
+              "name": "productName",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "price",
               "type": "Double",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
             },
             {
-              "name": "newPrice",
-              "type": "Double",
+              "name": "quantity",
+              "type": "Int",
               "example": "",
               "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productimage",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "totalPrice",
+              "type": "Double",
+              "example": "",
+              "mapping": "price",
               "cardinality": "Single"
             },
             {
@@ -768,26 +131,159 @@
               "example": "",
               "mapping": "",
               "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "ProductPricing",
-          "dependencies": [
-            {
-              "id": "3458764584135447953",
-              "type": "OUTBOUND",
-              "title": "ActiveCartProductsWithProducts",
-              "elementType": "READMODEL"
             },
             {
-              "id": "3458764584127822893",
+              "name": "cartItemId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584099149631",
+              "type": "OUTBOUND",
+              "title": "ViewCart",
+              "elementType": "SCREEN"
+            },
+            {
+              "id": "3458764584115718364",
+              "type": "OUTBOUND",
+              "title": "screen",
+              "elementType": "SCREEN"
+            },
+            {
+              "id": "3458764584094984137",
               "type": "INBOUND",
-              "title": "ChangePrice",
-              "elementType": "COMMAND"
+              "title": "CarttemAdded",
+              "elementType": "EVENT"
+            }
+          ]
+        }
+      ],
+      "screens": [
+        {
+          "id": "3458764584099149631",
+          "title": "ViewCart",
+          "fields": [],
+          "type": "SCREEN",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584099471667",
+              "type": "INBOUND",
+              "title": "CartItems",
+              "elementType": "READMODEL"
             }
           ]
         },
+        {
+          "id": "3458764584115718364",
+          "title": "screen",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "cartItemId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "SCREEN",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584115718377",
+              "type": "OUTBOUND",
+              "title": "RemoveItem",
+              "elementType": "COMMAND"
+            },
+            {
+              "id": "3458764584099471667",
+              "type": "INBOUND",
+              "title": "CartItems",
+              "elementType": "READMODEL"
+            }
+          ]
+        }
+      ],
+      "processors": [],
+      "specifications": [
+        {
+          "sliceName": "slice: ViewCart",
+          "title": "spec:  ViewCart",
+          "given": [],
+          "when": [],
+          "then": []
+        },
+        {
+          "sliceName": "slice: ViewCart",
+          "title": "spec:  ViewCart after revocation",
+          "given": [],
+          "when": [],
+          "then": []
+        }
+      ],
+      "actors": [
+        {
+          "name": "User",
+          "authzRequired": false
+        }
+      ]
+    },
+    {
+      "id": "",
+      "title": "slice: ClearCart",
+      "context": "",
+      "commands": [
+        {
+          "id": "3458764584100080846",
+          "title": "ClearCart",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584100080914",
+              "type": "OUTBOUND",
+              "title": "CartCleared",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764584100080749",
+              "type": "INBOUND",
+              "title": "screen",
+              "elementType": "SCREEN"
+            }
+          ]
+        }
+      ],
+      "events": [
         {
           "id": "3458764584100080914",
           "title": "CartCleared",
@@ -819,227 +315,11 @@
           ]
         }
       ],
-      "readmodels": [
-        {
-          "id": "3458764584135447953",
-          "title": "ActiveCartProductsWithProducts",
-          "fields": [
-            {
-              "name": "changedProductId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "aggregateId",
-              "cardinality": "List"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "List"
-            }
-          ],
-          "type": "READMODEL",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584719299197",
-              "type": "OUTBOUND",
-              "title": "automation",
-              "elementType": "AUTOMATION"
-            },
-            {
-              "id": "3458764584115718379",
-              "type": "INBOUND",
-              "title": "CartItemRemoved",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764584094984137",
-              "type": "INBOUND",
-              "title": "CarttemAdded",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764584128065142",
-              "type": "INBOUND",
-              "title": "PriceChanged",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764584100080914",
-              "type": "INBOUND",
-              "title": "CartCleared",
-              "elementType": "EVENT"
-            }
-          ]
-        }
-      ],
-      "screens": [],
-      "processors": [
-        {
-          "id": "3458764584719299197",
-          "title": "automation",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "changedProductId",
-              "cardinality": "List"
-            }
-          ],
-          "type": "AUTOMATION",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584719299198",
-              "type": "OUTBOUND",
-              "title": "RequestProductRevocationAfterPriceChange",
-              "elementType": "COMMAND"
-            },
-            {
-              "id": "3458764584135447953",
-              "type": "INBOUND",
-              "title": "ActiveCartProductsWithProducts",
-              "elementType": "READMODEL"
-            }
-          ]
-        }
-      ],
-      "specifications": [
-        {
-          "sliceName": "slice: ActiveCartSessions",
-          "title": "spec:  ActiveCartSessions",
-          "given": [],
-          "when": [],
-          "then": []
-        },
-        {
-          "sliceName": "slice: ActiveCartSessions",
-          "title": "spec:  ActiveCartSessions_cartProducts",
-          "given": [],
-          "when": [],
-          "then": []
-        },
-        {
-          "sliceName": "slice: ActiveCartSessions",
-          "title": "spec:  ActiveCartSessions_withCartItemRemoved",
-          "given": [],
-          "when": [],
-          "then": []
-        }
-      ],
-      "actors": []
-    },
-    {
-      "id": "",
-      "title": "slice: PriceChange",
-      "context": "",
-      "commands": [
-        {
-          "id": "3458764584127822893",
-          "title": "ChangePrice",
-          "fields": [
-            {
-              "name": "oldPrice",
-              "type": "Double",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "newPrice",
-              "type": "Double",
-              "example": "",
-              "mapping": "price",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584128065142",
-              "type": "OUTBOUND",
-              "title": "PriceChanged",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764584127822584",
-              "type": "INBOUND",
-              "title": "automation",
-              "elementType": "AUTOMATION"
-            }
-          ]
-        }
-      ],
-      "events": [
-        {
-          "id": "3458764584128065142",
-          "title": "PriceChanged",
-          "fields": [
-            {
-              "name": "oldPrice",
-              "type": "Double",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "newPrice",
-              "type": "Double",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "ProductPricing",
-          "dependencies": [
-            {
-              "id": "3458764584135447953",
-              "type": "OUTBOUND",
-              "title": "ActiveCartProductsWithProducts",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584127822893",
-              "type": "INBOUND",
-              "title": "ChangePrice",
-              "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
       "readmodels": [],
-      "screens": [],
-      "processors": [
+      "screens": [
         {
-          "id": "3458764584127822584",
-          "title": "automation",
+          "id": "3458764584100080749",
+          "title": "screen",
           "fields": [
             {
               "name": "aggregateId",
@@ -1047,190 +327,36 @@
               "example": "",
               "mapping": "",
               "cardinality": "Single"
-            },
-            {
-              "name": "oldPrice",
-              "type": "Double",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "price",
-              "type": "Double",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
             }
           ],
-          "type": "AUTOMATION",
+          "type": "SCREEN",
           "description": "",
           "dependencies": [
             {
-              "id": "3458764584127822893",
+              "id": "3458764584100080846",
               "type": "OUTBOUND",
-              "title": "ChangePrice",
+              "title": "ClearCart",
               "elementType": "COMMAND"
             }
           ]
         }
       ],
+      "processors": [],
       "specifications": [
         {
-          "sliceName": "slice: PriceChange",
-          "title": "spec:  PriceChange",
-          "given": [],
-          "when": [],
-          "then": []
-        },
-        {
-          "sliceName": "slice: PriceChange",
-          "title": "spec:  PriceChange_errorOnNegativePrice",
+          "sliceName": "slice: ClearCart",
+          "title": "spec:  ClearCart",
           "given": [],
           "when": [],
           "then": []
         }
       ],
-      "actors": []
-    },
-    {
-      "id": "",
-      "title": "slice: InventoryChange",
-      "context": "",
-      "commands": [
+      "actors": [
         {
-          "id": "3458764584114637705",
-          "title": "ChangeInventory",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "quantity",
-              "type": "Int",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584101068231",
-              "type": "OUTBOUND",
-              "title": "InventoryChanged",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764584100976849",
-              "type": "INBOUND",
-              "title": "automation",
-              "elementType": "AUTOMATION"
-            }
-          ]
+          "name": "User",
+          "authzRequired": false
         }
-      ],
-      "events": [
-        {
-          "id": "3458764584101068231",
-          "title": "InventoryChanged",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "quantity",
-              "type": "Int",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "ProductInventory",
-          "dependencies": [
-            {
-              "id": "3458764584101318212",
-              "type": "OUTBOUND",
-              "title": "ProductInventory",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584114637705",
-              "type": "INBOUND",
-              "title": "ChangeInventory",
-              "elementType": "COMMAND"
-            },
-            {
-              "id": "3458764584094984137",
-              "type": "INBOUND",
-              "title": "CarttemAdded",
-              "elementType": "EVENT"
-            }
-          ]
-        }
-      ],
-      "readmodels": [],
-      "screens": [],
-      "processors": [
-        {
-          "id": "3458764584100976849",
-          "title": "automation",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "quantity",
-              "type": "Int",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "AUTOMATION",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584114637705",
-              "type": "OUTBOUND",
-              "title": "ChangeInventory",
-              "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
-      "specifications": [
-        {
-          "sliceName": "slice: InventoryChange",
-          "title": "spec:  InventoryChange",
-          "given": [],
-          "when": [],
-          "then": []
-        },
-        {
-          "sliceName": "slice: InventoryChange",
-          "title": "spec:  InventoryChange_errorOnNegativeInventory",
-          "given": [],
-          "when": [],
-          "then": []
-        }
-      ],
-      "actors": []
+      ]
     },
     {
       "id": "",
@@ -1387,27 +513,14 @@
     },
     {
       "id": "",
-      "title": "slice: AddItem",
+      "title": "slice: Inventory",
       "context": "",
-      "commands": [
+      "commands": [],
+      "events": [
         {
-          "id": "3458764584135698767",
-          "title": "AddItem",
+          "id": "3458764584101068231",
+          "title": "InventoryChanged",
           "fields": [
-            {
-              "name": "productName",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "price",
-              "type": "Double",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
             {
               "name": "aggregateId",
               "type": "UUID",
@@ -1421,53 +534,39 @@
               "example": "",
               "mapping": "",
               "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "aggregate": "ProductInventory",
+          "dependencies": [
+            {
+              "id": "3458764584101318212",
+              "type": "OUTBOUND",
+              "title": "ProductInventory",
+              "elementType": "READMODEL"
             },
             {
-              "name": "productimage",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
+              "id": "3458764584114637705",
+              "type": "INBOUND",
+              "title": "ChangeInventory",
+              "elementType": "COMMAND"
+            }
+          ]
+        },
+        {
+          "id": "3458764584115718379",
+          "title": "CartItemRemoved",
+          "fields": [
             {
-              "name": "productId",
+              "name": "aggregateId",
               "type": "UUID",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584101177505",
-              "type": "OUTBOUND",
-              "title": "CartSessionStarted",
-              "elementType": "EVENT"
             },
             {
-              "id": "3458764584094984137",
-              "type": "OUTBOUND",
-              "title": "CarttemAdded",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764587040209272",
-              "type": "INBOUND",
-              "title": "AdminView",
-              "elementType": "SCREEN"
-            }
-          ]
-        }
-      ],
-      "events": [
-        {
-          "id": "3458764584101177505",
-          "title": "CartSessionStarted",
-          "fields": [
-            {
-              "name": "aggregateId",
+              "name": "cartItemId",
               "type": "UUID",
               "example": "",
               "mapping": "",
@@ -1475,45 +574,38 @@
             }
           ],
           "type": "EVENT",
-          "description": "foo beschreibng",
+          "description": "",
           "aggregate": "Cart",
           "dependencies": [
             {
-              "id": "3458764584135698767",
+              "id": "3458764584135447953",
+              "type": "OUTBOUND",
+              "title": "ActiveCartProductsWithProducts",
+              "elementType": "READMODEL"
+            },
+            {
+              "id": "3458764584101318212",
+              "type": "OUTBOUND",
+              "title": "ProductInventory",
+              "elementType": "READMODEL"
+            },
+            {
+              "id": "3458764584115718377",
               "type": "INBOUND",
-              "title": "AddItem",
+              "title": "RemoveItem",
               "elementType": "COMMAND"
             }
           ]
-        },
+        }
+      ],
+      "readmodels": [
         {
-          "id": "3458764584094984137",
-          "title": "CarttemAdded",
+          "id": "3458764584101318212",
+          "title": "ProductInventory",
           "fields": [
-            {
-              "name": "productName",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "price",
-              "type": "Double",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
             {
               "name": "quantity",
               "type": "Int",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productimage",
-              "type": "String",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
@@ -1531,60 +623,53 @@
               "example": "",
               "mapping": "",
               "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584114744115",
+              "type": "OUTBOUND",
+              "title": "screen",
+              "elementType": "SCREEN"
             },
             {
-              "name": "productId",
+              "id": "3458764584101068231",
+              "type": "INBOUND",
+              "title": "InventoryChanged",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764584115718379",
+              "type": "INBOUND",
+              "title": "CartItemRemoved",
+              "elementType": "EVENT"
+            }
+          ]
+        }
+      ],
+      "screens": [
+        {
+          "id": "3458764584114744115",
+          "title": "screen",
+          "fields": [
+            {
+              "name": "aggregateId",
               "type": "UUID",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
             }
           ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "Cart",
-          "dependencies": [
-            {
-              "id": "3458764584101068231",
-              "type": "OUTBOUND",
-              "title": "InventoryChanged",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764584099471667",
-              "type": "OUTBOUND",
-              "title": "CartItems",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584135447953",
-              "type": "OUTBOUND",
-              "title": "ActiveCartProductsWithProducts",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584135698767",
-              "type": "INBOUND",
-              "title": "AddItem",
-              "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
-      "readmodels": [],
-      "screens": [
-        {
-          "id": "3458764587040209272",
-          "title": "AdminView",
-          "fields": [],
           "type": "SCREEN",
           "description": "",
           "dependencies": [
             {
-              "id": "3458764584135698767",
-              "type": "OUTBOUND",
-              "title": "AddItem",
-              "elementType": "COMMAND"
+              "id": "3458764584101318212",
+              "type": "INBOUND",
+              "title": "ProductInventory",
+              "elementType": "READMODEL"
             }
           ]
         }
@@ -1592,15 +677,8 @@
       "processors": [],
       "specifications": [
         {
-          "sliceName": "slice: AddItem",
-          "title": "spec:  AddItem",
-          "given": [],
-          "when": [],
-          "then": []
-        },
-        {
-          "sliceName": "slice: AddItem",
-          "title": "spec:  AddItem adding multiple items",
+          "sliceName": "slice: Inventory",
+          "title": "spec:  Inventory",
           "given": [],
           "when": [],
           "then": []
@@ -1612,6 +690,443 @@
           "authzRequired": false
         }
       ]
+    },
+    {
+      "id": "",
+      "title": "slice: InventoryChange",
+      "context": "",
+      "commands": [
+        {
+          "id": "3458764584114637705",
+          "title": "ChangeInventory",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "quantity",
+              "type": "Int",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584101068231",
+              "type": "OUTBOUND",
+              "title": "InventoryChanged",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764584100976849",
+              "type": "INBOUND",
+              "title": "automation",
+              "elementType": "AUTOMATION"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764584101068231",
+          "title": "InventoryChanged",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "quantity",
+              "type": "Int",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "aggregate": "ProductInventory",
+          "dependencies": [
+            {
+              "id": "3458764584101318212",
+              "type": "OUTBOUND",
+              "title": "ProductInventory",
+              "elementType": "READMODEL"
+            },
+            {
+              "id": "3458764584114637705",
+              "type": "INBOUND",
+              "title": "ChangeInventory",
+              "elementType": "COMMAND"
+            }
+          ]
+        }
+      ],
+      "readmodels": [],
+      "screens": [],
+      "processors": [
+        {
+          "id": "3458764584100976849",
+          "title": "automation",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "quantity",
+              "type": "Int",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "AUTOMATION",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584114637705",
+              "type": "OUTBOUND",
+              "title": "ChangeInventory",
+              "elementType": "COMMAND"
+            }
+          ]
+        }
+      ],
+      "specifications": [
+        {
+          "sliceName": "slice: InventoryChange",
+          "title": "spec:  InventoryChange",
+          "given": [],
+          "when": [],
+          "then": []
+        },
+        {
+          "sliceName": "slice: InventoryChange",
+          "title": "spec:  InventoryChange_errorOnNegativeInventory",
+          "given": [],
+          "when": [],
+          "then": []
+        }
+      ],
+      "actors": []
+    },
+    {
+      "id": "",
+      "title": "slice: Removeitem",
+      "context": "",
+      "commands": [
+        {
+          "id": "3458764584115718377",
+          "title": "RemoveItem",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "cartItemId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND",
+          "description": "Das ist die Beschreibung",
+          "dependencies": [
+            {
+              "id": "3458764584115718379",
+              "type": "OUTBOUND",
+              "title": "CartItemRemoved",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764584115718364",
+              "type": "INBOUND",
+              "title": "screen",
+              "elementType": "SCREEN"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764584115718379",
+          "title": "CartItemRemoved",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "cartItemId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "aggregate": "Cart",
+          "dependencies": [
+            {
+              "id": "3458764584135447953",
+              "type": "OUTBOUND",
+              "title": "ActiveCartProductsWithProducts",
+              "elementType": "READMODEL"
+            },
+            {
+              "id": "3458764584101318212",
+              "type": "OUTBOUND",
+              "title": "ProductInventory",
+              "elementType": "READMODEL"
+            },
+            {
+              "id": "3458764584115718377",
+              "type": "INBOUND",
+              "title": "RemoveItem",
+              "elementType": "COMMAND"
+            }
+          ]
+        }
+      ],
+      "readmodels": [],
+      "screens": [
+        {
+          "id": "3458764584115718364",
+          "title": "screen",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "cartItemId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "SCREEN",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584115718377",
+              "type": "OUTBOUND",
+              "title": "RemoveItem",
+              "elementType": "COMMAND"
+            },
+            {
+              "id": "3458764584099471667",
+              "type": "INBOUND",
+              "title": "CartItems",
+              "elementType": "READMODEL"
+            }
+          ]
+        }
+      ],
+      "processors": [],
+      "specifications": [
+        {
+          "sliceName": "slice: Removeitem",
+          "title": "spec:  Removeitem",
+          "given": [],
+          "when": [],
+          "then": []
+        },
+        {
+          "sliceName": "slice: Removeitem",
+          "title": "spec:  RemoveitemAlreadyExisting",
+          "given": [],
+          "when": [],
+          "then": []
+        }
+      ],
+      "actors": [
+        {
+          "name": "User",
+          "authzRequired": false
+        }
+      ]
+    },
+    {
+      "id": "",
+      "title": "slice: PriceChange",
+      "context": "",
+      "commands": [
+        {
+          "id": "3458764584127822893",
+          "title": "ChangePrice",
+          "fields": [
+            {
+              "name": "oldPrice",
+              "type": "Double",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "newPrice",
+              "type": "Double",
+              "example": "",
+              "mapping": "price",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584128065142",
+              "type": "OUTBOUND",
+              "title": "PriceChanged",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764584127822584",
+              "type": "INBOUND",
+              "title": "PriceChange Automation",
+              "elementType": "AUTOMATION"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764584128065142",
+          "title": "PriceChanged",
+          "fields": [
+            {
+              "name": "oldPrice",
+              "type": "Double",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "newPrice",
+              "type": "Double",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "aggregate": "ProductPricing",
+          "dependencies": [
+            {
+              "id": "3458764584135447953",
+              "type": "OUTBOUND",
+              "title": "ActiveCartProductsWithProducts",
+              "elementType": "READMODEL"
+            },
+            {
+              "id": "3458764584127822893",
+              "type": "INBOUND",
+              "title": "ChangePrice",
+              "elementType": "COMMAND"
+            }
+          ]
+        }
+      ],
+      "readmodels": [],
+      "screens": [],
+      "processors": [
+        {
+          "id": "3458764584127822584",
+          "title": "PriceChange Automation",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "oldPrice",
+              "type": "Double",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "price",
+              "type": "Double",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "AUTOMATION",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584127822893",
+              "type": "OUTBOUND",
+              "title": "ChangePrice",
+              "elementType": "COMMAND"
+            }
+          ]
+        }
+      ],
+      "specifications": [
+        {
+          "sliceName": "slice: PriceChange",
+          "title": "spec:  PriceChange",
+          "given": [],
+          "when": [],
+          "then": []
+        },
+        {
+          "sliceName": "slice: PriceChange",
+          "title": "spec:  PriceChange_errorOnNegativePrice",
+          "given": [],
+          "when": [],
+          "then": []
+        }
+      ],
+      "actors": []
     },
     {
       "id": "",
@@ -1754,7 +1269,329 @@
     },
     {
       "id": "",
-      "title": "slice: ViewCart",
+      "title": "slice: no",
+      "context": "",
+      "commands": [],
+      "events": [
+        {
+          "id": "3458764584132555744",
+          "title": "ProductRevoked",
+          "fields": [
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "aggregate": "Cart",
+          "dependencies": [
+            {
+              "id": "3458764584133035758",
+              "type": "OUTBOUND",
+              "title": "SpringEventRegistry",
+              "elementType": "READMODEL"
+            },
+            {
+              "id": "3458764584132555283",
+              "type": "INBOUND",
+              "title": "RevokeProductAfterPriceChange",
+              "elementType": "COMMAND"
+            }
+          ]
+        },
+        {
+          "id": "3458764584719299200",
+          "title": "ProductRevocationRequested",
+          "fields": [
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "aggregate": "Cart",
+          "dependencies": [
+            {
+              "id": "3458764584719449725",
+              "type": "OUTBOUND",
+              "title": "Spring Event Registry",
+              "elementType": "READMODEL"
+            },
+            {
+              "id": "3458764584719299198",
+              "type": "INBOUND",
+              "title": "RequestProductRevocationAfterPriceChange",
+              "elementType": "COMMAND"
+            }
+          ]
+        }
+      ],
+      "readmodels": [
+        {
+          "id": "3458764584133035758",
+          "title": "SpringEventRegistry",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584133332195",
+              "type": "OUTBOUND",
+              "title": "automation",
+              "elementType": "AUTOMATION"
+            },
+            {
+              "id": "3458764584132555744",
+              "type": "INBOUND",
+              "title": "ProductRevoked",
+              "elementType": "EVENT"
+            }
+          ]
+        },
+        {
+          "id": "3458764584719449725",
+          "title": "Spring Event Registry",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "READMODEL",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584132555168",
+              "type": "OUTBOUND",
+              "title": "automation",
+              "elementType": "AUTOMATION"
+            },
+            {
+              "id": "3458764584719299200",
+              "type": "INBOUND",
+              "title": "ProductRevocationRequested",
+              "elementType": "EVENT"
+            }
+          ]
+        }
+      ],
+      "screens": [],
+      "processors": [
+        {
+          "id": "3458764584132555168",
+          "title": "automation",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "AUTOMATION",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584132555283",
+              "type": "OUTBOUND",
+              "title": "RevokeProductAfterPriceChange",
+              "elementType": "COMMAND"
+            },
+            {
+              "id": "3458764584719449725",
+              "type": "INBOUND",
+              "title": "Spring Event Registry",
+              "elementType": "READMODEL"
+            }
+          ]
+        }
+      ],
+      "specifications": [],
+      "actors": []
+    },
+    {
+      "id": "",
+      "title": "slice: NotifyCustomerOfProductRevoke",
+      "context": "",
+      "commands": [
+        {
+          "id": "3458764584133332196",
+          "title": "NotifiyCustomerByMail",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584133332198",
+              "type": "OUTBOUND",
+              "title": "CartItemRevoked",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764584133332195",
+              "type": "INBOUND",
+              "title": "automation",
+              "elementType": "AUTOMATION"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764584133332198",
+          "title": "CartItemRevoked",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584133332196",
+              "type": "INBOUND",
+              "title": "NotifiyCustomerByMail",
+              "elementType": "COMMAND"
+            }
+          ]
+        }
+      ],
+      "readmodels": [],
+      "screens": [],
+      "processors": [
+        {
+          "id": "3458764584133332195",
+          "title": "automation",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "AUTOMATION",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584133332196",
+              "type": "OUTBOUND",
+              "title": "NotifiyCustomerByMail",
+              "elementType": "COMMAND"
+            },
+            {
+              "id": "3458764584133035758",
+              "type": "INBOUND",
+              "title": "SpringEventRegistry",
+              "elementType": "READMODEL"
+            }
+          ]
+        }
+      ],
+      "specifications": [
+        {
+          "sliceName": "slice: NotifyCustomerOfProductRevoke",
+          "title": "spec:  NotifyCustomerOfProductRevoke",
+          "given": [],
+          "when": [],
+          "then": []
+        }
+      ],
+      "actors": []
+    },
+    {
+      "id": "",
+      "title": "slice: ActiveCartSessions",
       "context": "",
       "commands": [],
       "events": [
@@ -1817,12 +1654,6 @@
           "aggregate": "Cart",
           "dependencies": [
             {
-              "id": "3458764584101068231",
-              "type": "OUTBOUND",
-              "title": "InventoryChanged",
-              "elementType": "EVENT"
-            },
-            {
               "id": "3458764584099471667",
               "type": "OUTBOUND",
               "title": "CartItems",
@@ -1841,207 +1672,7 @@
               "elementType": "COMMAND"
             }
           ]
-        }
-      ],
-      "readmodels": [
-        {
-          "id": "3458764584099471667",
-          "title": "CartItems",
-          "fields": [
-            {
-              "name": "productName",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "price",
-              "type": "Double",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "quantity",
-              "type": "Int",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productimage",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "totalPrice",
-              "type": "Double",
-              "example": "",
-              "mapping": "price",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "cartItemId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "productId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "READMODEL",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584115718364",
-              "type": "OUTBOUND",
-              "title": "screen",
-              "elementType": "SCREEN"
-            },
-            {
-              "id": "3458764584099149631",
-              "type": "OUTBOUND",
-              "title": "ViewCart",
-              "elementType": "SCREEN"
-            },
-            {
-              "id": "3458764584094984137",
-              "type": "INBOUND",
-              "title": "CarttemAdded",
-              "elementType": "EVENT"
-            }
-          ]
-        }
-      ],
-      "screens": [
-        {
-          "id": "3458764584115718364",
-          "title": "screen",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "cartItemId",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "SCREEN",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584115718377",
-              "type": "OUTBOUND",
-              "title": "RemoveItem",
-              "elementType": "COMMAND"
-            },
-            {
-              "id": "3458764584099471667",
-              "type": "INBOUND",
-              "title": "CartItems",
-              "elementType": "READMODEL"
-            }
-          ]
         },
-        {
-          "id": "3458764584099149631",
-          "title": "ViewCart",
-          "fields": [],
-          "type": "SCREEN",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584099471667",
-              "type": "INBOUND",
-              "title": "CartItems",
-              "elementType": "READMODEL"
-            }
-          ]
-        }
-      ],
-      "processors": [],
-      "specifications": [
-        {
-          "sliceName": "slice: ViewCart",
-          "title": "spec:  ViewCart",
-          "given": [],
-          "when": [],
-          "then": []
-        },
-        {
-          "sliceName": "slice: ViewCart",
-          "title": "spec:  ViewCart after revocation",
-          "given": [],
-          "when": [],
-          "then": []
-        }
-      ],
-      "actors": [
-        {
-          "name": "User",
-          "authzRequired": false
-        }
-      ]
-    },
-    {
-      "id": "",
-      "title": "slice: ClearCart",
-      "context": "",
-      "commands": [
-        {
-          "id": "3458764584100080846",
-          "title": "ClearCart",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584100080914",
-              "type": "OUTBOUND",
-              "title": "CartCleared",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764584100080749",
-              "type": "INBOUND",
-              "title": "screen",
-              "elementType": "SCREEN"
-            }
-          ]
-        }
-      ],
-      "events": [
         {
           "id": "3458764584100080914",
           "title": "CartCleared",
@@ -2069,99 +1700,6 @@
               "type": "INBOUND",
               "title": "ClearCart",
               "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
-      "readmodels": [],
-      "screens": [
-        {
-          "id": "3458764584100080749",
-          "title": "screen",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "SCREEN",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764584100080846",
-              "type": "OUTBOUND",
-              "title": "ClearCart",
-              "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
-      "processors": [],
-      "specifications": [
-        {
-          "sliceName": "slice: ClearCart",
-          "title": "spec:  ClearCart",
-          "given": [],
-          "when": [],
-          "then": []
-        }
-      ],
-      "actors": [
-        {
-          "name": "User",
-          "authzRequired": false
-        }
-      ]
-    },
-    {
-      "id": "",
-      "title": "slice: Inventory",
-      "context": "",
-      "commands": [],
-      "events": [
-        {
-          "id": "3458764584101068231",
-          "title": "InventoryChanged",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "quantity",
-              "type": "Int",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "ProductInventory",
-          "dependencies": [
-            {
-              "id": "3458764584101318212",
-              "type": "OUTBOUND",
-              "title": "ProductInventory",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764584114637705",
-              "type": "INBOUND",
-              "title": "ChangeInventory",
-              "elementType": "COMMAND"
-            },
-            {
-              "id": "3458764584094984137",
-              "type": "INBOUND",
-              "title": "CarttemAdded",
-              "elementType": "EVENT"
             }
           ]
         },
@@ -2207,16 +1745,277 @@
               "elementType": "COMMAND"
             }
           ]
+        },
+        {
+          "id": "3458764584128065142",
+          "title": "PriceChanged",
+          "fields": [
+            {
+              "name": "oldPrice",
+              "type": "Double",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "newPrice",
+              "type": "Double",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "aggregate": "ProductPricing",
+          "dependencies": [
+            {
+              "id": "3458764584135447953",
+              "type": "OUTBOUND",
+              "title": "ActiveCartProductsWithProducts",
+              "elementType": "READMODEL"
+            },
+            {
+              "id": "3458764584127822893",
+              "type": "INBOUND",
+              "title": "ChangePrice",
+              "elementType": "COMMAND"
+            }
+          ]
         }
       ],
       "readmodels": [
         {
-          "id": "3458764584101318212",
-          "title": "ProductInventory",
+          "id": "3458764584135447953",
+          "title": "ActiveCartProductsWithProducts",
           "fields": [
+            {
+              "name": "changedProductId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "aggregateId",
+              "cardinality": "List"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "List"
+            }
+          ],
+          "type": "READMODEL",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584719299197",
+              "type": "OUTBOUND",
+              "title": "automation",
+              "elementType": "AUTOMATION"
+            },
+            {
+              "id": "3458764584094984137",
+              "type": "INBOUND",
+              "title": "CarttemAdded",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764584115718379",
+              "type": "INBOUND",
+              "title": "CartItemRemoved",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764584100080914",
+              "type": "INBOUND",
+              "title": "CartCleared",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764584128065142",
+              "type": "INBOUND",
+              "title": "PriceChanged",
+              "elementType": "EVENT"
+            }
+          ]
+        }
+      ],
+      "screens": [],
+      "processors": [
+        {
+          "id": "3458764584719299197",
+          "title": "automation",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "changedProductId",
+              "cardinality": "List"
+            }
+          ],
+          "type": "AUTOMATION",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584719299198",
+              "type": "OUTBOUND",
+              "title": "RequestProductRevocationAfterPriceChange",
+              "elementType": "COMMAND"
+            },
+            {
+              "id": "3458764584135447953",
+              "type": "INBOUND",
+              "title": "ActiveCartProductsWithProducts",
+              "elementType": "READMODEL"
+            }
+          ]
+        }
+      ],
+      "specifications": [
+        {
+          "sliceName": "slice: ActiveCartSessions",
+          "title": "spec:  ActiveCartSessions",
+          "given": [],
+          "when": [],
+          "then": []
+        },
+        {
+          "sliceName": "slice: ActiveCartSessions",
+          "title": "spec:  ActiveCartSessions_cartProducts",
+          "given": [],
+          "when": [],
+          "then": []
+        },
+        {
+          "sliceName": "slice: ActiveCartSessions",
+          "title": "spec:  ActiveCartSessions_withCartItemRemoved",
+          "given": [],
+          "when": [],
+          "then": []
+        }
+      ],
+      "actors": []
+    },
+    {
+      "id": "",
+      "title": "slice: AddItem",
+      "context": "",
+      "commands": [
+        {
+          "id": "3458764584135698767",
+          "title": "AddItem",
+          "fields": [
+            {
+              "name": "productName",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "price",
+              "type": "Double",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
             {
               "name": "quantity",
               "type": "Int",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productimage",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584094984137",
+              "type": "OUTBOUND",
+              "title": "CarttemAdded",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764584101177505",
+              "type": "OUTBOUND",
+              "title": "CartSessionStarted",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764587040209272",
+              "type": "INBOUND",
+              "title": "AdminView",
+              "elementType": "SCREEN"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764584094984137",
+          "title": "CarttemAdded",
+          "fields": [
+            {
+              "name": "productName",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "price",
+              "type": "Double",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "quantity",
+              "type": "Int",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productimage",
+              "type": "String",
               "example": "",
               "mapping": "",
               "cardinality": "Single"
@@ -2234,36 +2033,42 @@
               "example": "",
               "mapping": "",
               "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
             }
           ],
-          "type": "READMODEL",
+          "type": "EVENT",
           "description": "",
+          "aggregate": "Cart",
           "dependencies": [
             {
-              "id": "3458764584114744115",
+              "id": "3458764584099471667",
               "type": "OUTBOUND",
-              "title": "screen",
-              "elementType": "SCREEN"
+              "title": "CartItems",
+              "elementType": "READMODEL"
             },
             {
-              "id": "3458764584115718379",
-              "type": "INBOUND",
-              "title": "CartItemRemoved",
-              "elementType": "EVENT"
+              "id": "3458764584135447953",
+              "type": "OUTBOUND",
+              "title": "ActiveCartProductsWithProducts",
+              "elementType": "READMODEL"
             },
             {
-              "id": "3458764584101068231",
+              "id": "3458764584135698767",
               "type": "INBOUND",
-              "title": "InventoryChanged",
-              "elementType": "EVENT"
+              "title": "AddItem",
+              "elementType": "COMMAND"
             }
           ]
-        }
-      ],
-      "screens": [
+        },
         {
-          "id": "3458764584114744115",
-          "title": "screen",
+          "id": "3458764584101177505",
+          "title": "CartSessionStarted",
           "fields": [
             {
               "name": "aggregateId",
@@ -2273,14 +2078,33 @@
               "cardinality": "Single"
             }
           ],
+          "type": "EVENT",
+          "description": "foo beschreibng",
+          "aggregate": "Cart",
+          "dependencies": [
+            {
+              "id": "3458764584135698767",
+              "type": "INBOUND",
+              "title": "AddItem",
+              "elementType": "COMMAND"
+            }
+          ]
+        }
+      ],
+      "readmodels": [],
+      "screens": [
+        {
+          "id": "3458764587040209272",
+          "title": "AdminView",
+          "fields": [],
           "type": "SCREEN",
           "description": "",
           "dependencies": [
             {
-              "id": "3458764584101318212",
-              "type": "INBOUND",
-              "title": "ProductInventory",
-              "elementType": "READMODEL"
+              "id": "3458764584135698767",
+              "type": "OUTBOUND",
+              "title": "AddItem",
+              "elementType": "COMMAND"
             }
           ]
         }
@@ -2288,8 +2112,15 @@
       "processors": [],
       "specifications": [
         {
-          "sliceName": "slice: Inventory",
-          "title": "spec:  Inventory",
+          "sliceName": "slice: AddItem",
+          "title": "spec:  AddItem",
+          "given": [],
+          "when": [],
+          "then": []
+        },
+        {
+          "sliceName": "slice: AddItem",
+          "title": "spec:  AddItem adding multiple items",
           "given": [],
           "when": [],
           "then": []
@@ -2301,24 +2132,151 @@
           "authzRequired": false
         }
       ]
+    },
+    {
+      "id": "",
+      "title": "slice: Request Product Revoke",
+      "context": "",
+      "commands": [
+        {
+          "id": "3458764584719299198",
+          "title": "RequestProductRevocationAfterPriceChange",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "changedProductId",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "COMMAND",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584719299200",
+              "type": "OUTBOUND",
+              "title": "ProductRevocationRequested",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764584719299197",
+              "type": "INBOUND",
+              "title": "automation",
+              "elementType": "AUTOMATION"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764584719299200",
+          "title": "ProductRevocationRequested",
+          "fields": [
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "aggregate": "Cart",
+          "dependencies": [
+            {
+              "id": "3458764584719449725",
+              "type": "OUTBOUND",
+              "title": "Spring Event Registry",
+              "elementType": "READMODEL"
+            },
+            {
+              "id": "3458764584719299198",
+              "type": "INBOUND",
+              "title": "RequestProductRevocationAfterPriceChange",
+              "elementType": "COMMAND"
+            }
+          ]
+        }
+      ],
+      "readmodels": [],
+      "screens": [],
+      "processors": [
+        {
+          "id": "3458764584719299197",
+          "title": "automation",
+          "fields": [
+            {
+              "name": "aggregateId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "productId",
+              "type": "UUID",
+              "example": "",
+              "mapping": "changedProductId",
+              "cardinality": "List"
+            }
+          ],
+          "type": "AUTOMATION",
+          "description": "",
+          "dependencies": [
+            {
+              "id": "3458764584719299198",
+              "type": "OUTBOUND",
+              "title": "RequestProductRevocationAfterPriceChange",
+              "elementType": "COMMAND"
+            },
+            {
+              "id": "3458764584135447953",
+              "type": "INBOUND",
+              "title": "ActiveCartProductsWithProducts",
+              "elementType": "READMODEL"
+            }
+          ]
+        }
+      ],
+      "specifications": [
+        {
+          "sliceName": "slice: Request Product Revoke",
+          "title": "spec:  Request Product Revoke",
+          "given": [],
+          "when": [],
+          "then": []
+        },
+        {
+          "sliceName": "slice: Request Product Revoke",
+          "title": "spec:  Request Product Revoke",
+          "given": [],
+          "when": [],
+          "then": []
+        }
+      ],
+      "actors": []
     }
   ],
   "aggregates": [
     {
-      "id": "3458764587180936777",
-      "title": "Registration",
-      "fields": [],
-      "type": "AGGREGATE"
-    },
-    {
-      "id": "3458764587181028082",
-      "title": "User",
-      "fields": [],
-      "type": "AGGREGATE"
-    },
-    {
-      "id": "3458764584455835021",
-      "title": "ProductPricing",
+      "id": "3458764584137788395",
+      "title": "Cart",
       "fields": [
         {
           "name": "aggregateId",
@@ -2326,6 +2284,13 @@
           "example": "",
           "mapping": "",
           "cardinality": "Single"
+        },
+        {
+          "name": "cartItemIds",
+          "type": "String",
+          "example": "",
+          "mapping": "",
+          "cardinality": "List"
         }
       ],
       "type": "AGGREGATE"
@@ -2345,60 +2310,80 @@
       "type": "AGGREGATE"
     },
     {
-      "id": "3458764584137788395",
-      "title": "Cart",
+      "id": "3458764584455835021",
+      "title": "ProductPricing",
+      "fields": [
+        {
+          "name": "aggregateId",
+          "type": "UUID",
+          "example": "",
+          "mapping": "",
+          "cardinality": "Single"
+        }
+      ],
+      "type": "AGGREGATE"
+    },
+    {
+      "id": "3458764587180936777",
+      "title": "Registration",
+      "fields": [],
+      "type": "AGGREGATE"
+    },
+    {
+      "id": "3458764587181028082",
+      "title": "User",
       "fields": [],
       "type": "AGGREGATE"
     }
   ],
   "sliceDependencies": [
     {
-      "source": "slice: no",
-      "target": "slice: no"
+      "source": "slice: ViewCart",
+      "target": "slice: ViewCart"
     },
     {
-      "source": "slice: no",
-      "target": "slice: NotifyCustomerOfProductRevoke"
-    },
-    {
-      "source": "slice: no",
-      "target": "slice: RevokeProductAfterPriceChange"
-    },
-    {
-      "source": "slice: no",
-      "target": "slice: no"
-    },
-    {
-      "source": "slice: no",
-      "target": "slice: NotifyCustomerOfProductRevoke"
-    },
-    {
-      "source": "slice: no",
-      "target": "slice: RevokeProductAfterPriceChange"
-    },
-    {
-      "source": "slice: ActiveCartSessions",
-      "target": "slice: Request Product Revoke"
-    },
-    {
-      "source": "slice: ActiveCartSessions",
-      "target": "slice: ActiveCartSessions"
+      "source": "slice: ViewCart",
+      "target": "slice: ViewCart"
     },
     {
       "source": "slice: ViewCart",
       "target": "slice: Removeitem"
     },
     {
-      "source": "slice: ViewCart",
-      "target": "slice: ViewCart"
-    },
-    {
-      "source": "slice: ViewCart",
-      "target": "slice: ViewCart"
-    },
-    {
       "source": "slice: Inventory",
       "target": "slice: Inventory"
+    },
+    {
+      "source": "slice: no",
+      "target": "slice: NotifyCustomerOfProductRevoke"
+    },
+    {
+      "source": "slice: no",
+      "target": "slice: RevokeProductAfterPriceChange"
+    },
+    {
+      "source": "slice: no",
+      "target": "slice: no"
+    },
+    {
+      "source": "slice: no",
+      "target": "slice: NotifyCustomerOfProductRevoke"
+    },
+    {
+      "source": "slice: no",
+      "target": "slice: RevokeProductAfterPriceChange"
+    },
+    {
+      "source": "slice: no",
+      "target": "slice: no"
+    },
+    {
+      "source": "slice: ActiveCartSessions",
+      "target": "slice: ActiveCartSessions"
+    },
+    {
+      "source": "slice: ActiveCartSessions",
+      "target": "slice: Request Product Revoke"
     }
   ],
   "context": "Cart",
