@@ -1,19 +1,14 @@
 var Generator = require('yeoman-generator');
-var chalk = require('chalk');
-const {ensureDirSync} = require("fs-extra");
-var slugify = require('slugify')
-const {answers} = require("../app");
-const {givenAnswers, _commandTitle, _readmodelTitle} = require("./index");
+var {findSlice} = require('../../common/util/config')
+var {_screenTitle, _aggregateTitle, _eventTitle, _sliceTitle, _commandTitle} = require('../../common/util/naming')
+var {capitalizeFirstCharacter, uniqBy, lowercaseFirstCharacter} = require('../../common/util/util')
+const {variables, variableAssignments, renderUnionTypes, renderImports} = require("../common/domain");
+const {writeEvents} = require("../events");
+const {parseSchema} = require("../../common/util/jsonschema");
+
 
 let config = {}
 
-function _sliceTitle(title) {
-    return slugify(title.replace("slice:", "")).replaceAll("-", "").toLowerCase()
-}
-
-function _screenTitle(title) {
-    return slugify(title).replaceAll("-", "").toLowerCase()
-}
 
 module.exports = class extends Generator {
 
@@ -35,290 +30,37 @@ module.exports = class extends Generator {
                 choices: Array.from(new Set(config.slices.map((item) => item.context).filter(item => item))).sort(),
                 when: () => Array.from(new Set(config.slices.map((item) => item.context).filter(item => item))).length > 0,
             },
-            // {
-            //     type: 'list',
-            //     name: 'slice',
-            //     loop: false,
-            //     message: 'Welcher Slices soll generiert werden?',
-            //     choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).map((item, idx) => item.title).sort()
-            // },
-            // {
-            //     type: 'list',
-            //     name: 'aggregate',
-            //     message: `Zugehöriges Aggregate auswählen?`,
-            //     choices: aggregates,
-            // },
-            // {
-            //     type: 'confirm',
-            //     name: 'specifications',
-            //     loop: false,
-            //     message: 'Sollen Specifications generiert werden?',
-            //     when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.specifications?.length > 0) ?? false,
-            // },
-            // {
-            //     type: 'checkbox',
-            //     name: 'processTriggers',
-            //     message: 'Wähle Trigger Events',
-            //     when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.processors?.length > 0) ?? false,
-            //     choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).flatMap((slice) => slice.events).map(item => item.title)
-            // }
-            //
-            ]);
+        ]);
 
     }
 
 
     writePages() {
-        var slices = config.slices.map((slice)=>slice.title)
+        var slices = config.slices.map((slice) => slice.title)
         slices.forEach((slice) => {
             this._writePage(slice)
         });
     }
 
     _writePage(sliceName) {
-        var slice = this._findSlice(sliceName)
+        var slice = findSlice(config, sliceName)
         var screens = slice.screens
 
-        screens.forEach((screen)=>{
+
+        screens.forEach((screen) => {
+            var commands = screen?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND")
+
+            var commandHandlerImports = commands.map(command => `import {handle${_commandTitle(command.title)}} from '@/app/components/slices/${_sliceTitle(slice.title)}/${_commandTitle(command.title)}'`).join("\n")
+
             var title = _screenTitle(screen.title).toLowerCase()
-                   this.fs.copyTpl(
-                       this.templatePath('src/pages/page.tsx'),
-                       this.destinationPath(`${this.givenAnswers?.appName}/src/pages/${title}.tsx`),
-                       {
-                           _name: title,
-                           _pageName: capitalizeFirstCharacter(title)
-
-                       }
-                   )
-        })
-
-
-    }
-
-    // writeCommandHandlers() {
-    //     //this.answers.slices.forEach((slice) => {
-    //     this._writeCommandHandlers(this.answers.slice)
-    //     //});
-    // }
-
-    _writeCommandHandlers(sliceName) {
-        var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
-        slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
-                this.templatePath(`src/components/CommandHandler.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${command.title}CommandHandler.kt`),
+                this.templatePath('page.tsx.tpl'),
+                this.destinationPath(`${this.givenAnswers?.appName}/pages/${title}.tsx`),
                 {
-                    _slice: title,
-                    _commandType: this._commandTitle(command.title),
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._commandTitle(command.title),
-                    _typeImports: typeImports(command.fields),
-                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE"
-                }
-            )
-        })
-
-    }
-
-    // writeCommands() {
-    //     //this.answers.slices.forEach((slice) => {
-    //     this._writeCommands(this.answers.slice)
-    //     //});
-    // }
-
-    _writeCommands(sliceName) {
-        var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
-
-
-        slice.commands?.filter((command) => command.title).forEach((command) => {
-            this.fs.copyTpl(
-                this.templatePath(`src/components/Command.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._commandTitle(command.title)}.kt`),
-                {
-                    _slice: title,
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._commandTitle(command.title),
-                    _fields: ConstructorGenerator.generateConstructorVariables(
-                        command.fields,
-                        "aggregateId"
-                    ),
-                    _typeImports: typeImports(command.fields)
-
-                }
-            )
-        })
-
-
-    }
-
-
-    // writeEvents() {
-    //     //this.answers.slices.forEach((slice) => {
-    //     this._writeEvents(this.answers.slice)
-    //     //});
-    // }
-
-    _writeEvents(sliceName) {
-        var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
-
-
-        slice.events?.filter((event) => event.title).forEach((event) => {
-            this.fs.copyTpl(
-                this.templatePath(`src/components/Event.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/events/${this._eventTitle(event.title)}.kt`),
-                {
-                    _slice: title,
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._eventTitle(event.title),
-                    _fields: ConstructorGenerator.generateConstructorVariables(
-                        event.fields
-                    ),
-                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
-                    _typeImports: typeImports(event.fields)
-
-                }
-            )
-        })
-
-
-    }
-
-    // writeReadModels() {
-    //     //this.answers.slices.forEach((slice) => {
-    //     this._writeReadModels(this.answers.slice)
-    //     //});
-    // }
-
-    _writeReadModels(sliceName) {
-        var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
-
-        slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
-            this.fs.copyTpl(
-                this.templatePath(`src/components/ReadModel.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${this._readmodelTitle(readmodel.title)}.kt`),
-                {
-                    _slice: title,
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._readmodelTitle(readmodel.title),
-                    _fields: VariablesGenerator.generateVariables(
-                        readmodel.fields
-                    ),
-                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
-                    _typeImports: typeImports(readmodel.fields)
-                }
-            )
-
-            this.fs.copyTpl(
-                this.templatePath(`src/components/QueryHandler.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._readmodelTitle(readmodel.title)}QueryHandler.kt`),
-                {
-                    _slice: title,
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._readmodelTitle(readmodel.title),
-                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
-                    _typeImports: typeImports(readmodel.fields)
-
-                }
-            )
-        })
-
-
-    }
-
-    // writeRestControllers() {
-    //     if (this.answers.restendpoint) {
-    //         //this.answers.slices.forEach((slice) => {
-    //         this._writeRestControllers(this.answers.slice)
-    //         //});
-    //     }
-    //
-    // }
-
-    _writeRestControllers(sliceName) {
-        var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
-
-
-        slice.commands?.filter((command) => command.title).forEach((command) => {
-            this.fs.copyTpl(
-                this.templatePath(`src/components/RestResource.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._restResourceTitle(command.title)}.kt`),
-                {
-                    _slice: title,
-                    _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: title,
-                    _command: this._commandTitle(command.title),
-                    _controller: capitalizeFirstCharacter(title),
-                    _typeImports: typeImports(command.fields),
-                    _endpoint: this._generatePostRestCall(title, VariablesGenerator.generateRestParamInvocation(
-                        command.fields
-                    ), this._commandTitle(command.title), VariablesGenerator.generateInvocation(
-                        command.fields
-                    ))
-                }
-            )
-        })
-        slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
-            this.fs.copyTpl(
-                this.templatePath(`src/components/ReadOnlyRestResource.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/ReadOnly${this._restResourceTitle(readmodel.title)}.kt`),
-                {
-                    _slice: title,
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: title,
-                    _readModel: this._readmodelTitle(readmodel.title),
-                    _controller: capitalizeFirstCharacter(title),
-                    _typeImports: typeImports(readmodel.fields),
-                    _endpoint: this._generateGetRestCall(title, VariablesGenerator.generateRestParamInvocation(
-                        //only provide aggregateId (so that proper imports are generated)
-                        readmodel.fields.filter(item => item.name === "aggregateId")
-                    ), this._readmodelTitle(readmodel.title))
-                }
-            )
-        })
-
-
-    }
-
-    // writeSpecifications() {
-    //     if (this.answers.specifications) {
-    //         this.log(chalk.green('starting Specification Generation'))
-    //         this.composeWith(require.resolve('../specifications'), {
-    //             answers: {...this.answers, ...this.givenAnswers},
-    //             appName: this.answers.appName ?? this.appName
-    //         });
-    //     }
-    // }
-    //
-    // writeProcessors() {
-    //     //this.answers.slices.forEach((slice) => {
-    //     this._writeProcessors(this.answers.slice)
-    //     //});
-    // }
-
-    _writeProcessors(sliceName) {
-        var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
-        var command = slice.commands.length > 0 ? slice.commands[0] : null
-
-        slice.processors?.filter((processor) => processor.title).forEach((processor) => {
-            this.fs.copyTpl(
-                this.templatePath(`src/components/Processor.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._processorTitle(processor.title)}.kt`),
-                {
-                    _slice: title,
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._processorTitle(processor.title),
-                    _eventsImports: this._eventsImports(this.answers.processTriggers),
-                    _triggers: this._renderTriggers(this.answers.processTriggers),
-                    _variables: command ? VariablesGenerator.generateInvocation(
-                        command.fields
-                    ) : "",
-                    _command: command ? this._commandTitle(command.title) : ""
+                    _pageName: capitalizeFirstCharacter(title),
+                    _commands: commands.map((it) => `"${_sliceTitle(sliceName)}/${_commandTitle(it.title)}"`).join(","),
+                    _commandHandlerImports: commandHandlerImports
 
                 }
             )
@@ -327,208 +69,130 @@ module.exports = class extends Generator {
 
     }
 
-    _eventsImports(triggers) {
-        return triggers.map((trigger) => {
-            return `import ${this.givenAnswers.rootPackageName}.events.${this._eventTitle(trigger)}`
-        }).join("\n")
+    processSlices() {
+        config.slices.forEach((slice) => {
+            this.writeCommands(slice)
+        });
     }
 
-
-    _renderTriggers(triggers) {
-        return triggers.map((trigger) => {
-            return `\t@ApplicationModuleListener
-\tfun on(event: ${this._eventTitle(trigger)}) {
-\t     logger.info("Processing ${this._eventTitle(trigger)}")
-\t     process()     
-\t}`
-        }).join("\n\n")
-    }
-
-    _aggregateTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}Aggregate`
-    }
-
-    _commandTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}Command`
-    }
-
-
-    _processorTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}Processor`
-    }
-
-    _restResourceTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}Ressource`
-    }
-
-    _readmodelTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}ReadModel`
-    }
-
-    _eventTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}Event`
-    }
-
-
-    end() {
-        this.log(chalk.green('------------'))
-        this.log(chalk.blue('Jobs Commands is Done!'))
-        this.log(chalk.green('------------'))
-    }
-
-    _findSlice(sliceName) {
-        return config.slices.find((item) => item.title === sliceName)
-    }
-
-};
-
-
-class ConstructorGenerator {
-
-//(: {name, type, example, mapping}
-    static generateConstructorVariables(fields, overrides) {
-        return `${fields?.map((field) => (overrides?.includes(field.name) ? "override " : "") + "var " + field.name + ":" + typeMapping(field.type)).filter(it=>it).join(",")??""}`
-    }
-}
-
-class VariablesGenerator {
-
-//(: {name, type, example, mapping}
-    static generateVariables(fields) {
-        return fields?.map((variable) => {
-            if (variable.cardinality?.toLowerCase() === "list") {
-                return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality)} = emptyList();`;
-            } else {
-                return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality)}? = null;`;
-            }
-        }).join("\n")
-    }
-
-    static generateInvocation(fields) {
-        return fields?.map((variable) => {
-
-            return `${variable.name}`;
-
-        }).filter((it) => it !== "").join(",")??""
-    }
-
-    static generateRestParamInvocation(fields) {
-        return fields?.map((variable) => {
-            if (variable.type?.toLowerCase() == "date") {
-
-                return `@DateTimeFormat(pattern = "dd.MM.yyyy") @RequestParam ${variable.name}:${typeMapping(variable.type, variable.cardinality)}`;
-            } else {
-                return `@RequestParam ${variable.name}:${typeMapping(variable.type, variable.cardinality)}`;
-            }
-
-        }).filter((it) => it !== "").join(",")??""
-    }
-}
-
-const typeMapping = (fieldType, fieldCardinality) => {
-    var fieldType;
-    switch (fieldType?.toLowerCase()) {
-        case "string":
-            fieldType = "String";
-            break
-        case "double":
-            fieldType = "Double";
-            break
-        case "long":
-            fieldType = "Long";
-            break
-        case "boolean":
-            fieldType = "Boolean";
-            break
-        case "date":
-            fieldType = "LocalDate";
-            break
-        case "uuid":
-            fieldType = "UUID";
-            break
-        default:
-            fieldType = "String";
-            break
-    }
-    if (fieldCardinality?.toLowerCase() === "list") {
-        return `List<${fieldType}>`
-    } else {
-        return fieldType
-    }
-
-}
-
-const typeImports = (fields) => {
-    if(!fields || fields.length === 0) {
-        return []
-    }
-    var imports = fields?.map((field) => {
-        switch (field.type?.toLowerCase()) {
-            case "date":
-                return ["import java.time.LocalDate", "import org.springframework.format.annotation.DateTimeFormat"]
-            case "uuid":
-                return ["import java.util.UUID"]
-            default:
-                return []
+    writeCommands(slice) {
+        var commands = slice?.commands
+        if (!commands || commands.length == 0) {
+            return
         }
-        switch (field.cardinality?.toLowerCase()) {
-            case "LIST":
-                return ["java.util.List"]
-            default:
-                return []
+        commands.filter(command => command).forEach((command) => {
+            this._writeCommand(slice, command)
+            this._writeCommandSchema(slice, command)
+        })
+    }
+
+    _writeCommandSchema(slice, command) {
+        this.fs.copyTpl(
+            this.templatePath(`schema.json.tpl`),
+            this.destinationPath(`${this.givenAnswers?.appName}/app/components/slices/${_sliceTitle(slice.title)}/${_commandTitle(command?.title)}.json`),
+            {
+                _schema: JSON.stringify(parseSchema(command), null, 2)
+            }
+        )
+    }
+
+    _writeCommand(slice, command) {
+
+        let eventsDependencies = command.dependencies.filter((it) => it.type === "OUTBOUND")
+
+        var events = config.slices.flatMap(slice => slice.events).filter(event => eventsDependencies.map(it => it.id).includes(event.id))
+
+        var eventsImports = Array.from(new Set(events.map(event => renderImports(`@/app/components/events/${_aggregateTitle(event.aggregate)}`, [`${_eventTitle(event.title)}`])))).join("\n")
+
+
+        var aggregates = Array.from(new Set(events.filter(it => it.aggregate).map(it => it.aggregate)))
+
+        var aggregateEventImport = aggregates.map(aggregate => renderImports(`@/app/components/events/${_aggregateTitle(aggregate)}`, [`${_aggregateTitle(aggregate)}Events`])).join("\n")
+
+        var aggregateImports = aggregates.map(aggregate => renderImports(`@/app/components/domain`, [`${_aggregateTitle(aggregate)}`])).join("\n")
+
+        this.fs.copyTpl(
+            this.templatePath(`command.ts.tpl`),
+            this.destinationPath(`${this.givenAnswers?.appName}/app/components/slices/${_sliceTitle(slice.title)}/${_commandTitle(command?.title)}.ts`),
+            {
+                _aggregateEventImports: aggregateEventImport,
+                _aggregateImports: aggregateImports,
+                _eventImports: eventsImports,
+                _commandName: _commandTitle(command.title),
+                _commandFields: variables([command]),
+                _resultEventNames: Array.from(new Set(events.map(event => _eventTitle(event.title)))),
+                _handlePerAggregate: this.renderHandlePerAggregate(aggregates, command),
+                _cartAggregateHandlers: this.renderAggregateHandler(aggregates),
+                _cartAggregateHandlerImports: this.renderAggregateHandlerImports(aggregates),
+                _handleCommand: this.handleCommand(command, aggregates)
+            }
+        )
+
+
+    }
+
+    handleCommand(command, aggregates) {
+        if (!command) {
+            return
         }
-    })
-    return Array.from([...new Set(imports?.flat()??[])]).flat().join(";\n")
-
-}
-
-const invocation = (type, fields) => {
-    return `new ${type}(${fields.map((it) => variableNameOrMapping(it)).filter(it=>it).join(",")})`
-}
-
-const receiverInvocation = (type, receiver) => {
-    return `new ${type.title}(${type.fields?.map((it) => receiver + "." + variableNameOrMapping(it)).filter(it=>it).join(",")})`
-}
-
-const variableNameOrMapping = (field) => {
-    return (field.mapping && field.mapping !== "") ? field.mapping : field.name
-}
-
-const packageName = (type) => {
-    switch (type.type) {
-        case "COMMAND":
-            return "commands"
-        case "EVENT":
-            return "events"
-        case "READMODEL":
-            return "readmodels"
+        return `
+        export const handle${_commandTitle(command?.title)} = async (command:${_commandTitle(command.title)}): Promise<any> => {
+        
+            ${aggregates.map(aggregate => `return await ${lowercaseFirstCharacter(_aggregateTitle(aggregate))}Handler(
+                                findEventStore(),
+                                command.data.aggregateId,
+                                (state:${_aggregateTitle(aggregate)}) => _handle${_aggregateTitle(aggregate)}(command, state)`)
+        })
+        }
+        `;
     }
-}
 
+    renderHandlePerAggregate(aggregateTitles, command) {
+        let dependenciesForEvents = command?.dependencies ?? [].filter((it) => it.type === "OUTBOUND")
 
-const defaultValue = (type, cardinality = "single") => {
-    switch (type.toLowerCase()) {
-        case "string":
-            return cardinality.toLowerCase() === "list" ? "[]" : "\"\""
-        case "boolean":
-            return cardinality.toLowerCase() === "list" ? "[]" : "false"
+        var events = config.slices.flatMap(slice => slice.events).filter(event => dependenciesForEvents.map(it => it.id).includes(event.id))
+
+        if (events?.length === 0) {
+            return ""
+        }
+
+        return aggregateTitles.map(aggregate => {
+            return `const _handle${_aggregateTitle(aggregate)} = (command: ${_commandTitle(command.title)}, state: ${_aggregateTitle(aggregate)} ):${_aggregateTitle(aggregate)}Events => {
+                return ${this.renderResultEvents(command, events)}
+                }
+                    `
+        }).join("\n");
     }
-}
 
+    renderAggregateHandler(aggregateTitles) {
+        if (!aggregateTitles || aggregateTitles.length === 0) {
+            return ""
+        }
 
-function toCamelCase(prefix, variableName) {
-    return (prefix + variableName??"").replace(/_([a-z])/g, function (match, group1) {
-        return group1.toUpperCase();
-    });
-}
-
-function capitalizeFirstCharacter(inputString) {
-    // Check if the string is not empty
-    if (inputString.length > 0) {
-        // Capitalize the first character and concatenate the rest of the string
-        return inputString.charAt(0).toUpperCase() + inputString.slice(1);
-    } else {
-        // Return an empty string if the input is empty
-        return "";
+        return aggregateTitles.map((aggregate) => `const ${lowercaseFirstCharacter(_aggregateTitle(aggregate))}Handler = CommandHandler(${lowercaseFirstCharacter(_aggregateTitle(aggregate))}Evolve, ${lowercaseFirstCharacter(_aggregateTitle(aggregate))}InitialState, ${lowercaseFirstCharacter(_aggregateTitle(aggregate))}MapToStreamId)`).join("\n")
     }
+
+    renderAggregateHandlerImports(aggregateTitles) {
+        if (!aggregateTitles || aggregateTitles.length === 0) {
+            return ""
+        }
+        return aggregateTitles.map((aggregateTitle) => `import {evolve as ${lowercaseFirstCharacter(_aggregateTitle(aggregateTitle))}Evolve, initialState as ${lowercaseFirstCharacter(_aggregateTitle(aggregateTitle))}InitialState, mapToStreamId as ${lowercaseFirstCharacter(_aggregateTitle(aggregateTitle))}MapToStreamId} from "@/app/components/domain/${_aggregateTitle(aggregateTitle)}"`).join("\n")
+    }
+
+    renderResultEvents(command, events) {
+        if (command === undefined || events === undefined) {
+            return ""
+        }
+        var resultEventsFromCommand = uniqBy(events, (event) => event.title).map(event => {
+            return `{
+                type: '${_eventTitle(event.title)}',
+                data: {
+                    ${variableAssignments(event, "command", command, ",\n", ":")}
+                }
+            }`
+        });
+        return `[${resultEventsFromCommand.join(",")}]`
+
+    }
+
 }

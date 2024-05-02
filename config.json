@@ -11,6 +11,13 @@
           "title": "CarttemAdded",
           "fields": [
             {
+                          "name": "foo",
+                          "type": "String",
+                          "example": "",
+                          "mapping": "productName",
+                          "cardinality": "Single"
+                        },
+            {
               "name": "productName",
               "type": "String",
               "example": "",

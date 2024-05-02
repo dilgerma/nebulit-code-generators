@@ -7,9 +7,7 @@ const {givenAnswers, _commandTitle, _readmodelTitle} = require("./index");
 
 let config = {}
 
-function _sliceTitle(title) {
-    return slugify(title.replace("slice:", "")).replaceAll("-", "").toLowerCase()
-}
+
 
 module.exports = class extends Generator {
 

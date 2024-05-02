@@ -1,10 +1,32 @@
 var slugify = require('slugify')
 
-const variables = (elements) => {
+const variables = (elements, separator = "\n") => {
     var fields = elements.map(element => element.fields?.map(field => {
         return `\t\t${slugify(field.name)}:${typeMapping(field.type, field.cardinality)}`
-    }).join("\n"))
+    }).join(separator ? separator : "\n"))
     return fields
+}
+
+const variableAssignments = (element, sourceName, source, separator, assignmentOperator) => {
+    var fields = element.fields?.map(field => {
+        return `\t\t\t${processSourceMapping(field, sourceName, source, assignmentOperator)}`
+    }).join(separator ? separator : ",\n")
+    return fields
+}
+
+
+const processSourceMapping = (targetField, sourceName, source, assigmentOperator="=") => {
+    var name = targetField.name
+
+    var field = source.fields.find((field) => field.name === name)
+    if (field) {
+        return `${targetField.name}${assigmentOperator}${sourceName}.${field.name}`
+    }
+    var mapping = source.fields.find((field) => targetField.mapping === field.name)
+    if (mapping) {
+        return `${targetField.name}${assigmentOperator}${sourceName}.${targetField.mapping}`
+    }
+    return `//TODO ${targetField.name}${assigmentOperator}${sourceName}.${targetField.name}`
 }
 
 const variablesDefaults = (elements) => {
@@ -73,12 +95,20 @@ const defaultMapping = (fieldType, fieldCardinality) => {
     return defaultValue
 }
 
-const renderUnionTypes = (types)=>{
+const renderUnionTypes = (types) => {
     return types.join("|\n\t")
 }
 
-const renderImports = (basePath, types)=> {
-    return types.map(type => `import {${type}} from "${basePath}/${type}"`).join("\n")
+const renderImports = (basePath, types) => {
+    return Array.from(new Set(types.map(type => `import {${type}} from "${basePath}/${type}"`))).join("\n")
 }
 
-module.exports = {typeMapping, defaultMapping, variables, variablesDefaults,renderUnionTypes, renderImports}
+module.exports = {
+    typeMapping,
+    defaultMapping,
+    variables,
+    variablesDefaults,
+    renderUnionTypes,
+    renderImports,
+    variableAssignments
+}

@@ -49,14 +49,6 @@ module.exports = class extends Generator {
             answers: this.answers,
             appName: this.answers.appName ?? this.appName
         });
-        //
-        // if (this.answers.generatorType === 'aggregates') {
-        //     this.log(chalk.green('starting aggregates generation'))
-        //     this.composeWith(require.resolve('../aggregates'), {
-        //         answers: this.answers,
-        //         appName: this.answers.appName ?? this.appName
-        //     });
-        // }
     }
 
     _writeReactSkeleton() {

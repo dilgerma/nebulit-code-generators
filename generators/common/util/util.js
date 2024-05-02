@@ -14,9 +14,20 @@ const groupBy = function groupBy(array, callback) {
 
 function capitalizeFirstCharacter(inputString) {
     // Check if the string is not empty
-    if (inputString.length > 0) {
+    if (inputString?.length > 0) {
         // Capitalize the first character and concatenate the rest of the string
         return inputString.charAt(0).toUpperCase() + inputString.slice(1);
+    } else {
+        // Return an empty string if the input is empty
+        return "";
+    }
+}
+
+function lowercaseFirstCharacter(inputString) {
+    // Check if the string is not empty
+    if (inputString?.length > 0) {
+        // Capitalize the first character and concatenate the rest of the string
+        return inputString.charAt(0).toLowerCase() + inputString.slice(1);
     } else {
         // Return an empty string if the input is empty
         return "";
@@ -40,4 +51,4 @@ function uniqBy(array, keyFunc) {
     });
 }
 
-module.exports = {groupBy, capitalizeFirstCharacter, uniq, uniqBy}
+module.exports = {groupBy, capitalizeFirstCharacter,lowercaseFirstCharacter, uniq, uniqBy}

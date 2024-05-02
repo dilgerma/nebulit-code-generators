@@ -3,7 +3,7 @@ import type { <%-_aggregateName%>Events } from '@/app/core/events/<%-_aggregateN
 
 export type <%-_aggregateName%> = {
 
-    <%-_fields%>
+<%-_fields%>
 }
 
 export const initialState = (): <%-_aggregateName%> => {

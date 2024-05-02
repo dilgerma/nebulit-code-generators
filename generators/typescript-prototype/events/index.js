@@ -1,7 +1,7 @@
 var Generator = require('yeoman-generator');
 const renderSwitchStatement = require("../common/tools")
 const {uniqBy} = require("../../common/util/util");
-const {variables, variablesDefaults,renderUnionTypes, renderImports} = require("../common/domain");
+const {variables, variablesDefaults, renderUnionTypes, renderImports} = require("../common/domain");
 const {_aggregateTitle, _eventTitle} = require("../../common/util/naming")
 let config = {}
 
@@ -34,15 +34,18 @@ module.exports = class extends Generator {
                 }
             )
         })
-        this.fs.copyTpl(
-            this.templatePath(`AggregateEvent.ts.tpl`),
-            this.destinationPath(`${this.givenAnswers?.appName}/app/components/events/${_aggregateTitle(aggregate?.title)}/${_aggregateTitle(aggregate?.title)}Events.ts`),
-            {
-                _aggregateName: _aggregateTitle(aggregate?.title),
-                _unionTypeDefinition: renderUnionTypes(events.map(it => _eventTitle(it.title))),
-                _imports: renderImports(`@/app/components/events/${_aggregateTitle(aggregate?.title)}`, events.map(it => _eventTitle(it.title)))
-            }
-        )
+        if (events.length > 0) {
+
+            this.fs.copyTpl(
+                this.templatePath(`AggregateEvent.ts.tpl`),
+                this.destinationPath(`${this.givenAnswers?.appName}/app/components/events/${_aggregateTitle(aggregate?.title)}/${_aggregateTitle(aggregate?.title)}Events.ts`),
+                {
+                    _aggregateName: _aggregateTitle(aggregate?.title),
+                    _unionTypeDefinition: renderUnionTypes(events.map(it => _eventTitle(it.title))),
+                    _imports: renderImports(`@/app/components/events/${_aggregateTitle(aggregate?.title)}`, events.map(it => _eventTitle(it.title)))
+                }
+            );
+        }
 
 
     }
