@@ -5,6 +5,7 @@ import React from 'react';
 import {DebugEvents} from '@/app/components/debug/eventsdebug';
 import {CommandSelection} from '@/app/components/commandselection/CommandSelection';
 <%-_commandHandlerImports%>
+<%-_schemaImports%>
 
 export default function <%=_pageName%>(props: any) {
 
@@ -18,8 +19,7 @@ export default function <%=_pageName%>(props: any) {
                     <link rel="icon" href="/favicon.ico"/>
                 </Head>
                 <main>
-                    <DebugEvents/>
-                    <CommandSelection commands={[<%-_commands%>]}/>
+                    <CommandSelection commands={<%-_handlerMapping%>}/>
                 </main>
             </div>
         </div>

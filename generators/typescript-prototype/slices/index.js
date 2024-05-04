@@ -35,14 +35,14 @@ module.exports = class extends Generator {
     }
 
 
-    writePages() {
+    writeScreen() {
         var slices = config.slices.map((slice) => slice.title)
         slices.forEach((slice) => {
-            this._writePage(slice)
+            this._writeScreen(slice)
         });
     }
 
-    _writePage(sliceName) {
+    _writeScreen(sliceName) {
         var slice = findSlice(config, sliceName)
         var screens = slice.screens
 
@@ -50,17 +50,28 @@ module.exports = class extends Generator {
         screens.forEach((screen) => {
             var commands = screen?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND")
 
-            var commandHandlerImports = commands.map(command => `import {handle${_commandTitle(command.title)}} from '@/app/components/slices/${_sliceTitle(slice.title)}/${_commandTitle(command.title)}'`).join("\n")
+            var commandHandlerImports = commands.map(command => `import {handle${_commandTitle(command.title)}} from './${_commandTitle(command.title)}'`).join("\n")
+            var schemaImports = commands.map(command => `import ${_commandTitle(command.title)}Schema from './${_commandTitle(command.title)}.json'`).join("\n")
+
+            var handlerMapping = `[${commands.map((command)=>{
+                return  `{
+                    "command":"${_commandTitle(command.title)}",
+                    "handler": handle${_commandTitle(command.title)} ,
+                    "schema": ${_commandTitle(command.title)+"Schema"}
+                }`
+            }).join(",")}]`
 
             var title = _screenTitle(screen.title).toLowerCase()
             this.fs.copyTpl(
                 this.templatePath('page.tsx.tpl'),
-                this.destinationPath(`${this.givenAnswers?.appName}/pages/${title}.tsx`),
+                this.destinationPath(`${this.givenAnswers?.appName}/app/components/slices/${_sliceTitle(slice.title)}/${title}.tsx`),
                 {
                     _name: title,
                     _pageName: capitalizeFirstCharacter(title),
                     _commands: commands.map((it) => `"${_sliceTitle(sliceName)}/${_commandTitle(it.title)}"`).join(","),
-                    _commandHandlerImports: commandHandlerImports
+                    _commandHandlerImports: commandHandlerImports,
+                    _schemaImports: schemaImports,
+                    _handlerMapping: handlerMapping
 
                 }
             )
@@ -187,7 +198,7 @@ module.exports = class extends Generator {
             return `{
                 type: '${_eventTitle(event.title)}',
                 data: {
-                    ${variableAssignments(event, "command", command, ",\n", ":")}
+                    ${variableAssignments(event, "command.data", command, ",\n", ":")}
                 }
             }`
         });

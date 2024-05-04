@@ -8,7 +8,7 @@ import {v4} from "uuid"
 export function DebugEvents(props: any) {
 
     //Map<string, EventEnvelope[]>
-    var [showEvents, setShowEvents] = useState(false)
+    var [showEvents, setShowEvents] = useState(true)
     const [events, setEvents] = useState<{ [k: string]: EventEnvelope[] }>({})
     const [stream, setStream] = useState<string | undefined>("")
     const [uuid, setUuid] = useState<string>(v4())
@@ -23,7 +23,8 @@ export function DebugEvents(props: any) {
     return <Draggable>
         <div className={"debug"}>
             <div>
-                <input value={uuid} className={"checkbox"} type={"checkbox"} onChange={() => setShowEvents(!showEvents)}/>
+                <input value={uuid} className={"checkbox"} type={"checkbox"}
+                       onChange={() => setShowEvents(!showEvents)}/>
                 <input value={uuid} className={"input"}/>
                 <div onClick={() => setUuid(v4())} className={"button"}>UUID</div>
             </div>
