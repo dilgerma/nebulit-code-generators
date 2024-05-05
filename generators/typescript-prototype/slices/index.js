@@ -48,20 +48,23 @@ module.exports = class extends Generator {
 
 
         screens.forEach((screen) => {
+
+            var title = _screenTitle(screen.title)
+
+
             var commands = screen?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND")
 
             var commandHandlerImports = commands.map(command => `import {handle${_commandTitle(command.title)}} from './${_commandTitle(command.title)}'`).join("\n")
             var schemaImports = commands.map(command => `import ${_commandTitle(command.title)}Schema from './${_commandTitle(command.title)}.json'`).join("\n")
 
-            var handlerMapping = `[${commands.map((command)=>{
-                return  `{
+            var handlerMapping = `[${commands.map((command) => {
+                return `{
                     "command":"${_commandTitle(command.title)}",
                     "handler": handle${_commandTitle(command.title)} ,
-                    "schema": ${_commandTitle(command.title)+"Schema"}
+                    "schema": ${_commandTitle(command.title) + "Schema"}
                 }`
             }).join(",")}]`
 
-            var title = _screenTitle(screen.title).toLowerCase()
             this.fs.copyTpl(
                 this.templatePath('page.tsx.tpl'),
                 this.destinationPath(`${this.givenAnswers?.appName}/app/components/slices/${_sliceTitle(slice.title)}/${title}.tsx`),
@@ -132,8 +135,8 @@ module.exports = class extends Generator {
                 _commandName: _commandTitle(command.title),
                 _commandFields: variables([command]),
                 _resultEventNames: Array.from(new Set(events.map(event => _eventTitle(event.title)))),
-                _handlePerAggregate: this.renderHandlePerAggregate(aggregates, command),
-                _cartAggregateHandlers: this.renderAggregateHandler(aggregates),
+                _handlePerAggregate: this.renderCommandHandler(aggregates, command),
+                _cartAggregateHandlers: this.renderEmmetCommandHandler(aggregates),
                 _cartAggregateHandlerImports: this.renderAggregateHandlerImports(aggregates),
                 _handleCommand: this.handleCommand(command, aggregates)
             }
@@ -158,7 +161,12 @@ module.exports = class extends Generator {
         `;
     }
 
-    renderHandlePerAggregate(aggregateTitles, command) {
+    /**
+     * _handle(command) {
+     *     return [event, event, event]
+     * }
+     */
+    renderCommandHandler(aggregateTitles, command) {
         let dependenciesForEvents = command?.dependencies ?? [].filter((it) => it.type === "OUTBOUND")
 
         var events = config.slices.flatMap(slice => slice.events).filter(event => dependenciesForEvents.map(it => it.id).includes(event.id))
@@ -168,14 +176,14 @@ module.exports = class extends Generator {
         }
 
         return aggregateTitles.map(aggregate => {
-            return `const _handle${_aggregateTitle(aggregate)} = (command: ${_commandTitle(command.title)}, state: ${_aggregateTitle(aggregate)} ):${_aggregateTitle(aggregate)}Events => {
+            return `const _handle${_aggregateTitle(aggregate)} = (command: ${_commandTitle(command.title)}, state: ${_aggregateTitle(aggregate)} ):${_aggregateTitle(aggregate)}Events[] => {
                 return ${this.renderResultEvents(command, events)}
                 }
                     `
         }).join("\n");
     }
 
-    renderAggregateHandler(aggregateTitles) {
+    renderEmmetCommandHandler(aggregateTitles) {
         if (!aggregateTitles || aggregateTitles.length === 0) {
             return ""
         }

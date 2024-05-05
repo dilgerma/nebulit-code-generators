@@ -1,6 +1,7 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var slugify = require('slugify')
+const {_screenTitle, _sliceTitle} = require("../../common/util/naming");
 
 let config = {}
 
@@ -30,7 +31,7 @@ module.exports = class extends Generator {
 
     setDefaults() {
         if (!this.answers.appName) {
-            this.answers.appName = config?.codeGen?.application
+            this.answers.appName = config?.codeGen?.application+"Prototype"
         }
     }
 
@@ -42,9 +43,9 @@ module.exports = class extends Generator {
             appName: this.answers.appName ?? this.appName
         });
         this.composeWith(require.resolve('../events'), {
-                  answers: this.answers,
-                  appName: this.answers.appName ?? this.appName
-              });
+            answers: this.answers,
+            appName: this.answers.appName ?? this.appName
+        });
         this.composeWith(require.resolve('../slices'), {
             answers: this.answers,
             appName: this.answers.appName ?? this.appName
@@ -52,12 +53,45 @@ module.exports = class extends Generator {
     }
 
     _writeReactSkeleton() {
+
+        /*var sliceViews:ViewSelection[] = [{
+            "slice" : "sliceName",
+            "view" : CommandSelection,
+            "viewName": "viewName"
+        }]*/
+
+        var sliceViews = config.slices.flatMap((slice) => {
+            return slice.screens?.map((screen) => {
+                var componentName = _screenTitle(screen.title)
+                return `
+                          {
+                              "slice":"${_sliceTitle(slice.title)}",
+                              "viewName" : "${_sliceTitle(slice.title)}/${componentName}",
+                              "view" : ${_sliceTitle(slice.title)}${componentName}
+                          }`
+            })
+
+        }).join(",")
+
+        var componentImports = config.slices.flatMap((slice) => {
+            return slice.screens?.map((screen) => {
+                var componentName = _screenTitle(screen.title)
+                var sliceName = _sliceTitle(slice.title)
+                return `import ${sliceName}${componentName} from '@/app/components/slices/${sliceName}/${componentName}';
+                      `
+            })
+
+        }).join("\n")
+
+
         this.fs.copyTpl(
             this.templatePath('root'),
             this.destinationPath(slugify(this.answers.appName)),
             {
                 rootPackageName: this.answers.rootPackageName,
                 appName: this.answers.appName,
+                _views: sliceViews,
+                _imports: componentImports
             }
         )
 

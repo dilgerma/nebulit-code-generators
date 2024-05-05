@@ -27,17 +27,12 @@ module.exports = class extends Generator {
                 name: 'renderApp',
                 message: 'App rendern?'
             }]);
-        // , {
-        //         type: 'list',
-        //         name: 'generatorType',
-        //         message: 'Was soll generiert werden?',
-        //         choices: ['Basis', 'slices', "aggregates"]
-        //     }]);
+
     }
 
     setDefaults() {
         if (!this.answers.appName) {
-            this.answers.appName = config?.codeGen?.application
+            this.answers.appName = config?.codeGen?.application+"Catalog"
         }
     }
 
@@ -233,7 +228,7 @@ module.exports = class extends Generator {
     }
 };
 
-function renderProducers(items){
+function renderProducers(items) {
     return items.length > 0 ? `producers:
 ${items.join("\n")}` : "";
 }
