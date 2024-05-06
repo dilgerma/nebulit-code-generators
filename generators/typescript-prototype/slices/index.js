@@ -1,5 +1,5 @@
 var Generator = require('yeoman-generator');
-var {findSlice} = require('../../common/util/config')
+var {findSlice,buildLink} = require('../../common/util/config')
 var {_screenTitle, _aggregateTitle, _eventTitle, _sliceTitle, _commandTitle} = require('../../common/util/naming')
 var {capitalizeFirstCharacter, uniqBy, lowercaseFirstCharacter} = require('../../common/util/util')
 const {variables, variableAssignments, renderUnionTypes, renderImports} = require("../common/domain");
@@ -87,6 +87,20 @@ module.exports = class extends Generator {
         config.slices.forEach((slice) => {
             this.writeCommands(slice)
         });
+    }
+
+    writeReadModels(slice) {
+        var readModels = slice?.readModels
+        if (!readModels || readModels.length == 0) {
+                    return
+                }
+        readModels.filter(readModels => readModel).forEach((readModel) => {
+                   this._writeReadModel(slice, readModel)
+               })
+    }
+
+    _writeReadModel(slice, command) {
+
     }
 
     writeCommands(slice) {

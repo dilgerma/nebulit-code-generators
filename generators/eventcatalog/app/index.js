@@ -2,6 +2,7 @@ var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var slugify = require('slugify')
 const schema = require('fluent-json-schema')
+const {buildLink} = require("../../common/util/config");
 
 
 let config = {}
@@ -86,7 +87,8 @@ module.exports = class extends Generator {
                 this.destinationPath(`${slugify(this.answers.appName)}/domains/${aggregate?.title}/index.md`),
                 {
                     name: aggregate?.title,
-                    _description: aggregate.description ?? ""
+                    _description: aggregate.description ?? "",
+                    _link: buildLink(config.boardId, aggregate.id)
                 }
             )
         })
@@ -100,7 +102,8 @@ module.exports = class extends Generator {
                 this.destinationPath(`${slugify(this.answers.appName)}/domains/${actor?.title}/index.md`),
                 {
                     name: actor?.title,
-                    _description: actor.description ?? ""
+                    _description: actor.description ?? "",
+                    _link: buildLink(config.boardId, actor.id)
                 }
             )
         })
@@ -115,7 +118,8 @@ module.exports = class extends Generator {
                     this.destinationPath(`${slugify(this.answers.appName)}/services/${command?.title}/index.md`),
                     {
                         name: command?.title,
-                        _description: command.description ?? ""
+                        _description: command.description ?? "",
+                        _link: buildLink(config.boardId, command.id)
                     }
                 )
             })
@@ -200,7 +204,8 @@ module.exports = class extends Generator {
                             name: event?.title,
                             _producers: renderProducers(event.dependencies?.filter(it => it.type === "INBOUND").filter(item => item.elementType === "COMMAND").map(elementDependency => toListElement(elementDependency.title))),
                             _consumers: renderConsumers(event.dependencies?.filter(it => it.type === "OUTBOUND").map(elementDependency => toListElement(elementDependency.title))),
-                            _description: event.description ?? "TODO - beschreibung"
+                            _description: event.description ?? "TODO - beschreibung",
+                            _link: buildLink(config.boardId, event.id)
                         }
                     )
                 } else {
@@ -212,6 +217,7 @@ module.exports = class extends Generator {
                             _description: event.description ?? "TODO - beschreibung",
                             _producers: renderProducers(event.dependencies?.filter(it => it.type === "INBOUND").filter(item => item.elementType === "COMMAND").map(elementDependency => toListElement(elementDependency.title))),
                             _consumers: renderConsumers(event.dependencies?.filter(it => it.type === "OUTBOUND").map(elementDependency => toListElement(elementDependency.title))),
+                            _link: buildLink(config.boardId, event.id)
                         }
                     )
                 }

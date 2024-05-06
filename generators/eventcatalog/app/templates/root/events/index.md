@@ -11,4 +11,6 @@ summary: |
 
 <NodeGraph title="Consumer / Producer Diagram" />
 
+[Board Link](<%=_link%>)
+
 <Schema />

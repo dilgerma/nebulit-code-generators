@@ -7,3 +7,5 @@ summary: |
 ### Details
 
 <NodeGraph title="Domain Graph" />
+
+[Board Link](<%=_link%>)

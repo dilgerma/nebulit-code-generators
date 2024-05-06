@@ -6,4 +6,6 @@ summary: |
 
 ### Details
 
+[Board Link](<%=_link%>)
+
 <NodeGraph />

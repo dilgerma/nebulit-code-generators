@@ -2,117 +2,95 @@
   "slices": [
     {
       "id": "",
-      "title": "slice: RegisterUser",
+      "title": "slice: slice",
       "context": "",
       "commands": [
         {
-          "id": "3458764587933347801",
-          "title": "RegisterUser",
-          "fields": [
-            {
-              "name": "Name",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "email",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
+          "id": "3458764588122489246",
+          "title": "ExportCatalog",
+          "fields": [],
           "type": "COMMAND",
           "description": "",
+          "aggregateDependencies": [
+            "Catalog"
+          ],
           "dependencies": [
             {
-              "id": "3458764587933251635",
+              "id": "3458764588122489177",
               "type": "OUTBOUND",
-              "title": "UserRegistered",
+              "title": "CatalogExported",
               "elementType": "EVENT"
             },
             {
-              "id": "3458764587933251686",
+              "id": "3458764588122560094",
               "type": "INBOUND",
               "title": "screen",
               "elementType": "SCREEN"
-            },
-            {
-              "id": "3458764587933892827",
-              "type": "INBOUND",
-              "title": "generated value",
-              "elementType": "GENERATED_VALUE"
             }
           ]
         }
       ],
       "events": [
         {
-          "id": "3458764587933251635",
-          "title": "UserRegistered",
-          "fields": [
-            {
-              "name": "Name",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "email",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
+          "id": "3458764588122489177",
+          "title": "CatalogExported",
+          "fields": [],
           "type": "EVENT",
           "description": "",
-          "aggregate": "Account",
+          "aggregate": "Catalog",
+          "aggregateDependencies": [
+            "Catalog"
+          ],
           "dependencies": [
             {
-              "id": "3458764587933417280",
+              "id": "3458764588122489629",
               "type": "OUTBOUND",
-              "title": "RegisteredUsers",
+              "title": "generatedDocumentation",
               "elementType": "READMODEL"
             },
             {
-              "id": "3458764587933347801",
+              "id": "3458764588122489246",
               "type": "INBOUND",
-              "title": "RegisterUser",
+              "title": "ExportCatalog",
               "elementType": "COMMAND"
             }
           ]
         }
       ],
-      "readmodels": [],
+      "readmodels": [
+        {
+          "id": "3458764588122489629",
+          "title": "generatedDocumentation",
+          "fields": [],
+          "type": "READMODEL",
+          "description": "",
+          "aggregateDependencies": [
+            "Catalog"
+          ],
+          "dependencies": [
+            {
+              "id": "3458764588122489177",
+              "type": "INBOUND",
+              "title": "CatalogExported",
+              "elementType": "EVENT"
+            }
+          ]
+        }
+      ],
       "screens": [
         {
-          "id": "3458764587933251686",
+          "id": "3458764588122560094",
           "title": "screen",
           "type": "SCREEN",
           "description": "",
+          "aggregateDependencies": [
+            "Catalog"
+          ],
           "dependencies": [
             {
-              "id": "3458764587933347801",
+              "id": "3458764588122489246",
               "type": "OUTBOUND",
-              "title": "RegisterUser",
+              "title": "ExportCatalog",
               "elementType": "COMMAND"
             }
           ]
@@ -122,502 +100,25 @@
       "specifications": [],
       "actors": [
         {
-          "name": "Admin",
+          "name": "developer",
           "authzRequired": false
         }
       ]
-    },
-    {
-      "id": "",
-      "title": "slice: RegisteredUsers",
-      "context": "",
-      "commands": [],
-      "events": [],
-      "readmodels": [
-        {
-          "id": "3458764587933417280",
-          "title": "RegisteredUsers",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "Name",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "email",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "READMODEL",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764587933417243",
-              "type": "OUTBOUND",
-              "title": "automation",
-              "elementType": "AUTOMATION"
-            },
-            {
-              "id": "3458764587933251635",
-              "type": "INBOUND",
-              "title": "UserRegistered",
-              "elementType": "EVENT"
-            }
-          ]
-        }
-      ],
-      "screens": [],
-      "processors": [],
-      "specifications": [],
-      "actors": []
-    },
-    {
-      "id": "",
-      "title": "slice: Notification",
-      "context": "",
-      "commands": [
-        {
-          "id": "3458764587933417458",
-          "title": "SendConfirmation",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "Name",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "email",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764587933417649",
-              "type": "OUTBOUND",
-              "title": "ConfirmationSent",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764587933417243",
-              "type": "INBOUND",
-              "title": "automation",
-              "elementType": "AUTOMATION"
-            }
-          ]
-        }
-      ],
-      "events": [
-        {
-          "id": "3458764587933417649",
-          "title": "ConfirmationSent",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "confirmationCode",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "Account",
-          "dependencies": [
-            {
-              "id": "3458764587933417458",
-              "type": "INBOUND",
-              "title": "SendConfirmation",
-              "elementType": "COMMAND"
-            },
-            {
-              "id": "3458764587934148045",
-              "type": "INBOUND",
-              "title": "generated value",
-              "elementType": "GENERATED_VALUE"
-            }
-          ]
-        }
-      ],
-      "readmodels": [],
-      "screens": [],
-      "processors": [
-        {
-          "id": "3458764587933417243",
-          "title": "automation",
-          "fields": [
-            {
-              "name": "Name",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "email",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "AUTOMATION",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764587933417458",
-              "type": "OUTBOUND",
-              "title": "SendConfirmation",
-              "elementType": "COMMAND"
-            },
-            {
-              "id": "3458764587933417280",
-              "type": "INBOUND",
-              "title": "RegisteredUsers",
-              "elementType": "READMODEL"
-            }
-          ]
-        }
-      ],
-      "specifications": [],
-      "actors": []
-    },
-    {
-      "id": "",
-      "title": "slice: ChangePassword",
-      "context": "",
-      "commands": [
-        {
-          "id": "3458764587933483215",
-          "title": "ChangePassword",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "password",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764587933251636",
-              "type": "OUTBOUND",
-              "title": "PasswordChanged",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764587933417866",
-              "type": "INBOUND",
-              "title": "screen",
-              "elementType": "SCREEN"
-            },
-            {
-              "id": "3458764587934323325",
-              "type": "INBOUND",
-              "title": "generated value",
-              "elementType": "GENERATED_VALUE"
-            }
-          ]
-        }
-      ],
-      "events": [
-        {
-          "id": "3458764587933251636",
-          "title": "PasswordChanged",
-          "fields": [
-            {
-              "name": "password",
-              "type": "String",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "Account",
-          "dependencies": [
-            {
-              "id": "3458764587933483215",
-              "type": "INBOUND",
-              "title": "ChangePassword",
-              "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
-      "readmodels": [],
-      "screens": [
-        {
-          "id": "3458764587933417866",
-          "title": "screen",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "SCREEN",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764587933483215",
-              "type": "OUTBOUND",
-              "title": "ChangePassword",
-              "elementType": "COMMAND"
-            },
-            {
-              "id": "3458764587933553263",
-              "type": "INBOUND",
-              "title": "ConfirmedAccount",
-              "elementType": "READMODEL"
-            }
-          ]
-        }
-      ],
-      "processors": [],
-      "specifications": [],
-      "actors": [
-        {
-          "name": "User",
-          "authzRequired": false
-        }
-      ]
-    },
-    {
-      "id": "",
-      "title": "slice: AccountConfirmation",
-      "context": "",
-      "commands": [
-        {
-          "id": "3458764587933483646",
-          "title": "ConfirmAccount",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "confirmationCode",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "COMMAND",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764587933553026",
-              "type": "OUTBOUND",
-              "title": "AccountCOnfirmed",
-              "elementType": "EVENT"
-            },
-            {
-              "id": "3458764587933483589",
-              "type": "INBOUND",
-              "title": "automation",
-              "elementType": "AUTOMATION"
-            }
-          ]
-        }
-      ],
-      "events": [
-        {
-          "id": "3458764587933553026",
-          "title": "AccountCOnfirmed",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "Account",
-          "dependencies": [
-            {
-              "id": "3458764587933553263",
-              "type": "OUTBOUND",
-              "title": "ConfirmedAccount",
-              "elementType": "READMODEL"
-            },
-            {
-              "id": "3458764587933483646",
-              "type": "INBOUND",
-              "title": "ConfirmAccount",
-              "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
-      "readmodels": [],
-      "screens": [],
-      "processors": [
-        {
-          "id": "3458764587933483589",
-          "title": "automation",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            },
-            {
-              "name": "confirmationCode",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "AUTOMATION",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764587933483646",
-              "type": "OUTBOUND",
-              "title": "ConfirmAccount",
-              "elementType": "COMMAND"
-            }
-          ]
-        }
-      ],
-      "specifications": [],
-      "actors": []
-    },
-    {
-      "id": "",
-      "title": "slice: confirmedAccount",
-      "context": "",
-      "commands": [],
-      "events": [],
-      "readmodels": [
-        {
-          "id": "3458764587933553263",
-          "title": "ConfirmedAccount",
-          "fields": [
-            {
-              "name": "aggregateId",
-              "type": "UUID",
-              "example": "",
-              "mapping": "",
-              "cardinality": "Single"
-            }
-          ],
-          "type": "READMODEL",
-          "description": "",
-          "dependencies": [
-            {
-              "id": "3458764587933417866",
-              "type": "OUTBOUND",
-              "title": "screen",
-              "elementType": "SCREEN"
-            },
-            {
-              "id": "3458764587933553026",
-              "type": "INBOUND",
-              "title": "AccountCOnfirmed",
-              "elementType": "EVENT"
-            }
-          ]
-        }
-      ],
-      "screens": [],
-      "processors": [],
-      "specifications": [],
-      "actors": []
     }
   ],
   "aggregates": [
     {
-      "id": "3458764587933734047",
-      "title": "Account",
+      "id": "3458764588122560764",
+      "title": "Catalog",
       "fields": [],
       "type": "AGGREGATE"
     }
   ],
-  "sliceDependencies": [
-    {
-      "source": "slice: RegisteredUsers",
-      "target": "slice: Notification"
-    },
-    {
-      "source": "slice: confirmedAccount",
-      "target": "slice: ChangePassword"
-    }
-  ],
-  "context": "Registration",
+  "sliceDependencies": [],
+  "context": "CatalogExport",
   "codeGen": {
-    "application": "Registration",
-    "rootPackage": "de.nebulit"
-  }
+    "application": "",
+    "rootPackage": ""
+  },
+  "boardId": "uXjVNkjCVJY="
 }
