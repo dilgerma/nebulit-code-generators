@@ -21,17 +21,11 @@ module.exports = class extends Generator {
             message: 'Projektname?',
             when: () => !config?.codeGen?.application,
         }]);
-        // , {
-        //         type: 'list',
-        //         name: 'generatorType',
-        //         message: 'Was soll generiert werden?',
-        //         choices: ['Basis', 'slices', "aggregates"]
-        //     }]);
     }
 
     setDefaults() {
         if (!this.answers.appName) {
-            this.answers.appName = config?.codeGen?.application+"Prototype"
+            this.answers.appName = config?.codeGen?.application + "Prototype"
         }
     }
 
@@ -53,12 +47,6 @@ module.exports = class extends Generator {
     }
 
     _writeReactSkeleton() {
-
-        /*var sliceViews:ViewSelection[] = [{
-            "slice" : "sliceName",
-            "view" : CommandSelection,
-            "viewName": "viewName"
-        }]*/
 
         var sliceViews = config.slices.flatMap((slice) => {
             return slice.screens?.map((screen) => {

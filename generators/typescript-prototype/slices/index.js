@@ -1,10 +1,24 @@
 var Generator = require('yeoman-generator');
-var {findSlice,buildLink} = require('../../common/util/config')
-var {_screenTitle, _aggregateTitle, _eventTitle, _sliceTitle, _commandTitle} = require('../../common/util/naming')
+var {findSlice, buildLink} = require('../../common/util/config')
+var {
+    _screenTitle,
+    _aggregateTitle,
+    _eventTitle,
+    _sliceTitle,
+    _commandTitle,
+    _readmodelTitle
+} = require('../../common/util/naming')
 var {capitalizeFirstCharacter, uniqBy, lowercaseFirstCharacter} = require('../../common/util/util')
-const {variables, variableAssignments, renderUnionTypes, renderImports} = require("../common/domain");
+const {
+    variables,
+    variableAssignments,
+    renderUnionTypes,
+    renderImports,
+    variablesDefaults
+} = require("../common/domain");
 const {writeEvents} = require("../events");
 const {parseSchema} = require("../../common/util/jsonschema");
+const renderSwitchStatement = require("../common/tools");
 
 
 let config = {}
@@ -86,21 +100,42 @@ module.exports = class extends Generator {
     processSlices() {
         config.slices.forEach((slice) => {
             this.writeCommands(slice)
+            this.writeReadModels(slice)
         });
     }
 
     writeReadModels(slice) {
-        var readModels = slice?.readModels
+        var readModels = slice?.readmodels
         if (!readModels || readModels.length == 0) {
-                    return
-                }
-        readModels.filter(readModels => readModel).forEach((readModel) => {
-                   this._writeReadModel(slice, readModel)
-               })
+            return
+        }
+        readModels.filter(readModel => readModel).forEach((readModel) => {
+            this._writeReadModel(slice, readModel)
+        })
     }
 
-    _writeReadModel(slice, command) {
+    _writeReadModel(slice, readmodel) {
+        var dependencyEvents = readmodel.dependencies.filter(it => it.type === "INBOUND" && it.elementType === "EVENT")
 
+        var aggregateEventImports = readmodel.aggregateDependencies?.map(depdendency => {
+            return `import { ${_aggregateTitle(depdendency)}Events } from "@/app/core/events/${_aggregateTitle(depdendency)}/${_aggregateTitle(depdendency)}Events"`;
+        }).join("\n")
+
+        var aggregateEvents = readmodel.aggregateDependencies?.map(aggregate => `${_aggregateTitle(aggregate)}Events`).join("|")
+
+        this.fs.copyTpl(
+            this.templatePath(`readmodel.ts.tpl`),
+            this.destinationPath(`${this.givenAnswers?.appName}/app/components/slices/${_sliceTitle(slice.title)}/${_readmodelTitle(readmodel?.title)}.ts`),
+            {
+                _readModelName: _readmodelTitle(readmodel.title),
+                _aggregateEventImports: aggregateEventImports,
+                _fields: variables([readmodel]),
+                _fieldDefaults: variablesDefaults([readmodel]),
+                _aggregateEvents: aggregateEvents,
+                _switchStatement: renderSwitchStatement("type", "state", dependencyEvents)
+
+            }
+        )
     }
 
     writeCommands(slice) {
