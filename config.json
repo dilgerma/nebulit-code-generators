@@ -2,27 +2,47 @@
   "slices": [
     {
       "id": "",
-      "title": "slice: slice",
+      "title": "slice: RegisterRoom",
       "context": "",
       "commands": [
         {
-          "id": "3458764588122489246",
-          "title": "ExportCatalog",
-          "fields": [],
+          "id": "3458764588300754605",
+          "title": "RegisterRoom",
+          "fields": [
+            {
+              "name": "location",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "name",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "roomNumber",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
           "type": "COMMAND",
           "description": "",
-          "aggregateDependencies": [
-            "Catalog"
-          ],
+          "aggregateDependencies": [],
           "dependencies": [
             {
-              "id": "3458764588122489177",
+              "id": "3458764588300135355",
               "type": "OUTBOUND",
-              "title": "CatalogExported",
+              "title": "RoomAdded",
               "elementType": "EVENT"
             },
             {
-              "id": "3458764588122560094",
+              "id": "3458764588304333940",
               "type": "INBOUND",
               "title": "screen",
               "elementType": "SCREEN"
@@ -32,81 +52,99 @@
       ],
       "events": [
         {
-          "id": "3458764588122489177",
-          "title": "CatalogExported",
-          "fields": [],
-          "type": "EVENT",
-          "description": "",
-          "aggregate": "Catalog",
-          "aggregateDependencies": [
-            "Catalog"
-          ],
-          "dependencies": [
+          "id": "3458764588300135355",
+          "title": "RoomAdded",
+          "fields": [
             {
-              "id": "3458764588122489629",
-              "type": "OUTBOUND",
-              "title": "generatedDocumentation",
-              "elementType": "READMODEL"
+              "name": "location",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
             },
             {
-              "id": "3458764588122489246",
+              "name": "roomNumber",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "name",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "aggregate": "Room Administration",
+          "aggregateDependencies": [],
+          "dependencies": [
+            {
+              "id": "3458764588300754605",
               "type": "INBOUND",
-              "title": "ExportCatalog",
+              "title": "RegisterRoom",
               "elementType": "COMMAND"
             }
           ]
         }
       ],
-      "readmodels": [
-        {
-          "id": "3458764588122489629",
-          "title": "generatedDocumentation",
-          "fields": [],
-          "type": "READMODEL",
-          "description": "",
-          "aggregateDependencies": [
-            "Catalog",
-            "Foo"
-          ],
-          "dependencies": [
-            {
-              "id": "3458764588122489177",
-              "type": "INBOUND",
-              "title": "CatalogExported",
-              "elementType": "EVENT"
-            }, {
-                          "id": "3458764588122489177",
-                          "type": "INBOUND",
-                          "title": "CatalogExportedFoo",
-                          "elementType": "EVENT"
-                        }
-          ]
-        }
-      ],
+      "readmodels": [],
       "screens": [
         {
-          "id": "3458764588122560094",
+          "id": "3458764588304333940",
           "title": "screen",
+          "fields": [
+            {
+              "name": "location",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "name",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            },
+            {
+              "name": "roomNumber",
+              "type": "String",
+              "example": "",
+              "mapping": "",
+              "cardinality": "Single"
+            }
+          ],
           "type": "SCREEN",
           "description": "",
-          "aggregateDependencies": [
-            "Catalog"
-          ],
+          "aggregateDependencies": [],
           "dependencies": [
             {
-              "id": "3458764588122489246",
+              "id": "3458764588300754605",
               "type": "OUTBOUND",
-              "title": "ExportCatalog",
+              "title": "RegisterRoom",
               "elementType": "COMMAND"
             }
           ]
         }
       ],
       "processors": [],
-      "specifications": [],
+      "specifications": [
+        {
+          "sliceName": "slice: RegisterRoom",
+          "title": "spec:  slice test good case",
+          "given": [],
+          "when": [],
+          "then": []
+        }
+      ],
       "actors": [
         {
-          "name": "developer",
+          "name": "Admin",
           "authzRequired": false
         }
       ]
@@ -114,17 +152,17 @@
   ],
   "aggregates": [
     {
-      "id": "3458764588122560764",
-      "title": "Catalog",
+      "id": "3458764588305632547",
+      "title": "Room Administration",
       "fields": [],
       "type": "AGGREGATE"
     }
   ],
   "sliceDependencies": [],
-  "context": "CatalogExport",
+  "context": "Context",
   "codeGen": {
-    "application": "EventCatalog",
-    "rootPackage": ""
+    "application": "Room Administration",
+    "rootPackage": "de.nebulit"
   },
-  "boardId": "uXjVNkjCVJY="
+  "boardId": "uXjVKK791Ao="
 }

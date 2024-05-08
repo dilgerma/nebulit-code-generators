@@ -3,6 +3,7 @@ const {ensureDirSync} = require("fs-extra");
 var chalk = require('chalk');
 var slugify = require('slugify')
 
+
 let config = {}
 
 module.exports = class extends Generator {

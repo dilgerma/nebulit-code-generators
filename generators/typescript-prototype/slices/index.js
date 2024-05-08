@@ -59,9 +59,10 @@ module.exports = class extends Generator {
     _writeScreen(sliceName) {
         var slice = findSlice(config, sliceName)
         var screens = slice.screens
+        var processors = slice.processors
+        let screensAndProcessors = screens.concat(processors)
 
-
-        screens.forEach((screen) => {
+        screensAndProcessors.forEach((screen) => {
 
             var title = _screenTitle(screen.title)
 
@@ -100,22 +101,24 @@ module.exports = class extends Generator {
     processSlices() {
         config.slices.forEach((slice) => {
             this.writeCommands(slice)
-            this.writeReadModels(slice)
+            this.writeReadModels(slice, config.slices.flatMap(it => it.events))
         });
     }
 
-    writeReadModels(slice) {
+    writeReadModels(slice, allEvents) {
         var readModels = slice?.readmodels
         if (!readModels || readModels.length == 0) {
             return
         }
         readModels.filter(readModel => readModel).forEach((readModel) => {
-            this._writeReadModel(slice, readModel)
+            this._writeReadModel(slice, readModel, allEvents)
         })
     }
 
-    _writeReadModel(slice, readmodel) {
+    _writeReadModel(slice, readmodel, allEvents) {
         var dependencyEvents = readmodel.dependencies.filter(it => it.type === "INBOUND" && it.elementType === "EVENT")
+
+        var events = allEvents.filter(it => dependencyEvents.find(item => item.id === it.id)!==undefined).filter(it => it)
 
         var aggregateEventImports = readmodel.aggregateDependencies?.map(depdendency => {
             return `import { ${_aggregateTitle(depdendency)}Events } from "@/app/core/events/${_aggregateTitle(depdendency)}/${_aggregateTitle(depdendency)}Events"`;
@@ -132,7 +135,9 @@ module.exports = class extends Generator {
                 _fields: variables([readmodel]),
                 _fieldDefaults: variablesDefaults([readmodel]),
                 _aggregateEvents: aggregateEvents,
-                _switchStatement: renderSwitchStatement("type", "state", dependencyEvents)
+                _switchStatement: renderSwitchStatement(readmodel, "type", "state", events, (readmodel, event)=>{
+                    return variableAssignments(readmodel, "data", event, ",\n",":")
+                })
 
             }
         )

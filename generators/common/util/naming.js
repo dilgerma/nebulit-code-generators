@@ -35,4 +35,6 @@ function _screenTitle(title) {
     return `${slugify(capitalizeFirstCharacter(title), "")}`
 }
 
+
+
 module.exports = {_processorTitle, _restResourceTitle, _readmodelTitle, _eventTitle, _commandTitle, _aggregateTitle, _screenTitle, _sliceTitle}

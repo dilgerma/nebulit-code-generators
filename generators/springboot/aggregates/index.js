@@ -38,7 +38,7 @@ module.exports = class extends Generator {
     _writeAggregates(aggregate) {
         this.fs.copyTpl(
             this.templatePath(`src/components/Aggregate.kt.tpl`),
-            this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain/${this._aggregateTitle(aggregate.title)}.kt`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain/${this._aggregateTitle(aggregate.title)}.kt`),
             {
                 _rootPackageName: this.givenAnswers.rootPackageName,
                 _name: this._aggregateTitle(aggregate.title),
@@ -52,7 +52,7 @@ module.exports = class extends Generator {
 
         this.fs.copyTpl(
             this.templatePath(`src/components/AggregateService.kt.tpl`),
-            this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/support/${this._aggregateTitle(aggregate.title)}Service.kt`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/support/${this._aggregateTitle(aggregate.title)}Service.kt`),
             {
                 _rootPackageName: this.givenAnswers.rootPackageName,
                 _aggregate: this._aggregateTitle(aggregate.title),
@@ -102,7 +102,7 @@ class VariablesGenerator {
 
     static generateRestParamInvocation(fields) {
         return fields?.map((variable) => {
-            if (variable.type?.toLowerCase() == "date") {
+            if (variable.type?.toLowerCase() === "date") {
 
                 return `@DateTimeFormat(pattern = "dd.MM.yyyy") @RequestParam ${variable.name}:${typeMapping(variable.type, variable.cardinality)}`;
             } else {

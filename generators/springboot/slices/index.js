@@ -3,7 +3,8 @@ var chalk = require('chalk');
 const {ensureDirSync} = require("fs-extra");
 var slugify = require('slugify')
 const {answers} = require("../app");
-const {givenAnswers, _commandTitle, _readmodelTitle} = require("./index");
+const {_eventTitle, _commandTitle, _readmodelTitle, _sliceTitle, _aggregateTitle, _restResourceTitle} = require("./../../../generators/common/util/naming");
+
 
 let config = {}
 
@@ -63,31 +64,6 @@ module.exports = class extends Generator {
 
     }
 
-
-    // writePages() {
-    //     this.answers.slices.forEach((slice) => {
-    //         this._writePage(slice)
-    //     });
-    // }
-
-    // _writePage(sliceName) {
-    //     var slice = this._findSlice(sliceName)
-    //     var title = _sliceTitle(slice.title).toLowerCase()
-    //     this.fs.copyTpl(
-    //         this.templatePath('src/pages/page.tsx'),
-    //         this.destinationPath(`${this.givenAnswers?.appName}/src/pages/${title}.tsx`),
-    //         {
-    //             _name: title,
-    //             _fields: FieldComponentGenerator.generateVariables(slice.commands),
-    //             _state: FieldComponentGenerator.generateState(slice.commands),
-    //             _commandTriggers: FieldComponentGenerator.generateCommandTrigger(slice, slice.commands),
-    //             _imports: FieldComponentGenerator.generateSliceSpecificImports(slice, slice.commands),
-    //             _handlerImports: FieldComponentGenerator.generateHandlerImports(slice, slice.commands),
-    //
-    //         }
-    //     )
-    // }
-
     writeCommandHandlers() {
         //this.answers.slices.forEach((slice) => {
         this._writeCommandHandlers(this.answers.slice)
@@ -96,18 +72,18 @@ module.exports = class extends Generator {
 
     _writeCommandHandlers(sliceName) {
         var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
+        var title = _capitalizeTitle(slice.title).toLowerCase()
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/CommandHandler.kt.tpl`),
                 this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${command.title}CommandHandler.kt`),
                 {
                     _slice: title,
-                    _commandType: this._commandTitle(command.title),
+                    _commandType: _commandTitle(command.title),
                     _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._commandTitle(command.title),
+                    _name: _commandTitle(command.title),
                     _typeImports: typeImports(command.fields),
-                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE"
+                    _aggregate: this.answers.aggregate !== "Keins" ? _aggregateTitle(this.answers.aggregate) : "AGGREGATE"
                 }
             )
         })
@@ -122,17 +98,17 @@ module.exports = class extends Generator {
 
     _writeCommands(sliceName) {
         var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
+        var title = _capitalizeTitle(slice.title).toLowerCase()
 
 
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/Command.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._commandTitle(command.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_commandTitle(command.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._commandTitle(command.title),
+                    _name: _commandTitle(command.title),
                     _fields: ConstructorGenerator.generateConstructorVariables(
                         command.fields,
                         "aggregateId"
@@ -155,21 +131,21 @@ module.exports = class extends Generator {
 
     _writeEvents(sliceName) {
         var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
+        var title = _capitalizeTitle(slice.title).toLowerCase()
 
 
         slice.events?.filter((event) => event.title).forEach((event) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/Event.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/events/${this._eventTitle(event.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/events/${_eventTitle(event.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._eventTitle(event.title),
+                    _name: _eventTitle(event.title),
                     _fields: ConstructorGenerator.generateConstructorVariables(
                         event.fields
                     ),
-                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
+                    _aggregate: this.answers.aggregate !== "Keins" ? _aggregateTitle(this.answers.aggregate) : "AGGREGATE",
                     _typeImports: typeImports(event.fields)
 
                 }
@@ -187,7 +163,7 @@ module.exports = class extends Generator {
 
     _writeReadModels(sliceName) {
         var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
+        var title = _capitalizeTitle(slice.title).toLowerCase()
 
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
             this.fs.copyTpl(
@@ -200,7 +176,7 @@ module.exports = class extends Generator {
                     _fields: VariablesGenerator.generateVariables(
                         readmodel.fields
                     ),
-                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
+                    _aggregate: this.answers.aggregate !== "Keins" ? _aggregateTitle(this.answers.aggregate) : "AGGREGATE",
                     _typeImports: typeImports(readmodel.fields)
                 }
             )
@@ -212,7 +188,7 @@ module.exports = class extends Generator {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: this._readmodelTitle(readmodel.title),
-                    _aggregate: this.answers.aggregate !== "Keins" ? this._aggregateTitle(this.answers.aggregate) : "AGGREGATE",
+                    _aggregate: this.answers.aggregate !== "Keins" ? _aggregateTitle(this.answers.aggregate) : "AGGREGATE",
                     _typeImports: typeImports(readmodel.fields)
 
                 }
@@ -233,23 +209,23 @@ module.exports = class extends Generator {
 
     _writeRestControllers(sliceName) {
         var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
+        var title = _capitalizeTitle(slice.title).toLowerCase()
 
 
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/RestResource.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._restResourceTitle(command.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_restResourceTitle(command.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: title,
-                    _command: this._commandTitle(command.title),
+                    _command: _commandTitle(command.title),
                     _controller: capitalizeFirstCharacter(title),
                     _typeImports: typeImports(command.fields),
                     _endpoint: this._generatePostRestCall(title, VariablesGenerator.generateRestParamInvocation(
                         command.fields
-                    ), this._commandTitle(command.title), VariablesGenerator.generateInvocation(
+                    ), _commandTitle(command.title), VariablesGenerator.generateInvocation(
                         command.fields
                     ))
                 }
@@ -258,7 +234,7 @@ module.exports = class extends Generator {
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/ReadOnlyRestResource.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/ReadOnly${this._restResourceTitle(readmodel.title)}.kt`),
+                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/ReadOnly${_restResourceTitle(readmodel.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -323,12 +299,12 @@ module.exports = class extends Generator {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: this._processorTitle(processor.title),
-                    _eventsImports: this._eventsImports(this.answers.processTriggers),
+                    _eventsImports: _eventsImports(this.answers.processTriggers),
                     _triggers: this._renderTriggers(this.answers.processTriggers),
                     _variables: command ? VariablesGenerator.generateInvocation(
                         command.fields
                     ) : "",
-                    _command: command ? this._commandTitle(command.title) : ""
+                    _command: command ? _commandTitle(command.title) : ""
 
                 }
             )
@@ -339,7 +315,7 @@ module.exports = class extends Generator {
 
     _eventsImports(triggers) {
         return triggers.map((trigger) => {
-            return `import ${this.givenAnswers.rootPackageName}.events.${this._eventTitle(trigger)}`
+            return `import ${this.givenAnswers.rootPackageName}.events.${_eventTitle(trigger)}`
         }).join("\n")
     }
 
@@ -347,38 +323,12 @@ module.exports = class extends Generator {
     _renderTriggers(triggers) {
         return triggers.map((trigger) => {
             return `\t@ApplicationModuleListener
-\tfun on(event: ${this._eventTitle(trigger)}) {
-\t     logger.info("Processing ${this._eventTitle(trigger)}")
+\tfun on(event: ${_eventTitle(trigger)}) {
+\t     logger.info("Processing ${_eventTitle(trigger)}")
 \t     process()     
 \t}`
         }).join("\n\n")
     }
-
-    _aggregateTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}Aggregate`
-    }
-
-    _commandTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}Command`
-    }
-
-
-    _processorTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}Processor`
-    }
-
-    _restResourceTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}Ressource`
-    }
-
-    _readmodelTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}ReadModel`
-    }
-
-    _eventTitle(title) {
-        return `${slugify(capitalizeFirstCharacter(title), "")}Event`
-    }
-
 
     end() {
         this.log(chalk.green('------------'))
@@ -525,6 +475,9 @@ const defaultValue = (type, cardinality = "single") => {
     }
 }
 
+function _capitalizeTitle(title) {
+    return `${slugify(capitalizeFirstCharacter(title), "")}`
+}
 
 function toCamelCase(prefix, variableName) {
     return (prefix + variableName).replace(/_([a-z])/g, function (match, group1) {

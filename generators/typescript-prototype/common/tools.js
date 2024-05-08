@@ -1,5 +1,5 @@
 const {_eventTitle} = require("../../common/util/naming")
-
+const {variableAssignments} = require("../common/domain")
 /*
 *
 * switch (type) {
@@ -15,13 +15,14 @@ const {_eventTitle} = require("../../common/util/naming")
             return state;
     }
 * */
-function renderSwitchStatement(typeName="type", stateName="state", events){
+function renderSwitchStatement(element, typeName="type", stateName="state", events, renderAssignmentFunction){
     return `switch(${typeName}) {
         ${events.map(event=> {
             return `
 \t\tcase '${_eventTitle(event.title)}':
             return {
-            \t...${stateName}
+            \t...${stateName},
+            \t${renderAssignmentFunction?renderAssignmentFunction(element, event):""}
             }`
     }).join("\n")}
 \t\tdefault: return ${stateName}

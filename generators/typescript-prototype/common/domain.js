@@ -17,12 +17,11 @@ const variableAssignments = (element, sourceName, source, separator, assignmentO
 
 const processSourceMapping = (targetField, sourceName, source, assigmentOperator="=") => {
     var name = targetField.name
-
-    var field = source.fields.find((field) => field.name === name)
+    var field = source.fields?.find((field) => field.name === name)
     if (field) {
         return `${targetField.name}${assigmentOperator}${sourceName}.${field.name}`
     }
-    var mapping = source.fields.find((field) => targetField.mapping === field.name)
+    var mapping = source.fields?.find((field) => targetField.mapping === field.name)
     if (mapping) {
         return `${targetField.name}${assigmentOperator}${sourceName}.${targetField.mapping}`
     }

@@ -2,7 +2,7 @@ var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 const renderSwitchStatement = require("../common/tools")
 const {uniqBy} = require("../../common/util/util");
-const {variables,variablesDefaults} = require("../common/domain");
+const {variables, variablesDefaults, variableAssignments} = require("../common/domain");
 const {_aggregateTitle} = require("../../common/util/naming")
 let config = {}
 
@@ -23,7 +23,7 @@ module.exports = class extends Generator {
 
     _writeAggregates(aggregate) {
 
-        let events = uniqBy(config?.slices?.flatMap(it => it.events).filter(it => it.aggregate === aggregate.title),(item)=>item.title)
+        let events = uniqBy(config?.slices?.flatMap(it => it.events).filter(it => it.aggregate === aggregate.title), (item) => item.title)
 
         this.fs.copyTpl(
             this.templatePath(`Aggregate.ts.tpl`),
@@ -32,7 +32,9 @@ module.exports = class extends Generator {
                 _aggregateName: _aggregateTitle(aggregate.title),
                 _fields: variables([aggregate]),
                 _fieldDefaults: variablesDefaults([aggregate]),
-                _switchStatement: renderSwitchStatement("type", "state", events)
+                _switchStatement: renderSwitchStatement(aggregate, "type", "state", events, (aggregate, event) => {
+                    return variableAssignments(event, "data", aggregate, ",\n", ":")
+                })
 
             }
         )
