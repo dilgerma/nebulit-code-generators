@@ -3,6 +3,7 @@ var chalk = require('chalk');
 var slugify = require('slugify')
 const {answers} = require("../app");
 const {givenAnswers} = require("./index");
+const {_aggregateTitle} = require("../../common/util/naming")
 
 let config = {}
 
@@ -38,10 +39,10 @@ module.exports = class extends Generator {
     _writeAggregates(aggregate) {
         this.fs.copyTpl(
             this.templatePath(`src/components/Aggregate.kt.tpl`),
-            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain/${this._aggregateTitle(aggregate.title)}.kt`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain/${_aggregateTitle(aggregate.title)}.kt`),
             {
                 _rootPackageName: this.givenAnswers.rootPackageName,
-                _name: this._aggregateTitle(aggregate.title),
+                _name: _aggregateTitle(aggregate.title),
                 _fields: VariablesGenerator.generateVariables(
                     aggregate.fields
                 ),
@@ -52,22 +53,16 @@ module.exports = class extends Generator {
 
         this.fs.copyTpl(
             this.templatePath(`src/components/AggregateService.kt.tpl`),
-            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/support/${this._aggregateTitle(aggregate.title)}Service.kt`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/support/${_aggregateTitle(aggregate.title)}Service.kt`),
             {
                 _rootPackageName: this.givenAnswers.rootPackageName,
-                _aggregate: this._aggregateTitle(aggregate.title),
+                _aggregate: _aggregateTitle(aggregate.title),
                 _typeImports: typeImports(aggregate.fields)
             }
         )
 
 
     }
-
-    _aggregateTitle(title) {
-        return `${capitalizeFirstCharacter(title)}Aggregate`
-    }
-
-
 };
 
 

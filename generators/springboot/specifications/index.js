@@ -68,7 +68,7 @@ module.exports = class extends Generator {
             }
             this.fs.copyTpl(
                 this.templatePath(`src/components/Specification.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/test/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${specificationName}.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/test/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${specificationName}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,

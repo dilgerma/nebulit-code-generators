@@ -76,7 +76,7 @@ module.exports = class extends Generator {
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/CommandHandler.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${command.title}CommandHandler.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${command.title}CommandHandler.kt`),
                 {
                     _slice: title,
                     _commandType: _commandTitle(command.title),
@@ -104,7 +104,7 @@ module.exports = class extends Generator {
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/Command.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_commandTitle(command.title)}.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_commandTitle(command.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -137,7 +137,7 @@ module.exports = class extends Generator {
         slice.events?.filter((event) => event.title).forEach((event) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/Event.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/events/${_eventTitle(event.title)}.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/events/${_eventTitle(event.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -168,7 +168,7 @@ module.exports = class extends Generator {
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/ReadModel.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${this._readmodelTitle(readmodel.title)}.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${this._readmodelTitle(readmodel.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -215,7 +215,7 @@ module.exports = class extends Generator {
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/RestResource.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_restResourceTitle(command.title)}.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_restResourceTitle(command.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -234,7 +234,7 @@ module.exports = class extends Generator {
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/ReadOnlyRestResource.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/ReadOnly${_restResourceTitle(readmodel.title)}.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/ReadOnly${_restResourceTitle(readmodel.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
