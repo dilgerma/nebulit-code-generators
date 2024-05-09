@@ -72,7 +72,7 @@ module.exports = class extends Generator {
 
     _writeCommandHandlers(sliceName) {
         var slice = this._findSlice(sliceName)
-        var title = _capitalizeTitle(slice.title).toLowerCase()
+        var title = _slicePackage(slice.title).toLowerCase()
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/CommandHandler.kt.tpl`),
@@ -98,7 +98,7 @@ module.exports = class extends Generator {
 
     _writeCommands(sliceName) {
         var slice = this._findSlice(sliceName)
-        var title = _capitalizeTitle(slice.title).toLowerCase()
+        var title = _slicePackage(slice.title).toLowerCase()
 
 
         slice.commands?.filter((command) => command.title).forEach((command) => {
@@ -131,7 +131,7 @@ module.exports = class extends Generator {
 
     _writeEvents(sliceName) {
         var slice = this._findSlice(sliceName)
-        var title = _capitalizeTitle(slice.title).toLowerCase()
+        var title = _slicePackage(slice.title).toLowerCase()
 
 
         slice.events?.filter((event) => event.title).forEach((event) => {
@@ -163,7 +163,7 @@ module.exports = class extends Generator {
 
     _writeReadModels(sliceName) {
         var slice = this._findSlice(sliceName)
-        var title = _capitalizeTitle(slice.title).toLowerCase()
+        var title = _slicePackage(slice.title).toLowerCase()
 
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
             this.fs.copyTpl(
@@ -209,7 +209,7 @@ module.exports = class extends Generator {
 
     _writeRestControllers(sliceName) {
         var slice = this._findSlice(sliceName)
-        var title = _capitalizeTitle(slice.title).toLowerCase()
+        var title = _slicePackage(slice.title).toLowerCase()
 
 
         slice.commands?.filter((command) => command.title).forEach((command) => {
@@ -288,7 +288,7 @@ module.exports = class extends Generator {
 
     _writeProcessors(sliceName) {
         var slice = this._findSlice(sliceName)
-        var title = _sliceTitle(slice.title).toLowerCase()
+        var title = _slicePackage(slice.title).toLowerCase()
         var command = slice.commands.length > 0 ? slice.commands[0] : null
 
         slice.processors?.filter((processor) => processor.title).forEach((processor) => {
@@ -475,8 +475,8 @@ const defaultValue = (type, cardinality = "single") => {
     }
 }
 
-function _capitalizeTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title), "")}`
+function _slicePackage(title) {
+    return `${slugify(title.replaceAll("slice:","").replaceAll("-",""))}`
 }
 
 function toCamelCase(prefix, variableName) {
