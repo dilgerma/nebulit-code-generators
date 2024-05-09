@@ -194,8 +194,6 @@ module.exports = class extends Generator {
         config.slices?.filter(slice => slice.commands?.length > 0).forEach((slice) => {
             slice.events?.forEach((event) => {
 
-                console.log("###" + JSON.stringify(event))
-
                 if (event.aggregate) {
                     this.fs.copyTpl(
                         this.templatePath('root/events/index.md'),

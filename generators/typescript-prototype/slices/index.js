@@ -1,5 +1,6 @@
 var Generator = require('yeoman-generator');
 var {findSlice, buildLink} = require('../../common/util/config')
+var slugify = require('slugify')
 var {
     _screenTitle,
     _aggregateTitle,

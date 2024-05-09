@@ -1,6 +1,7 @@
 var Generator = require('yeoman-generator');
 const renderSwitchStatement = require("../common/tools")
 const {uniqBy} = require("../../common/util/util");
+const slugify = require('slugify')
 const {variables, variablesDefaults, renderUnionTypes, renderImports} = require("../common/domain");
 const {_aggregateTitle, _eventTitle} = require("../../common/util/naming")
 let config = {}
