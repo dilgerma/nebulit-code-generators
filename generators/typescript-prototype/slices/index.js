@@ -82,7 +82,7 @@ module.exports = class extends Generator {
 
             this.fs.copyTpl(
                 this.templatePath('page.tsx.tpl'),
-                this.destinationPath(`${this.givenAnswers?.appName}/app/components/slices/${_sliceTitle(slice.title)}/${title}.tsx`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${title}.tsx`),
                 {
                     _name: title,
                     _pageName: capitalizeFirstCharacter(title),

@@ -27,7 +27,7 @@ module.exports = class extends Generator {
 
         this.fs.copyTpl(
             this.templatePath(`Aggregate.ts.tpl`),
-            this.destinationPath(`${this.givenAnswers?.appName}/app/components/domain/${_aggregateTitle(aggregate?.title)}.ts`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/domain/${_aggregateTitle(aggregate?.title)}.ts`),
             {
                 _aggregateName: _aggregateTitle(aggregate.title),
                 _fields: variables([aggregate]),

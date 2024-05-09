@@ -26,7 +26,7 @@ module.exports = class extends Generator {
         events.forEach((event) => {
             this.fs.copyTpl(
                 this.templatePath(`Event.ts.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/app/components/events/${_aggregateTitle(aggregate?.title)}/${_eventTitle(event?.title)}.ts`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/events/${_aggregateTitle(aggregate?.title)}/${_eventTitle(event?.title)}.ts`),
                 {
                     _eventTitle: _eventTitle(event?.title),
                     _fields: variables([event]),
