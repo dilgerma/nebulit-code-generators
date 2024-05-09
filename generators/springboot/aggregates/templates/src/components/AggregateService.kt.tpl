@@ -7,6 +7,7 @@ import <%= _rootPackageName%>.domain.<%= _aggregate%>
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.context.ApplicationEventPublisher
 import java.util.UUID
 
 interface <%= _aggregate%>Repository : CrudRepository<<%= _aggregate%>, Long> {
@@ -16,8 +17,9 @@ interface <%= _aggregate%>Repository : CrudRepository<<%= _aggregate%>, Long> {
 
 @Component
 class <%= _aggregate%>Service(
-    var repository: <%= _aggregate%>Repository,
-    var eventsEntityRepository: EventsEntityRepository,
+    val repository: <%= _aggregate%>Repository,
+    val eventsEntityRepository: EventsEntityRepository,
+    val applicationEventPublisher: ApplicationEventPublisher
 ) : AggregateService<<%= _aggregate%>> {
 
     @Transactional
@@ -25,6 +27,9 @@ class <%= _aggregate%>Service(
         repository.save(aggregate)
         if (aggregate.events.isNotEmpty()) {
             eventsEntityRepository.saveAll(aggregate.events)
+            aggregate.events.forEach {
+                applicationEventPublisher.publishEvent(it.value as Any)
+            }
         }
 
     }
@@ -34,7 +39,7 @@ class <%= _aggregate%>Service(
     }
 
     override fun findEventsByAggregateId(aggregateId: UUID): List<InternalEvent> {
-        return  eventsEntityRepository.findByAggregateIdAndIdGreaterThanOrderByIdAsc(
+        return eventsEntityRepository.findByAggregateIdAndIdGreaterThanOrderByIdAsc(
             aggregateId, 0)
     }
 

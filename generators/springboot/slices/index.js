@@ -168,11 +168,11 @@ module.exports = class extends Generator {
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/ReadModel.kt.tpl`),
-                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${this._readmodelTitle(readmodel.title)}.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${_readmodelTitle(readmodel.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._readmodelTitle(readmodel.title),
+                    _name: _readmodelTitle(readmodel.title),
                     _fields: VariablesGenerator.generateVariables(
                         readmodel.fields
                     ),
@@ -183,11 +183,11 @@ module.exports = class extends Generator {
 
             this.fs.copyTpl(
                 this.templatePath(`src/components/QueryHandler.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._readmodelTitle(readmodel.title)}QueryHandler.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_readmodelTitle(readmodel.title)}QueryHandler.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._readmodelTitle(readmodel.title),
+                    _name: _readmodelTitle(readmodel.title),
                     _aggregate: this.answers.aggregate !== "Keins" ? _aggregateTitle(this.answers.aggregate) : "AGGREGATE",
                     _typeImports: typeImports(readmodel.fields)
 
@@ -239,13 +239,13 @@ module.exports = class extends Generator {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: title,
-                    _readModel: this._readmodelTitle(readmodel.title),
+                    _readModel: _readmodelTitle(readmodel.title),
                     _controller: capitalizeFirstCharacter(title),
                     _typeImports: typeImports(readmodel.fields),
                     _endpoint: this._generateGetRestCall(title, VariablesGenerator.generateRestParamInvocation(
                         //only provide aggregateId (so that proper imports are generated)
-                        readmodel.fields.filter(item => item.name === "aggregateId")
-                    ), this._readmodelTitle(readmodel.title))
+                        readmodel.fields?.filter(item => item.name === "aggregateId")
+                    ), _readmodelTitle(readmodel.title))
                 }
             )
         })
@@ -294,7 +294,7 @@ module.exports = class extends Generator {
         slice.processors?.filter((processor) => processor.title).forEach((processor) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/Processor.kt.tpl`),
-                this.destinationPath(`${this.givenAnswers?.appName}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._processorTitle(processor.title)}.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._processorTitle(processor.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,

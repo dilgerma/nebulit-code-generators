@@ -1,6 +1,8 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 const renderSwitchStatement = require("../common/tools")
+const slugify = require('slugify')
+
 const {uniqBy} = require("../../common/util/util");
 const {variables, variablesDefaults, variableAssignments} = require("../common/domain");
 const {_aggregateTitle} = require("../../common/util/naming")
