@@ -1,4 +1,5 @@
-import type { Event } from '@event-driven-io/emmett';
+import type { Event, ReadStreamResult } from '@event-driven-io/emmett';
+import {findEventStore} from '@/app/core/infrastructure/inmemoryEventstore';
 <%-_aggregateEventImports%>
 
 export type <%-_readModelName%> = {
@@ -16,3 +17,5 @@ export const evolve = (state: <%-_readModelName%>, _eventData: <%=_aggregateEven
     const {type, data} = _eventData;
     <%-_switchStatement%>
 }
+
+<%-_loadFromStream%>

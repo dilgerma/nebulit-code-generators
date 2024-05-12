@@ -7,7 +7,7 @@ var {
     _eventTitle,
     _sliceTitle,
     _commandTitle,
-    _readmodelTitle
+    _readmodelTitle, _processorTitle
 } = require('../../common/util/naming')
 var {capitalizeFirstCharacter, uniqBy, lowercaseFirstCharacter} = require('../../common/util/util')
 const {
@@ -19,7 +19,7 @@ const {
 } = require("../common/domain");
 const {writeEvents} = require("../events");
 const {parseSchema} = require("../../common/util/jsonschema");
-const renderSwitchStatement = require("../common/tools");
+const {renderSwitchStatement, renderLoadFromStream} = require("../common/tools");
 
 
 let config = {}
@@ -50,20 +50,41 @@ module.exports = class extends Generator {
     }
 
 
-    writeScreen() {
+    writeScreensAndProcessors() {
         var slices = config.slices.map((slice) => slice.title)
         slices.forEach((slice) => {
             this._writeScreen(slice)
+            this._writeProcessor(slice)
         });
+    }
+
+    _writeProcessor(sliceName) {
+        var slice = findSlice(config, sliceName)
+        var processors = slice.processors
+        processors.forEach((processor) => {
+            var title = _processorTitle(processor.title)
+            var commands = processor?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND")
+
+
+            this.fs.copyTpl(
+                this.templatePath('processorView.tsx.tpl'),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${title}.tsx`),
+                {
+                    _name: title,
+                    _pageName: capitalizeFirstCharacter(title),
+                }
+            )
+
+        })
+
     }
 
     _writeScreen(sliceName) {
         var slice = findSlice(config, sliceName)
         var screens = slice.screens
         var processors = slice.processors
-        let screensAndProcessors = screens.concat(processors)
 
-        screensAndProcessors.forEach((screen) => {
+        screens.forEach((screen) => {
 
             var title = _screenTitle(screen.title)
 
@@ -119,7 +140,7 @@ module.exports = class extends Generator {
     _writeReadModel(slice, readmodel, allEvents) {
         var dependencyEvents = readmodel.dependencies.filter(it => it.type === "INBOUND" && it.elementType === "EVENT")
 
-        var events = allEvents.filter(it => dependencyEvents.find(item => item.id === it.id)!==undefined).filter(it => it)
+        var events = allEvents.filter(it => dependencyEvents.find(item => item.id === it.id) !== undefined).filter(it => it)
 
         var aggregateEventImports = readmodel.aggregateDependencies?.map(depdendency => {
             return `import { ${_aggregateTitle(depdendency)}Events } from "@/app/core/events/${_aggregateTitle(depdendency)}/${_aggregateTitle(depdendency)}Events"`;
@@ -136,9 +157,10 @@ module.exports = class extends Generator {
                 _fields: variables([readmodel]),
                 _fieldDefaults: variablesDefaults([readmodel]),
                 _aggregateEvents: aggregateEvents,
-                _switchStatement: renderSwitchStatement(readmodel, "type", "state", events, (readmodel, event)=>{
-                    return variableAssignments(readmodel, "data", event, ",\n",":")
-                })
+                _switchStatement: renderSwitchStatement(readmodel, "type", "state", events, (readmodel, event) => {
+                    return variableAssignments(readmodel, "data", event, ",\n", ":")
+                }),
+                _loadFromStream: renderLoadFromStream(readmodel)
 
             }
         )
@@ -171,7 +193,7 @@ module.exports = class extends Generator {
 
         var events = config.slices.flatMap(slice => slice.events).filter(event => eventsDependencies.map(it => it.id).includes(event.id))
 
-        var eventsImports = Array.from(new Set(events.map(event => renderImports(`@/app/components/events/${_aggregateTitle(event.aggregate)}`, [`${_eventTitle(event.title)}`])))).join("\n")
+        var eventsImports = Array.from(new Set(events.filter(event => event.aggregate).map(event => renderImports(`@/app/components/events/${_aggregateTitle(event.aggregate)}`, [`${_eventTitle(event.title)}`])))).join("\n")
 
 
         var aggregates = Array.from(new Set(events.filter(it => it.aggregate).map(it => it.aggregate)))

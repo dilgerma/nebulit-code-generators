@@ -1,6 +1,6 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
-const renderSwitchStatement = require("../common/tools")
+const {renderSwitchStatement,renderLoadFromStream} = require("../common/tools")
 const slugify = require('slugify')
 
 const {uniqBy} = require("../../common/util/util");

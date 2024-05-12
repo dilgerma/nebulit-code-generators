@@ -47,16 +47,3 @@ img {
   max-height: 500px;
   overflow-y: scroll;
 }
-
-.top-margin {
-  margin-top: 15px;
-}
-
-.command {
-  cursor: pointer;
-  text-align: center;
-  background-color: lightblue;
-  max-width: 250px;
-  padding: 10px;
-  color:white
-}

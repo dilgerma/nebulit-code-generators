@@ -3,21 +3,26 @@ import {JsonForm} from '@/app/components/commandselection/JsonForm';
 import {CommandConfig} from '@/app/core/types'
 
 export const CommandSelection = (props:{commands:CommandConfig[]}) => {
-    const [selectedCommandConfig, setSelectedCommand] = useState<CommandConfig|null>(null)
+    const [selectedCommandConfig, setSelectedCommand] = useState<CommandConfig|undefined>()
 
 
 
     return <div>
-        <select value={selectedCommandConfig?.command??""} onChange={(evt) => {
-            //@ts-ignore
-            setSelectedCommand(props.commands?.find(it => it.command == evt.target.value))
-        }} className="select">
-            <option value="">Bitte auswählen</option>
 
+        <div className={"fixed-grid"}>
+        <div className="grid">
             {props.commands.map((command: CommandConfig, idx: number) => {
-                return <option value={command.command} key={idx}>{command?.command}</option>
-            })}
-        </select>
+                 return <div className={"cell command"} key={idx}
+                 onClick={()=> setSelectedCommand(props.commands?.find(it => it.command == command.command))}>
+                     <h3>Command</h3>
+                     <div>
+                     {command?.command}</div>
+                <div className={"cell"}/>
+                 </div>
+             })}
+        </div>
+        </div>
+
         <div>
             {selectedCommandConfig ? <JsonForm schema={selectedCommandConfig.schema} handleCommand={selectedCommandConfig?.handler}/> : <span/>}
         </div>

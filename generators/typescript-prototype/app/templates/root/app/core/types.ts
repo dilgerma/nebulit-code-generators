@@ -9,6 +9,15 @@ export type CommandConfig = {
 
 export type ViewSelection = {
     "slice" : string,
+    "viewType": string,
     "view" : React.FC<any>,
     "viewName":string
 }
+
+export type ProcessorSelection = {
+    "slice" : string,
+    "processorType" : string,
+    "view" : React.FC<any>,
+    "processorName":string
+}
+

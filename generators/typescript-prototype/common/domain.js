@@ -86,6 +86,12 @@ const defaultMapping = (fieldType, fieldCardinality) => {
         case "boolean":
             defaultValue = "false";
             break;
+        case "int":
+            defaultValue = 0
+            break;
+        case "double":
+            defaultValue = 0.0
+            break;
         default:
             defaultValue = "undefined";
             break;

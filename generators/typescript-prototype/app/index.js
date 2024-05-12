@@ -1,7 +1,7 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var slugify = require('slugify')
-const {_screenTitle, _sliceTitle} = require("../../common/util/naming");
+const {_screenTitle, _sliceTitle, _processorTitle} = require("../../common/util/naming");
 
 let config = {}
 
@@ -54,6 +54,7 @@ module.exports = class extends Generator {
                 return `
                           {
                               "slice":"${_sliceTitle(slice.title)}",
+                              "viewType":"${componentName}",
                               "viewName" : "${_sliceTitle(slice.title)}/${componentName}",
                               "view" : ${_sliceTitle(slice.title)}${componentName}
                           }`
@@ -61,13 +62,35 @@ module.exports = class extends Generator {
 
         }).join(",")
 
+        var processorViews = config.slices.flatMap((slice) => {
+            return slice.processors?.map((processor) => {
+                var componentName = _processorTitle(processor.title)
+                return `
+                                 {
+                                     "slice":"${_sliceTitle(slice.title)}",
+                                     "processorType":"${componentName}",
+                                     "processorName" : "${_sliceTitle(slice.title)}/${componentName}",
+                                     "view" : ${_sliceTitle(slice.title)}${componentName}
+                                 }`
+            })
+
+        }).join(",")
+
         var componentImports = config.slices.flatMap((slice) => {
-            return slice.screens?.map((screen) => {
+            var screens = slice.screens?.map((screen) => {
                 var componentName = _screenTitle(screen.title)
                 var sliceName = _sliceTitle(slice.title)
                 return `import ${sliceName}${componentName} from '@/app/components/slices/${sliceName}/${componentName}';
                       `
             })
+            var processors = slice.processors?.map((processor) => {
+                var componentName = _processorTitle(processor.title)
+                var sliceName = _sliceTitle(slice.title)
+                return `import ${sliceName}${componentName} from '@/app/components/slices/${sliceName}/${componentName}';
+                                 `
+            })
+
+            return screens.concat(processors)
 
         }).join("\n")
 
@@ -79,6 +102,7 @@ module.exports = class extends Generator {
                 rootPackageName: this.answers.rootPackageName,
                 appName: this.answers.appName,
                 _views: sliceViews,
+                _processors: processorViews,
                 _imports: componentImports
             }
         )
