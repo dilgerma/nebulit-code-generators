@@ -21,3 +21,7 @@ export type ProcessorSelection = {
     "processorName":string
 }
 
+export interface Processor  {
+
+    process: ()=>void
+}
