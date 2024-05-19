@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@event-driven-io/emmett": "^0.7.0",
+    "@event-driven-io/emmett": "^0.9.0",
     "next": "14.1.4",
     "polyfill-crypto-methods": "^0.2.0",
     "@rjsf/core": "^5.18.3",

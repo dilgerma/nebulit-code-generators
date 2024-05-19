@@ -1,31 +1,28 @@
-import {initialState, loadFromStream} from '@/app/components/slices/inventory/<%-_readModelName%>';
+<%-_readModelsImports%>
 import {Processor} from '@/app/core/types';
-import {
-    <%-_commandName%>,
-    handle<%-_commandName%>
-} from '@/app/components/slices/<%-_slice%>/<%-_commandName%>';
+<%-_cartAggregateHandlerImports%>
 
 
 
-interface <%-_processorName%> extends Processor {
-    <%-_processorFields%>
+interface <!%-_processorName%> extends Processor {
+    <!%-_processorFields%>
 }
 
-let processor:<%-_processorName%> = {
+let processor:<!%-_processorName%> = {
 
-    <%-_processorFieldDefaults%>
+    <!%-_processorFieldDefaults%>
 
 
     process: async ()=>{
-        let readModel = await loadFromStream(    <%-_streamName%>, initialState())
+        let readModel = await loadFromStream(    <!%-_streamName%>, initialState())
 
-        var command:<%-_commandName%> = {
-            type:"<%-_commandName%>",
+        var command:<!%-_commandName%> = {
+            type:"<!%-_commandName%>",
             data: {
                 <$-_commandFieldAssignmentsFromReadModel%>
             }
         }
 
-        await handle<%-_commandName%>(command)
+        await handle<!%-_commandName%>(command)
     }
 }

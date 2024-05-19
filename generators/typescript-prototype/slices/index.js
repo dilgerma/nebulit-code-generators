@@ -39,26 +39,47 @@ module.exports = class extends Generator {
         this.answers = await this.prompt([
             {
                 type: 'checkbox',
-                name: 'context',
+                name: 'slices',
+                choices: config.slices.map(it => it.title),
                 loop: false,
-                message: 'Welchen Kontexte (keine Auswahl für alle)?',
-                choices: Array.from(new Set(config.slices.map((item) => item.context).filter(item => item))).sort(),
-                when: () => Array.from(new Set(config.slices.map((item) => item.context).filter(item => item))).length > 0,
-            },
-        ]);
+                message: 'Welcher Slices soll generiert werden?'
+            }])
 
     }
 
 
     writeScreensAndProcessors() {
-        var slices = config.slices.map((slice) => slice.title)
+        var slices = this.answers.slices
         slices.forEach((slice) => {
             this._writeScreen(slice)
-            this._writeProcessor(slice)
+            this._writeProcessorView(slice)
+            //this._writeProcessor(slice)
         });
     }
 
     _writeProcessor(sliceName) {
+        var slice = findSlice(config, sliceName)
+        var processors = slice.processors
+        processors.forEach((processor) => {
+            var title = _processorTitle(processor.title)
+            var commands = processor?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND")
+            var readmodels = processor?.dependencies?.filter(dep => dep.type === "INBOUND").filter(it => it.elementType === "READMODEL")
+
+            //import {initialState as , loadFromStream} from '@/app/components/slices/inventory/<!%-_readModelName%>';
+
+            this.fs.copyTpl(
+                this.templatePath('processor.ts.tpl'),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${title}.ts`),
+                {
+                    _name: title,
+                    _pageName: capitalizeFirstCharacter(title),
+                }
+            )
+        })
+
+    }
+
+    _writeProcessorView(sliceName) {
         var slice = findSlice(config, sliceName)
         var processors = slice.processors
         processors.forEach((processor) => {
@@ -121,13 +142,15 @@ module.exports = class extends Generator {
     }
 
     processSlices() {
-        config.slices.forEach((slice) => {
-            this.writeCommands(slice)
-            this.writeReadModels(slice, config.slices.flatMap(it => it.events))
+        var slices = this.answers.slices.map(slice => findSlice(config, slice))
+
+        slices.forEach((slice) => {
+            this._writeCommands(slice)
+            this._writeReadModels(slice, config.slices.flatMap(it => it.events))
         });
     }
 
-    writeReadModels(slice, allEvents) {
+    _writeReadModels(slice, allEvents) {
         var readModels = slice?.readmodels
         if (!readModels || readModels.length == 0) {
             return
@@ -150,7 +173,7 @@ module.exports = class extends Generator {
 
         this.fs.copyTpl(
             this.templatePath(`readmodel.ts.tpl`),
-            this.destinationPath(`${this.givenAnswers?.appName}/app/components/slices/${_sliceTitle(slice.title)}/${_readmodelTitle(readmodel?.title)}.ts`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${_readmodelTitle(readmodel?.title)}.ts`),
             {
                 _readModelName: _readmodelTitle(readmodel.title),
                 _aggregateEventImports: aggregateEventImports,
@@ -166,7 +189,7 @@ module.exports = class extends Generator {
         )
     }
 
-    writeCommands(slice) {
+    _writeCommands(slice) {
         var commands = slice?.commands
         if (!commands || commands.length == 0) {
             return
@@ -180,7 +203,7 @@ module.exports = class extends Generator {
     _writeCommandSchema(slice, command) {
         this.fs.copyTpl(
             this.templatePath(`schema.json.tpl`),
-            this.destinationPath(`${this.givenAnswers?.appName}/app/components/slices/${_sliceTitle(slice.title)}/${_commandTitle(command?.title)}.json`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${_commandTitle(command?.title)}.json`),
             {
                 _schema: JSON.stringify(parseSchema(command), null, 2)
             }
@@ -204,7 +227,7 @@ module.exports = class extends Generator {
 
         this.fs.copyTpl(
             this.templatePath(`command.ts.tpl`),
-            this.destinationPath(`${this.givenAnswers?.appName}/app/components/slices/${_sliceTitle(slice.title)}/${_commandTitle(command?.title)}.ts`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${_commandTitle(command?.title)}.ts`),
             {
                 _aggregateEventImports: aggregateEventImport,
                 _aggregateImports: aggregateImports,
