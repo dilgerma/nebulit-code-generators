@@ -17,7 +17,6 @@ const {
     renderImports,
     variablesDefaults
 } = require("../common/domain");
-const {writeEvents} = require("../events");
 const {parseSchema} = require("../../common/util/jsonschema");
 const {renderSwitchStatement, renderLoadFromStream} = require("../common/tools");
 

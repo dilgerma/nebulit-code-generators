@@ -1,8 +1,7 @@
 package <%= _rootPackageName%>.events
 
-import <%= _rootPackageName%>.common.Event
+import <%= _rootPackageName%>.common.BaseEvent
+
 <%= _typeImports %>
-import mu.KotlinLogging
 
-
-data class <%=_name%>(<%= _fields%>) : Event
+data class <%=_name%>(<%= _fields%>) : BaseEvent()
