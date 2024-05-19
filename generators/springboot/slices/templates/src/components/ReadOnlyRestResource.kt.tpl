@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 import mu.KotlinLogging
 
 
+
 @RestController
 class <%= _controller%>Ressource(
     private var repository: EventsEntityRepository,

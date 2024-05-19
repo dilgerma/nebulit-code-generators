@@ -2,11 +2,11 @@ var slugify = require('slugify')
 var {capitalizeFirstCharacter} = require("./util")
 
 function _aggregateTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "")}Aggregate`
+    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "").replaceAll("-","")}Aggregate`
 }
 
 function _commandTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "")}Command`
+    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "").replaceAll("-","")}Command`
 }
 
 function _sliceTitle(title) {
@@ -16,23 +16,23 @@ function _sliceTitle(title) {
 
 
 function _processorTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "")}Processor`
+    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "").replaceAll("-","")}Processor`
 }
 
 function _restResourceTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "")}Ressource`
+    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "").replaceAll("-","")}Ressource`
 }
 
 function _readmodelTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "")}ReadModel`
+    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "").replaceAll("-","")}ReadModel`
 }
 
 function _eventTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "")}Event`
+    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "").replaceAll("-","")}Event`
 }
 
 function _screenTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "")}`
+    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","").replaceAll("-","")), "")}`
 }
 
 

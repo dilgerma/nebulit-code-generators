@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class <%= _name%>CommandHandler(
     private var aggregateService: AggregateService<<%= _aggregate%>>,
-    private var applicationEventPublisher: ApplicationEventPublisher
 ) : BaseCommandHandler<<%= _aggregate%>>(aggregateService) {
 
     var logger = KotlinLogging.logger {}

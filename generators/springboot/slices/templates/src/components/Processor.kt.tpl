@@ -20,7 +20,7 @@ class <%= _name%>(
 
    var logger = KotlinLogging.logger {}
 
-   fun process() {
+   override fun process() {
      //TODO process readModel from events
      /*
      commandHandler.handle(<%- _command%>(<%= _variables%>))

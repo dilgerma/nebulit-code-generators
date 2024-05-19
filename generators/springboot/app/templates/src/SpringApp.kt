@@ -25,3 +25,7 @@ class SpringApp {
     }
 }
 
+
+fun main(args: Array<String>) {
+     runApplication<SpringApp>(*args)
+}

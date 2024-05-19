@@ -3,11 +3,18 @@ var chalk = require('chalk');
 const {ensureDirSync} = require("fs-extra");
 var slugify = require('slugify')
 const {answers} = require("../app");
-const {_eventTitle, _commandTitle, _readmodelTitle, _sliceTitle, _aggregateTitle, _restResourceTitle} = require("./../../../generators/common/util/naming");
+const {
+    _eventTitle,
+    _commandTitle,
+    _processorTitle,
+    _readmodelTitle,
+    _sliceTitle,
+    _aggregateTitle,
+    _restResourceTitle
+} = require("./../../../generators/common/util/naming");
 
 
 let config = {}
-
 
 
 module.exports = class extends Generator {
@@ -20,13 +27,12 @@ module.exports = class extends Generator {
     }
 
     async prompting() {
-        var aggregates = config.aggregates?.map((item, idx) => item.title).sort()
         this.answers = await this.prompt([
             {
                 type: 'checkbox',
                 name: 'context',
                 loop: false,
-                message: 'Welchen Kontexte (keine Auswahl für alle)?',
+                message: 'Choose the ModelContext to generate (no choice means "all")?',
                 choices: Array.from(new Set(config.slices.map((item) => item.context).filter(item => item))).sort(),
                 when: () => Array.from(new Set(config.slices.map((item) => item.context).filter(item => item))).length > 0,
             },
@@ -34,30 +40,25 @@ module.exports = class extends Generator {
                 type: 'list',
                 name: 'slice',
                 loop: false,
-                message: 'Welcher Slices soll generiert werden?',
+                message: 'Choose the Slice to generate?',
                 choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).map((item, idx) => item.title).sort()
             },
             {
                 type: 'confirm',
                 name: 'restendpoint',
-                message: 'Sollen Rest Endpunkte generiert werden?',
+                message: 'Generate REST Endpoints?',
                 when: (input) => ((config.slices.find((slice) => slice.title === input.slice)?.commands?.length > 0) || (config.slices.find((slice) => slice.title === input.slice)?.readmodels?.length > 0)) ?? false,
             },
             {
-                type: 'list',
-                name: 'aggregate',
-                message: `Zugehöriges Aggregate auswählen?`,
-                choices: aggregates,
-            }, {
                 type: 'confirm',
                 name: 'specifications',
                 loop: false,
-                message: 'Sollen Specifications generiert werden?',
+                message: 'Generate Specifications (select multiple)?',
                 when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.specifications?.length > 0) ?? false,
             }, {
                 type: 'checkbox',
                 name: 'processTriggers',
-                message: 'Wähle Trigger Events',
+                message: 'Which event triggers the processor?',
                 when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.processors?.length > 0) ?? false,
                 choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).flatMap((slice) => slice.events).map(item => item.title)
             }]);
@@ -83,7 +84,8 @@ module.exports = class extends Generator {
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: _commandTitle(command.title),
                     _typeImports: typeImports(command.fields),
-                    _aggregate: this.answers.aggregate !== "Keins" ? _aggregateTitle(this.answers.aggregate) : "AGGREGATE"
+                    //for now take first aggregate
+                    _aggregate: _aggregateTitle((command.aggregateDependencies || ["AGGREGATE"])[0])
                 }
             )
         })
@@ -145,7 +147,8 @@ module.exports = class extends Generator {
                     _fields: ConstructorGenerator.generateConstructorVariables(
                         event.fields
                     ),
-                    _aggregate: this.answers.aggregate !== "Keins" ? _aggregateTitle(this.answers.aggregate) : "AGGREGATE",
+                    //for now take first aggregate
+                    _aggregate: _aggregateTitle((event.aggregateDependencies || ["AGGREGATE"])[0]),
                     _typeImports: typeImports(event.fields)
 
                 }
@@ -166,6 +169,10 @@ module.exports = class extends Generator {
         var title = _slicePackage(slice.title).toLowerCase()
 
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
+
+            let sliceEvents = config.slices.flatMap(it => it.events)
+            let inboundEvents = readmodel.dependencies?.filter(it => it.type === "INBOUND").filter(it => it.elementType === "EVENT").map(it => sliceEvents.find(sliceEvent => it.id === sliceEvent.id))
+
             this.fs.copyTpl(
                 this.templatePath(`src/components/ReadModel.kt.tpl`),
                 this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${_readmodelTitle(readmodel.title)}.kt`),
@@ -176,7 +183,12 @@ module.exports = class extends Generator {
                     _fields: VariablesGenerator.generateVariables(
                         readmodel.fields
                     ),
-                    _aggregate: this.answers.aggregate !== "Keins" ? _aggregateTitle(this.answers.aggregate) : "AGGREGATE",
+                    //for now take first aggregate
+                    _aggregate: _aggregateTitle((readmodel.aggregateDependencies || ["AGGREGATE"])[0]),
+                    _eventsImports: this._eventsImports(inboundEvents.map(it => it.title)),
+
+                    _switchCase: renderReadModelSwitchCase(inboundEvents),
+
                     _typeImports: typeImports(readmodel.fields)
                 }
             )
@@ -188,7 +200,9 @@ module.exports = class extends Generator {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: _readmodelTitle(readmodel.title),
-                    _aggregate: this.answers.aggregate !== "Keins" ? _aggregateTitle(this.answers.aggregate) : "AGGREGATE",
+                    //for now take first aggregate
+                    _aggregate: _aggregateTitle((readmodel.aggregateDependencies || ["AGGREGATE"])[0]),
+
                     _typeImports: typeImports(readmodel.fields)
 
                 }
@@ -294,12 +308,12 @@ module.exports = class extends Generator {
         slice.processors?.filter((processor) => processor.title).forEach((processor) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/Processor.kt.tpl`),
-                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${this._processorTitle(processor.title)}.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_processorTitle(processor.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: this._processorTitle(processor.title),
-                    _eventsImports: _eventsImports(this.answers.processTriggers),
+                    _name: _processorTitle(processor.title),
+                    _eventsImports: this._eventsImports(this.answers.processTriggers),
                     _triggers: this._renderTriggers(this.answers.processTriggers),
                     _variables: command ? VariablesGenerator.generateInvocation(
                         command.fields
@@ -347,7 +361,7 @@ class ConstructorGenerator {
 
 //(: {name, type, example, mapping}
     static generateConstructorVariables(fields, overrides) {
-        return `${fields?.map((field) => (overrides?.includes(field.name) ? "override " : "") + "var " + field.name + ":" + typeMapping(field.type)).filter(it=>it).join(",")??""}`
+        return `${fields?.map((field) => (overrides?.includes(field.name) ? "override " : "") + "var " + field.name + ":" + typeMapping(field.type)).filter(it => it).join(",") ?? ""}`
     }
 }
 
@@ -369,7 +383,7 @@ class VariablesGenerator {
 
             return `${variable.name}`;
 
-        }).filter((it) => it !== "").join(",")??""
+        }).filter((it) => it !== "").join(",") ?? ""
     }
 
     static generateRestParamInvocation(fields) {
@@ -381,7 +395,7 @@ class VariablesGenerator {
                 return `@RequestParam ${variable.name}:${typeMapping(variable.type, variable.cardinality)}`;
             }
 
-        }).filter((it) => it !== "").join(",")??""
+        }).filter((it) => it !== "").join(",") ?? ""
     }
 }
 
@@ -419,7 +433,7 @@ const typeMapping = (fieldType, fieldCardinality) => {
 }
 
 const typeImports = (fields) => {
-    if(!fields || fields.length === 0) {
+    if (!fields || fields.length === 0) {
         return []
     }
     var imports = fields?.map((field) => {
@@ -438,16 +452,16 @@ const typeImports = (fields) => {
                 return []
         }
     })
-    return Array.from([...new Set(imports?.flat()??[])]).flat().join(";\n")
+    return Array.from([...new Set(imports?.flat() ?? [])]).flat().join(";\n")
 
 }
 
 const invocation = (type, fields) => {
-    return `new ${type}(${fields.map((it) => variableNameOrMapping(it)).filter(it=>it).join(",")})`
+    return `new ${type}(${fields.map((it) => variableNameOrMapping(it)).filter(it => it).join(",")})`
 }
 
 const receiverInvocation = (type, receiver) => {
-    return `new ${type.title}(${type.fields?.map((it) => receiver + "." + variableNameOrMapping(it)).filter(it=>it).join(",")})`
+    return `new ${type.title}(${type.fields?.map((it) => receiver + "." + variableNameOrMapping(it)).filter(it => it).join(",")})`
 }
 
 const variableNameOrMapping = (field) => {
@@ -465,6 +479,17 @@ const packageName = (type) => {
     }
 }
 
+const renderReadModelSwitchCase = (events)=>{
+    return `
+             ${events.map(event => {
+                 return `
+                    is ${_eventTitle(event.title)} -> {
+                        //TODO handle event fields
+                    }   
+                 `
+    }).join("\n")}   
+    `
+}
 
 const defaultValue = (type, cardinality = "single") => {
     switch (type.toLowerCase()) {
@@ -476,7 +501,7 @@ const defaultValue = (type, cardinality = "single") => {
 }
 
 function _slicePackage(title) {
-    return `${slugify(title.replaceAll("slice:","").replaceAll("-",""))}`
+    return `${slugify(title.replaceAll("slice:", "")).replaceAll("-", "")}`
 }
 
 function toCamelCase(prefix, variableName) {
