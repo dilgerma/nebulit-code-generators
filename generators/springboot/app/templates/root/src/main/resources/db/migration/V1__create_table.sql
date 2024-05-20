@@ -10,6 +10,7 @@ CREATE TABLE events (
     id INT PRIMARY KEY,
     aggregate_id varchar(200),
     value varchar,
+    metadata varchar,
     version int,
     created date default current_date
 );

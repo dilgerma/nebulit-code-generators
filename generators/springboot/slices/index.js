@@ -77,7 +77,7 @@ module.exports = class extends Generator {
         slice.commands?.filter((command) => command.title).forEach((command) => {
             this.fs.copyTpl(
                 this.templatePath(`src/components/CommandHandler.kt.tpl`),
-                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${command.title}CommandHandler.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${slugify(command.title).replaceAll("-","")}CommandHandler.kt`),
                 {
                     _slice: title,
                     _commandType: _commandTitle(command.title),
@@ -479,10 +479,10 @@ const packageName = (type) => {
     }
 }
 
-const renderReadModelSwitchCase = (events)=>{
+const renderReadModelSwitchCase = (events) => {
     return `
              ${events.map(event => {
-                 return `
+        return `
                     is ${_eventTitle(event.title)} -> {
                         //TODO handle event fields
                     }   

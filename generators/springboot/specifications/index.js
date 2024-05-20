@@ -77,8 +77,9 @@ module.exports = class extends Generator {
                     _typeImports: _typeImports,
                     _given: renderGiven(given, defaults),
                     _when: renderWhen(when, then, defaults),
-                    _then: renderThen(then, defaults),
-                    _aggregate: _aggregateTitle(this.givenAnswers.aggregate),
+                    _then: renderThen(when, then, defaults),
+                    // take first aggregate
+                    _aggregate: _aggregateTitle((slice.aggregates || [])[0]),
                     _aggregateId: aggregateId
 
                 }
@@ -251,38 +252,44 @@ function capitalizeFirstCharacter(inputString) {
 }
 
 
-function renderThen(thenList, defaults) {
-    var then = thenList.map((item) => {
+function renderThen(whenList, thenList, defaults) {
 
-        if (item.type === "SPEC_EVENT") {
+    if (thenList.some((error) => error.type === "SPEC_ERROR")) {
+        // in case error render error
+        return whenList.map((command) => {
+            return `Assertions.assertThrows(CommandException::class.java) {
+                             commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}`
+        }).join("\n");
+    } else {
+        //in case no error render then
+        var then = thenList.map((item) => {
 
-            return `\twhenResult.andWaitForEventOfType(${_eventTitle(item.title)}::class.java)
+            if (item.type === "SPEC_EVENT") {
+
+                return `\twhenResult.andWaitForEventOfType(${_eventTitle(item.title)}::class.java)
                         ${assertionList(item.fields, defaults)}.toArrive()`
 
-        } else if (item.type === "SPEC_READMODEL") {
-            return `\twhenResult.andWaitForStateChange {
+            } else if (item.type === "SPEC_READMODEL") {
+                return `\twhenResult.andWaitForStateChange {
             \t\tvar readModel: ${_readmodelTitle(item.title)} =
                             queryHandler.handleQuery(${_readmodelTitle(item.title)}Query(AGGREGATE_ID))
     \t\t//assertThat(readModel.data).contains(..)
     \t}`
+            }
+
+        }).join("\n")
+
+        if (thenList?.length === 0) {
+            return "Assertions.fail<Unit>(\"No assertion defined in Model. Manual implementation required\")"
         }
-
-    }).join("\n")
-
-    if (thenList?.length === 0) {
-        return "Assertions.fail<Unit>(\"No assertion defined in Model. Manual implementation required\")"
+        return then
     }
-    return then
 }
 
 
 function renderWhen(whenList, thenList, defaults) {
-    if (thenList.some((error) => error.type === "SPEC_ERROR")) {
-        return whenList.map((command) => {
-            return `Assertions.assertThrows(CommandException::class.java) {
-                          commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}`
-        }).join("\n");
-    } else {
+    //only render when if no error occured
+    if (!thenList.some((error) => error.type === "SPEC_ERROR")) {
         return whenList.map((command) => {
             return `commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))`
         }).join("\n");
