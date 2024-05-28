@@ -1,7 +1,7 @@
-package de.mebulit.common.persistence
+package <%=rootPackageName%>.common.persistence
 
 import com.thoughtworks.xstream.XStream
-import de.mebulit.common.Event
+import <%=rootPackageName%>.common.Event
 import jakarta.persistence.*
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.annotations.CreationTimestamp
@@ -71,7 +71,7 @@ class XmlPayloadConverter : AttributeConverter<Event?, String?> {
     var xStream = XStream()
 
     init {
-        xStream.allowTypesByRegExp(listOf("de.mebulit.*").toTypedArray())
+        xStream.allowTypesByRegExp(listOf("<%-rootPackageName%>.*").toTypedArray())
     }
 
     override fun convertToDatabaseColumn(record: Event?): String? {
@@ -90,7 +90,7 @@ class XmlMetaDataConverter : AttributeConverter<EventMetaData?, String?> {
     var xStream = XStream()
 
     init {
-        xStream.allowTypesByRegExp(listOf("de.mebulit.*").toTypedArray())
+        xStream.allowTypesByRegExp(listOf("<%-rootPackageName%>.*").toTypedArray())
     }
 
     override fun convertToDatabaseColumn(record: EventMetaData?): String? {
