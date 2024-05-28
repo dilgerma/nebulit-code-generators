@@ -24,12 +24,4 @@ data class DefaultEventMetaData(
 
 }
 
-interface Event {
-    fun getMetaData(): EventMetaData = DefaultEventMetaData.empty()
-}
-
-open class BaseEvent(private var metaData: EventMetaData = DefaultEventMetaData.empty()) : Event {
-    override fun getMetaData(): EventMetaData {
-        return metaData
-    }
-}
+interface Event
