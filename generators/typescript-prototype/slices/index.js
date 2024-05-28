@@ -41,7 +41,7 @@ module.exports = class extends Generator {
                 name: 'slices',
                 choices: config.slices.map(it => it.title),
                 loop: false,
-                message: 'Welcher Slices soll generiert werden?'
+                message: 'Which Slice should be generated?'
             }])
 
     }

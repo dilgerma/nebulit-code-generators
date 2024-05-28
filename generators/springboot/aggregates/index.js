@@ -24,7 +24,7 @@ module.exports = class extends Generator {
             {
                 type: 'checkbox',
                 name: 'aggregates',
-                message: 'Welche Aggregates soll generiert werden?',
+                message: 'Which Aggregate should be generated?',
                 choices: config?.aggregates?.map((item, idx) => item.title).sort()
             }]);
 

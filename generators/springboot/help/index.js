@@ -23,56 +23,56 @@ module.exports = class extends Generator {
             {
                 type: 'confirm',
                 name: 'config',
-                message: 'Bevor du startest kopierst du dir die JSON-Konfiguration aus dem Miro Plugin in dein lokales Arbeitsverzeichnis.',
+                message: 'Before you start, copy the JSON configuration from the Miro plugin into your local working directory.',
             },
             {
                 type: 'confirm',
                 name: 'generator',
-                message: 'Der Generator erwartet die Konfiguration im Root des Projektes für die Generierung.',
+                message: 'The generator expects the configuration in the root of the project for generation.',
             }, {
                 type: 'confirm',
                 name: 'appName',
-                message: 'Zuerst wirst du einige Fragen zur Anwendung beantworten (Name des Service, Root Package etc.)?',
+                message: 'First, you will answer some questions about the application (name of the service, root package, etc.',
             },
             {
                 type: 'confirm',
                 name: 'generatorType',
-                message: 'Anschließend wirst du gefragt, was du generieren möchtest - Skeleton (die Basisanwendung), Slices (mit weiterer Auswahl, welches Slice und Aggregates (das oder die Aggregate, die im Modell definiert sind)',
+                message: 'Next, you will be asked what you want to generate - Skeleton (the base application), Slices (with further selection of which slice), and Aggregates (the aggregate or aggregates defined in the model).',
             },
 
             {
                 type: 'confirm',
                 name: 'generatorType',
-                message: 'Anschließend wirst du gefragt, was du generieren möchtest - Skeleton (die Basisanwendung), Slices (mit weiterer Auswahl, welches Slice und Aggregates (das oder die Aggregate, die im Modell definiert sind)',
+                message: 'Next, you will be asked what you want to generate - Skeleton (the base application), Slices (with further selection of which slice), and Aggregates (the aggregate or aggregates defined in the model).',
             },
             {
                 type: 'confirm',
                 name: 'context',
-                message: 'Falls du Kontexte im Modell definiert hast wählst du dann die Kontexte aus, die für die Generierung relevant sind. Dies ist meist der Fall wenn du mehrere Modell in einem Miro Board definiert hast.',
+                message: 'If you have defined contexts in the model, you will then select the contexts that are relevant for the generation. This is usually the case if you have defined multiple models on a Miro board.',
             },
             {
                 type: 'confirm',
                 name: 'slice',
-                message: 'Anschließend wählst du den Slice aus, den du generieren möchtest (die Auswahl ist auf den Kontext begrenzt ,falls du einen gewählt hast)',
+                message: 'Next, you select the slice you want to generate (the selection is limited to the context if you have chosen one).',
             },
             {
                 type: 'confirm',
                 name: 'restendpoint',
-                message: 'Für State Change / State View Slices können Rest Endpunkte generiert werden. Der Default ist "y".'
+                message: 'For State Change / State View slices, REST endpoints can be generated. The default is "y".'
             },
             {
                 type: 'confirm',
                 name: 'aggregate',
-                message: `Anschließend wählst die die Aggregate die generiert werden sollen. Die Auswahl begrenzt sich auf die im Modell definierten Aggregate.`,
+                message: `Next, you select the aggregates to be generated. The selection is limited to the aggregates defined in the model.`,
             }, {
                 type: 'confirm',
                 name: 'specifications',
                 loop: false,
-                message: 'Im nächsten Schritt definierst du, ob Testcases aus den Specifications generiert werden sollen.',
+                message: 'Next, you choose the aggregates to generate. Your options are restricted to the aggregates defined in the model.',
             }, {
                 type: 'confirm',
                 name: 'processTriggers',
-                message: 'In einem der letzten Schritte definierst du, ob Automatisierungen erstellt werden sollen. Das sind Prozessoren die typischerweise von Events oder ReadModels getriggert werden.'
+                message: 'In one of the final steps, you define whether automations should be created. These are processors typically triggered by events or read models.'
             }
         ]);
     }

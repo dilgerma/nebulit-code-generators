@@ -19,7 +19,7 @@ module.exports = class extends Generator {
         this.answers = await this.prompt([{
             type: 'input',
             name: 'appName',
-            message: 'Projektname?',
+            message: 'Projectame?',
             when: () => !config?.codeGen?.application,
         }, {
             type: 'input',
@@ -30,7 +30,7 @@ module.exports = class extends Generator {
             {
                 type: 'list',
                 name: 'generatorType',
-                message: 'Was soll generiert werden?',
+                message: 'What should be generated?',
                 choices: ['Skeleton', 'slices', "aggregates"]
             }]);
     }

@@ -29,11 +29,11 @@ module.exports = class extends Generator {
                 {
                     type: 'checkbox',
                     name: 'specifications',
-                    message: 'Welche Specifications sollen generiert werden?',
+                    message: 'Which specification should be generated?',
                     choices: specsFromSlice
                 }]);
         } else {
-            this.log(chalk.blue('Keine Specifications definiert!'))
+            this.log(chalk.blue('No Specifications defined!'))
         }
 
     }

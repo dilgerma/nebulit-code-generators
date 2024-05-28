@@ -18,7 +18,7 @@ module.exports = class extends Generator {
         this.answers = await this.prompt([{
             type: 'list',
             name: 'generator',
-            message: 'Welcher Generator?',
+            message: 'Which generator?',
             choices: ["springboot","typescript-prototype","eventcatalog"]
         }]);
     }

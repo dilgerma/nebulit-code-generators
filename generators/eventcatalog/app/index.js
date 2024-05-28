@@ -20,13 +20,13 @@ module.exports = class extends Generator {
         this.answers = await this.prompt([{
             type: 'input',
             name: 'appName',
-            message: 'Projektname?',
+            message: 'Projectname?',
             when: () => !config?.codeGen?.application,
         },
             {
                 type: 'confirm',
                 name: 'renderApp',
-                message: 'App rendern?'
+                message: 'render app?'
             }]);
 
     }
