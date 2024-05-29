@@ -257,8 +257,11 @@ function renderThen(whenList, thenList, defaults) {
     if (thenList.some((error) => error.type === "SPEC_ERROR")) {
         // in case error render error
         return whenList.map((command) => {
-            return `Assertions.assertThrows(CommandException::class.java) {
-                             commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}`
+            return `
+        whenResult.andWaitForStateChange {
+                Assertions.assertThrows(CommandException::class.java) {
+                         commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}
+        }`
         }).join("\n");
     } else {
         //in case no error render then
