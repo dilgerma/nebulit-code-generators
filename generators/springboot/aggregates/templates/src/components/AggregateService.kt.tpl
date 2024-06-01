@@ -12,6 +12,9 @@ import java.util.UUID
 
 interface <%= _aggregate%>Repository : CrudRepository<<%= _aggregate%>, Long> {
     fun findByAggregateId(aggregateId: UUID): <%= _aggregate%>?
+
+    fun existsByAggregateId(aggregateId: UUID): Boolean
+
 }
 
 
@@ -32,6 +35,10 @@ class <%= _aggregate%>Service(
             }
         }
 
+    }
+
+    override fun existsByAggregateId(aggregateId: UUID): Boolean {
+        return repository.existsByAggregateId(aggregateId)
     }
 
     override fun findByAggregateId(aggregateId: UUID): <%= _aggregate%>? {
