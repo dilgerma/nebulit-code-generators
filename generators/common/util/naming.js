@@ -2,11 +2,11 @@ var slugify = require('slugify')
 var {capitalizeFirstCharacter} = require("./util")
 
 function _aggregateTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "").replaceAll("-","")}Aggregate`
+    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "").replaceAll("-","")}${!title?.endsWith("Aggregate") ? "Aggregate" : ""}`
 }
 
 function _commandTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "").replaceAll("-","")}Command`
+    return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "").replaceAll("-","")}${!title?.endsWith("Command") ? "Command" : ""}`
 }
 
 function _sliceTitle(title) {

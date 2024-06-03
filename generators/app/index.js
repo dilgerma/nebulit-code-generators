@@ -7,6 +7,8 @@ let config = {}
 
 module.exports = class extends Generator {
 
+    appName = "."
+
     constructor(args, opts) {
         super(args, opts);
         this.argument('appname', {type: String, required: false});
@@ -19,7 +21,7 @@ module.exports = class extends Generator {
             type: 'list',
             name: 'generator',
             message: 'Which generator?',
-            choices: ["springboot","typescript-prototype","eventcatalog"]
+            choices: ["springboot", "axon","typescript-prototype","eventcatalog"]
         }]);
     }
 
