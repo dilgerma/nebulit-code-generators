@@ -1,27 +1,39 @@
-CREATE TABLE IF NOT EXISTS aggregates (
-    aggregate_id varchar(255) PRIMARY KEY,
-    version BIGINT,
-    discriminator varchar
-);
-
-CREATE SEQUENCE events_seq START 101;
-
-CREATE TABLE events (
-    id INT PRIMARY KEY,
-    aggregate_id varchar(200),
-    value varchar,
-    metadata varchar,
-    version int,
-    created date default current_date
-);
-
-CREATE TABLE IF NOT EXISTS event_publication
+create sequence domain_event_entry_seq start with 1 increment by 50;
+create table domain_event_entry
 (
-  id               UUID NOT NULL,
-  listener_id      TEXT NOT NULL,
-  event_type       TEXT NOT NULL,
-  serialized_event TEXT NOT NULL,
-  publication_date TIMESTAMP WITH TIME ZONE NOT NULL,
-  completion_date  TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY (id)
+    global_index         bigint       not null,
+    sequence_number      bigint       not null,
+    aggregate_identifier varchar(255) not null,
+    event_identifier     varchar(255) not null unique,
+    payload_revision     varchar(255),
+    payload_type         varchar(255) not null,
+    time_stamp           varchar(255) not null,
+    type                 varchar(255),
+    meta_data            oid,
+    payload              oid          not null,
+    primary key (global_index),
+    unique (aggregate_identifier, sequence_number)
+);
+create table snapshot_event_entry
+(
+    sequence_number      bigint       not null,
+    aggregate_identifier varchar(255) not null,
+    event_identifier     varchar(255) not null unique,
+    payload_revision     varchar(255),
+    payload_type         varchar(255) not null,
+    time_stamp           varchar(255) not null,
+    type                 varchar(255) not null,
+    meta_data            oid,
+    payload              oid          not null,
+    primary key (sequence_number, aggregate_identifier, type)
+);
+create table token_entry
+(
+    segment        integer      not null,
+    owner          varchar(255),
+    processor_name varchar(255) not null,
+    timestamp      varchar(255) not null,
+    token_type     varchar(255),
+    token          oid,
+    primary key (segment, processor_name)
 )

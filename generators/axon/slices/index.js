@@ -204,8 +204,9 @@ module.exports = class extends Generator {
                 _slice: slice,
                 _rootPackageName: this.givenAnswers.rootPackageName,
                 _name: _readmodelTitle(readmodel.title),
-                _fields: VariablesGenerator.generateVariables(
-                    readmodel.fields
+                _fields: VariablesGenerator.generateLiveReportVariables(
+                    readmodel.fields,
+                    "aggregateId"
                 ),
                 //for now take first aggregate
                 _aggregate: _aggregateTitle((readmodel.aggregateDependencies || ["AGGREGATE"])[0]),
@@ -422,8 +423,19 @@ class ConstructorGenerator {
 
 class VariablesGenerator {
 
+    static generateLiveReportVariables(fields,identifier) {
+            return fields?.map((variable) => {
+                if (variable.cardinality?.toLowerCase() === "list") {
+                    return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality)} = emptyList();`;
+                } else {
+                    return `\t${variable.name == identifier ? "@AggregateIdentifier " : ""}var ${variable.name}:${typeMapping(variable.type, variable.cardinality)}? = null;`;
+                }
+            }).join("\n")
+        }
+
 //(: {name, type, example, mapping}
-    static generateVariables(fields) {
+    static generateVariables(fields, annotations) {
+        if(!annotations) {annotations = []}
         return fields?.map((variable) => {
             if (variable.cardinality?.toLowerCase() === "list") {
                 return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality)} = emptyList();`;

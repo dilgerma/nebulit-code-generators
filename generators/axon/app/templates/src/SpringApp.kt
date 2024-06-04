@@ -15,7 +15,8 @@ import org.springframework.modulith.Modulith
 @EnableJpaRepositories
 @SpringBootApplication
 @EnableScheduling
-@EntityScan(basePackages = ["<%= rootPackageName%>","org.springframework.modulith.events.jpa"])
+@EntityScan(basePackages = ["<%= rootPackageName%>","org.springframework.modulith.events.jpa",
+    "org.axonframework.eventhandling.tokenstore,org.axonframework.eventsourcing.eventstore.jpa"])
 class SpringApp {
     companion object {
         fun main(args: Array<String>) {

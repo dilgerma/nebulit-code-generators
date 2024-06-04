@@ -13,3 +13,6 @@ spring:
     user: postgres
     password: postgres
 
+axon:
+  axonserver:
+    enabled: false

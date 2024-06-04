@@ -1,6 +1,7 @@
 package <%= _rootPackageName%>.<%=_slice%>
 
 import <%= _rootPackageName%>.common.ReadModel
+import <%= _rootPackageName%>.common.Query
 import org.axonframework.eventsourcing.EventSourcingHandler
 import org.axonframework.eventsourcing.EventSourcingRepository
 import org.axonframework.eventsourcing.eventstore.EventStore
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component
 
 import mu.KotlinLogging
 
-class <%= _name%>Query(var aggregateId: UUID)
+class <%= _name%>Query(var aggregateId: UUID): Query
 
 @Component
 class <%= _name%>EventSourceRepository(eventStore:EventStore): EventSourcingRepository<<%= _name%>>(builder(<%= _name%>::class.java).eventStore(eventStore))

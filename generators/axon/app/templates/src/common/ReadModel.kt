@@ -10,6 +10,5 @@ interface EventState<U>{
     fun applyEvents(events: List<InternalEvent>): U
 }
 
-interface ReadModel<U>: EventState<U>
+interface ReadModel
 
-interface ProcessorReadModel<U>: ReadModel<U>
