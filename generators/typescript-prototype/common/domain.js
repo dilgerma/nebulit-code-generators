@@ -7,8 +7,8 @@ const variables = (elements, separator = "\n") => {
     return fields
 }
 
-const variableAssignments = (element, sourceName, source, separator, assignmentOperator) => {
-    var fields = element.fields?.map(field => {
+const variableAssignments = (elementFields, sourceName, source, separator, assignmentOperator) => {
+    var fields = elementFields?.map(field => {
         return `\t\t\t${processSourceMapping(field, sourceName, source, assignmentOperator)}`
     }).join(separator ? separator : ",\n")
     return fields
@@ -25,7 +25,7 @@ const processSourceMapping = (targetField, sourceName, source, assigmentOperator
     if (mapping) {
         return `${targetField.name}${assigmentOperator}${sourceName}.${targetField.mapping}`
     }
-    return `//TODO ${targetField.name}${assigmentOperator}${sourceName}.${targetField.name}`
+    return `${targetField.name}${assigmentOperator}${sourceName}.${targetField.name}`
 }
 
 const variablesDefaults = (elements) => {
@@ -115,5 +115,6 @@ module.exports = {
     variablesDefaults,
     renderUnionTypes,
     renderImports,
-    variableAssignments
+    variableAssignments,
+    processSourceMapping
 }

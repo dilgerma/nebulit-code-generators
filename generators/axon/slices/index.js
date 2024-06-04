@@ -12,6 +12,7 @@ const {
     _aggregateTitle,
     _restResourceTitle
 } = require("./../../../generators/common/util/naming");
+const {variableAssignments, processSourceMapping} = require("../../typescript-prototype/common/domain");
 
 
 let config = {}
@@ -55,7 +56,15 @@ module.exports = class extends Generator {
                 loop: false,
                 message: 'Generate Specifications (select multiple)?',
                 when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.specifications?.length > 0) ?? false,
-            }, {
+            },
+            {
+                type: 'checkbox',
+                name: 'liveReportModels',
+                message: 'Which ReadModels should read directly from the Eventstream?',
+                when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.readmodels?.length > 0) ?? false,
+                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).flatMap((slice) => slice.readmodels).map(item => item.title)
+            },
+            {
                 type: 'checkbox',
                 name: 'processTriggers',
                 message: 'Which event triggers the processor?',
@@ -171,46 +180,90 @@ module.exports = class extends Generator {
 
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
 
+            let liveReport = this.answers.liveReportModels?.includes(readmodel.title)
+
             let sliceEvents = config.slices.flatMap(it => it.events)
             let inboundEvents = readmodel.dependencies?.filter(it => it.type === "INBOUND").filter(it => it.elementType === "EVENT").map(it => sliceEvents.find(sliceEvent => it.id === sliceEvent.id))
 
-            this.fs.copyTpl(
-                this.templatePath(`src/components/ReadModel.kt.tpl`),
-                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${_readmodelTitle(readmodel.title)}.kt`),
-                {
-                    _slice: title,
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: _readmodelTitle(readmodel.title),
-                    _fields: VariablesGenerator.generateVariables(
-                        readmodel.fields
-                    ),
-                    //for now take first aggregate
-                    _aggregate: _aggregateTitle((readmodel.aggregateDependencies || ["AGGREGATE"])[0]),
-                    _eventsImports: this._eventsImports(inboundEvents.map(it => it.title)),
+            if (liveReport) {
+                this._writeLiveReportReadModel(title, readmodel, inboundEvents)
+            } else {
+                //_writeQueryableReportReadModel(readmodel, inboundEvents)
+            }
 
-                    _switchCase: renderReadModelSwitchCase(inboundEvents),
-
-                    _typeImports: typeImports(readmodel.fields)
-                }
-            )
-
-            this.fs.copyTpl(
-                this.templatePath(`src/components/QueryHandler.kt.tpl`),
-                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_readmodelTitle(readmodel.title)}QueryHandler.kt`),
-                {
-                    _slice: title,
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: _readmodelTitle(readmodel.title),
-                    //for now take first aggregate
-                    _aggregate: _aggregateTitle((readmodel.aggregateDependencies || ["AGGREGATE"])[0]),
-
-                    _typeImports: typeImports(readmodel.fields)
-
-                }
-            )
         })
 
 
+    }
+
+    _writeLiveReportReadModel(slice, readmodel, inboundEvents) {
+        this.fs.copyTpl(
+            this.templatePath(`src/components/LiveReportReadModel.kt.tpl`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${slice}/${_readmodelTitle(readmodel.title)}.kt`),
+            {
+                _slice: slice,
+                _rootPackageName: this.givenAnswers.rootPackageName,
+                _name: _readmodelTitle(readmodel.title),
+                _fields: VariablesGenerator.generateVariables(
+                    readmodel.fields
+                ),
+                //for now take first aggregate
+                _aggregate: _aggregateTitle((readmodel.aggregateDependencies || ["AGGREGATE"])[0]),
+                _eventsImports: this._eventsImports(inboundEvents.map(it => it.title)),
+
+                _eventSourcingHandlers: _eventSourcingHandlers(readmodel, inboundEvents),
+
+                _typeImports: typeImports(readmodel.fields)
+            }
+        )
+
+        this.fs.copyTpl(
+            this.templatePath(`src/components/LiveReportQueryHandler.kt.tpl`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${slice}/internal/${_readmodelTitle(readmodel.title)}QueryHandler.kt`),
+            {
+                _slice: slice,
+                _rootPackageName: this.givenAnswers.rootPackageName,
+                _name: _readmodelTitle(readmodel.title),
+                _typeImports: typeImports(readmodel.fields)
+            }
+        )
+    }
+
+    _writeQueryableReportReadModel(readModel, events) {
+        this.fs.copyTpl(
+            this.templatePath(`src/components/ReadModel.kt.tpl`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${_readmodelTitle(readmodel.title)}.kt`),
+            {
+                _slice: title,
+                _rootPackageName: this.givenAnswers.rootPackageName,
+                _name: _readmodelTitle(readmodel.title),
+                _fields: VariablesGenerator.generateVariables(
+                    readmodel.fields
+                ),
+                //for now take first aggregate
+                _aggregate: _aggregateTitle((readmodel.aggregateDependencies || ["AGGREGATE"])[0]),
+                _eventsImports: this._eventsImports(inboundEvents.map(it => it.title)),
+
+                _switchCase: renderReadModelSwitchCase(inboundEvents),
+
+                _typeImports: typeImports(readmodel.fields)
+            }
+        )
+
+        this.fs.copyTpl(
+            this.templatePath(`src/components/QueryHandler.kt.tpl`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_readmodelTitle(readmodel.title)}QueryHandler.kt`),
+            {
+                _slice: title,
+                _rootPackageName: this.givenAnswers.rootPackageName,
+                _name: _readmodelTitle(readmodel.title),
+                //for now take first aggregate
+                _aggregate: _aggregateTitle((readmodel.aggregateDependencies || ["AGGREGATE"])[0]),
+
+                _typeImports: typeImports(readmodel.fields)
+
+            }
+        )
     }
 
     writeRestControllers() {
@@ -280,9 +333,10 @@ module.exports = class extends Generator {
     _generateGetRestCall(slice, restVariables, readModel) {
 
         return `@GetMapping("/${slice}")
-    fun findInformation(${restVariables}):ReadModel<${readModel}> {
-    return delegatingQueryHandler.handleQuery<UUID, ${readModel}>(${readModel}Query(aggregateId))    }
+    fun findReadModel(${restVariables}):${readModel} {
+     return queryGateway.query(${readModel}Query(aggregateId), ${readModel}::class.java).get()    }
       `
+
     }
 
     writeSpecifications() {
@@ -480,6 +534,26 @@ const packageName = (type) => {
     }
 }
 
+const _eventSourcingHandlers = (readModel, events) => {
+    var readModelFieldNames = readModel.fields.map((it) => it.name)
+    return events.map((event) => {
+        return `
+    @EventSourcingHandler
+    fun on(event: ${_eventTitle(event.title)}) {
+       //TODO process fields
+       /*
+       ${
+            event.fields.filter(
+                (field) => readModelFieldNames.includes(field.name))
+                .map((field) => {
+                    return processSourceMapping(field, "event", field.name, "=")
+                }).join("\n\t\t")
+        }
+    */
+    }`
+    }).join("\n")
+
+}
 const renderReadModelSwitchCase = (events) => {
     return `
              ${events.map(event => {
