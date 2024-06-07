@@ -231,7 +231,7 @@ function renderThenExpectation(when, thenList, defaults) {
 
     }).join("\n")
 
-    if (thens?.length === 0) {
+    if (thens?.length === 0 && !thenList.some((error) => error.type === "SPEC_ERROR")) {
         return "Assertions.fail<Unit>(\"No assertion defined in Model. Manual implementation required\")"
     }
     return thens
@@ -240,12 +240,8 @@ function renderThenExpectation(when, thenList, defaults) {
 function renderThen(whenList, thenList, defaults) {
 
     if (thenList.some((error) => error.type === "SPEC_ERROR")) {
-        // in case error render error
-        return whenList.map((command) => {
-            return `
-                   .expectException(CommandException::class.java)       
-        }`
-        }).join("\n");
+        // in case error render erro
+          return `.expectException(CommandException::class.java)`
     } else {
         return `.expectSuccessfulHandlerExecution()
                 .expectEvents(*expectedEvents.toTypedArray())`
@@ -255,12 +251,9 @@ function renderThen(whenList, thenList, defaults) {
 
 function renderWhen(whenCommand, thenList, defaults) {
     //only render when if no error occured
-    if (!thenList.some((error) => error.type === "SPEC_ERROR")) {
-            return `val command = ${_commandTitle(whenCommand.title)}(
+    return `val command = ${_commandTitle(whenCommand.title)}(
  \t\t\t\t${randomizedInvocationParamterList(whenCommand.fields, defaults)}
             )`
-    }
-    return ""
 
 }
 

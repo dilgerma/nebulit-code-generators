@@ -1,12 +1,14 @@
 import <%= _rootPackageName%>.common.Event
 import <%= _rootPackageName%>.common.support.RandomData
 import <%= _rootPackageName%>.domain.<%=_aggregate%>
+import de.nebulit.common.CommandException
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.jupiter.api.BeforeEach
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions
 <%= _elementImports%>
 <%= _typeImports%>
 

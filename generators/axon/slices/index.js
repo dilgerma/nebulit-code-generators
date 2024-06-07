@@ -74,32 +74,32 @@ module.exports = class extends Generator {
 
     }
 
-    writeCommandHandlers() {
-        //this.answers.slices.forEach((slice) => {
-        this._writeCommandHandlers(this.answers.slice)
-        //});
-    }
+    //writeCommandHandlers() {
+    //this.answers.slices.forEach((slice) => {
+    //  this._writeCommandHandlers(this.answers.slice)
+    //});
+    //}
 
-    _writeCommandHandlers(sliceName) {
-        var slice = this._findSlice(sliceName)
-        var title = _slicePackage(slice.title).toLowerCase()
-        slice.commands?.filter((command) => command.title).forEach((command) => {
-            this.fs.copyTpl(
-                this.templatePath(`src/components/CommandHandler.kt.tpl`),
-                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${slugify(command.title).replaceAll("-", "")}CommandHandler.kt`),
-                {
-                    _slice: title,
-                    _commandType: _commandTitle(command.title),
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: _commandTitle(command.title),
-                    _typeImports: typeImports(command.fields),
-                    //for now take first aggregate
-                    _aggregate: _aggregateTitle((command.aggregateDependencies || ["AGGREGATE"])[0])
-                }
-            )
-        })
-
-    }
+    // _writeCommandHandlers(sliceName) {
+    //     var slice = this._findSlice(sliceName)
+    //     var title = _slicePackage(slice.title).toLowerCase()
+    //     slice.commands?.filter((command) => command.title).forEach((command) => {
+    //         this.fs.copyTpl(
+    //             this.templatePath(`src/components/CommandHandler.kt.tpl`),
+    //             this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${slugify(command.title).replaceAll("-", "")}CommandHandler.kt`),
+    //             {
+    //                 _slice: title,
+    //                 _commandType: _commandTitle(command.title),
+    //                 _rootPackageName: this.givenAnswers.rootPackageName,
+    //                 _name: _commandTitle(command.title),
+    //                 _typeImports: typeImports(command.fields),
+    //                 //for now take first aggregate
+    //                 _aggregate: _aggregateTitle((command.aggregateDependencies || ["AGGREGATE"])[0])
+    //             }
+    //         )
+    //     })
+    //
+    // }
 
     writeCommands() {
         //this.answers.slices.forEach((slice) => {
