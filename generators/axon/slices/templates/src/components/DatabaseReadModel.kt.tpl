@@ -14,14 +14,11 @@ import mu.KotlinLogging
 
 class <%= _name%>Query(var aggregateId: UUID): Query
 
-@Component
-class <%= _name%>EventSourceRepository(eventStore:EventStore): EventSourcingRepository<<%= _name%>>(builder(<%= _name%>::class.java).eventStore(eventStore))
-
 
 class <%= _name%> : ReadModel {
 
 <%- _fields%>
 
-<%- _eventSourcingHandlers %>
+<%- _eventHandlers %>
 
 }

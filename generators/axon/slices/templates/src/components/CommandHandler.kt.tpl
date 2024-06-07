@@ -8,12 +8,7 @@ import org.axonframework.commandhandling.CommandHandler
 import org.axonframework.eventsourcing.EventSourcingRepository
 import org.axonframework.eventsourcing.eventstore.EventStore
 import java.util.concurrent.Callable
-
-@Component
-class <%= _aggregate%>EventSourceRepository(eventStore: EventStore): EventSourcingRepository<<%= _aggregate%>>(
-    builder(
-    <%= _aggregate%>::class.java).eventStore(eventStore))
-
+import <%= _rootPackageName%>.domain.commands.<%=_slice%>.<%= _name%>
 
 @Component
 class <%= _name%>CommandHandler(
@@ -28,7 +23,7 @@ class <%= _name%>CommandHandler(
         aggregateRepository.load(
             command.aggregateId.toString(),
         ).execute {
-            // TODO handle command
+            it.handle(command)
         }
 
 

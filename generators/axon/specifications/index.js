@@ -6,6 +6,7 @@ const {answers} = require("../app");
 const {slice} = require("../slices");
 const {givenAnswers} = require("./index");
 const {v4: uuidv4} = require('uuid');
+const {_eventTitle, _readmodelTitle, _commandTitle, _aggregateTitle} = require("../../common/util/naming");
 
 
 function _sliceTitle(title) {
@@ -55,7 +56,7 @@ module.exports = class extends Generator {
             var specificationName = _specificationTitle(capitalizeFirstCharacter(slugify(specification.title, "")))
 
             var given = specification.given
-            var when = specification.when
+            var when = specification.when?.[0] ?? []
             var then = specification.then
 
             var allElements = given.concat(when).concat(then)
@@ -78,6 +79,7 @@ module.exports = class extends Generator {
                     _given: renderGiven(given, defaults),
                     _when: renderWhen(when, then, defaults),
                     _then: renderThen(when, then, defaults),
+                    _thenExpectations: renderThenExpectation(when, then, defaults),
                     // take first aggregate
                     _aggregate: _aggregateTitle((slice.aggregates || [])[0]),
                     _aggregateId: aggregateId
@@ -140,7 +142,7 @@ const generateImports = (rootPackageName, sliceName, elements) => {
             case "spec_event":
                 return `import ${rootPackageName}.events.${_eventTitle(element.title)}`
             case "spec_command":
-                return `import ${rootPackageName}.${sliceName}.internal.${_commandTitle(element.title)}`
+                return `import ${rootPackageName}.domain.commands.${sliceName}.${_commandTitle(element.title)}`
             case "spec_readmodel":
                 return `import ${rootPackageName}.${sliceName}.${_readmodelTitle(element.title)}`
             default:
@@ -184,17 +186,6 @@ const variableNameOrMapping = (field) => {
     return (field.mapping && field.mapping !== "") ? field.mapping : field.name
 }
 
-const packageName = (type) => {
-    switch (type.type) {
-        case "COMMAND":
-            return "commands"
-        case "EVENT":
-            return "events"
-        case "READMODEL":
-            return "readmodels"
-    }
-}
-
 
 const defaultValue = (type, cardinality = "single", name, defaults) => {
     if (cardinality?.toLowerCase() !== "list" && defaults[name]) {
@@ -209,36 +200,11 @@ const defaultValue = (type, cardinality = "single", name, defaults) => {
 }
 
 
-function toCamelCase(prefix, variableName) {
-    return (prefix + variableName).replace(/_([a-z])/g, function (match, group1) {
-        return group1.toUpperCase();
-    });
-}
-
 function _specificationTitle(title) {
     var adjustedTitle = title.replace("Spec:", "").replace("-", "").trim()
     return `${slugify(capitalizeFirstCharacter(adjustedTitle), "")}Test`
 }
 
-function _aggregateTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title), "")}Aggregate`
-}
-
-function _commandTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title), "")}Command`
-}
-
-function _restResourceTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title), "")}RestController`
-}
-
-function _readmodelTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title), "")}ReadModel`
-}
-
-function _eventTitle(title) {
-    return `${slugify(capitalizeFirstCharacter(title), "")}Event`
-}
 
 function capitalizeFirstCharacter(inputString) {
     // Check if the string is not empty
@@ -251,6 +217,25 @@ function capitalizeFirstCharacter(inputString) {
     }
 }
 
+function renderThenExpectation(when, thenList, defaults) {
+    //in case no error render then
+    var thens = thenList.map((item) => {
+
+        if (item.type === "SPEC_EVENT") {
+            return `
+               expectedEvents.add(RandomData.newInstance<${_eventTitle(item.title)}> { 
+               ${assertionList(item.fields, when.fields, defaults)}
+                })   
+                `
+        }
+
+    }).join("\n")
+
+    if (thens?.length === 0) {
+        return "Assertions.fail<Unit>(\"No assertion defined in Model. Manual implementation required\")"
+    }
+    return thens
+}
 
 function renderThen(whenList, thenList, defaults) {
 
@@ -258,70 +243,36 @@ function renderThen(whenList, thenList, defaults) {
         // in case error render error
         return whenList.map((command) => {
             return `
-        whenResult.andWaitForStateChange {
-                Assertions.assertThrows(CommandException::class.java) {
-                         commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))}
+                   .expectException(CommandException::class.java)       
         }`
         }).join("\n");
     } else {
-        //in case no error render then
-        var then = thenList.map((item) => {
-
-            if (item.type === "SPEC_EVENT") {
-
-                return `\twhenResult.andWaitForEventOfType(${_eventTitle(item.title)}::class.java)
-                        ${assertionList(item.fields, defaults)}.toArrive()`
-
-            } else if (item.type === "SPEC_READMODEL") {
-                return `\twhenResult.andWaitForStateChange {
-            \t\tvar readModel: ${_readmodelTitle(item.title)} =
-                            queryHandler.handleQuery(${_readmodelTitle(item.title)}Query(AGGREGATE_ID))
-    \t\t//assertThat(readModel.data).contains(..)
-    \t}`
-            }
-
-        }).join("\n")
-
-        if (thenList?.length === 0) {
-            return "Assertions.fail<Unit>(\"No assertion defined in Model. Manual implementation required\")"
-        }
-        return then
+        return `.expectSuccessfulHandlerExecution()
+                .expectEvents(*expectedEvents.toTypedArray())`
     }
 }
 
 
-function renderWhen(whenList, thenList, defaults) {
+function renderWhen(whenCommand, thenList, defaults) {
     //only render when if no error occured
     if (!thenList.some((error) => error.type === "SPEC_ERROR")) {
-        return whenList.map((command) => {
-            return `commandHandler.handle(${_commandTitle(command.title)}(${randomizedInvocationParamterList(command.fields, defaults)}))`
-        }).join("\n");
+            return `val command = ${_commandTitle(whenCommand.title)}(
+ \t\t\t\t${randomizedInvocationParamterList(whenCommand.fields, defaults)}
+            )`
     }
+    return ""
 
 }
 
 function renderGiven(givenList, defaults) {
     var givens = givenList.map((event) => {
-        return `
-        events.add(RandomData.newInstance(listOf("value")) {
+        return `events.add(RandomData.newInstance<${_eventTitle(event.title)}> {
                         ${randomizedInvocationParamterList(event.fields.filter((it) => it.name == "aggregateId"), defaults)}
-                        this.value = ${_eventTitle(event.title)}(
-                            ${randomizedInvocationParamterList(event.fields, defaults)}
-                        )
-                    })
-        `
+                    })`
     }).join("\n")
 
     var given = `
-    var events = mutableListOf<InternalEvent>()
      ${givens}
-     
-      events.forEach { event ->
-                        run {
-                            repository.save(event)
-                            event.value?.let { eventPublisher.publishEvent(it) }
-                        }
-                    }
     `
     return given
 
@@ -365,20 +316,20 @@ function randomizedInvocationParamterList(variables, defaults) {
 
 }
 
-function assertionList(variables, defaults) {
-    if (variables.some((it) => it.example !== "")) {
-        var assertions = variables.map((variable) => {
-            if (variable.example !== "") {
-                return `\tit.${variable.name} == ${renderVariable(variable.example, variable.type, variable.name, defaults)}`;
-            } else if (variable.example === "" && defaults[variable.name]) {
-                return `\tit.${variable.name} == ${renderVariable(defaults[variable.name], variable.type, variable.name, defaults)}`;
-            }
-        }).join("&&");
-        return `.matching { ${assertions} }`;
-    } else {
-        return ""
-    }
-
-
+function assertionList(variables, assignmentValues, defaults) {
+    return variables.map((variable) => {
+        // if example data provided, take the example into assertion
+        if (variable.example !== "") {
+            return `\tthis.${variable.name} = ${renderVariable(variable.example, variable.type, variable.name, defaults)}`;
+            // take the value from the command if available
+        } else if (assignmentValues?.some(field => field.name === variable.name)) {
+            return `\tthis.${variable.name} = command.${variable.name}`;
+        } else if (variable.example === "" && defaults[variable.name]) {
+            // is there any default? take the default
+            return `\tthis.${variable.name} = ${renderVariable(defaults[variable.name], variable.type, variable.name, defaults)}`;
+        } else {
+            return `//this.${variable.name} = ...`
+        }
+    }).filter(it => it).join("\n");
 }
 

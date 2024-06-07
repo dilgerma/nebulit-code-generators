@@ -113,9 +113,20 @@ module.exports = class extends Generator {
 
 
         slice.commands?.filter((command) => command.title).forEach((command) => {
+
+            this.fs.copyTpl(
+                this.templatePath(`src/components/package-info.java.tpl`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain/commands/${title}/package-info.java`),
+                {
+                    _slice: title,
+                    _rootPackageName: this.givenAnswers.rootPackageName,
+                }
+            )
+
+
             this.fs.copyTpl(
                 this.templatePath(`src/components/Command.kt.tpl`),
-                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_commandTitle(command.title)}.kt`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain/commands/${title}/${_commandTitle(command.title)}.kt`),
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
@@ -423,19 +434,21 @@ class ConstructorGenerator {
 
 class VariablesGenerator {
 
-    static generateLiveReportVariables(fields,identifier) {
-            return fields?.map((variable) => {
-                if (variable.cardinality?.toLowerCase() === "list") {
-                    return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality)} = emptyList();`;
-                } else {
-                    return `\t${variable.name == identifier ? "@AggregateIdentifier " : ""}var ${variable.name}:${typeMapping(variable.type, variable.cardinality)}? = null;`;
-                }
-            }).join("\n")
-        }
+    static generateLiveReportVariables(fields, identifier) {
+        return fields?.map((variable) => {
+            if (variable.cardinality?.toLowerCase() === "list") {
+                return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality)} = emptyList();`;
+            } else {
+                return `\t${variable.name == identifier ? "@AggregateIdentifier " : ""}var ${variable.name}:${typeMapping(variable.type, variable.cardinality)}? = null;`;
+            }
+        }).join("\n")
+    }
 
 //(: {name, type, example, mapping}
     static generateVariables(fields, annotations) {
-        if(!annotations) {annotations = []}
+        if (!annotations) {
+            annotations = []
+        }
         return fields?.map((variable) => {
             if (variable.cardinality?.toLowerCase() === "list") {
                 return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality)} = emptyList();`;

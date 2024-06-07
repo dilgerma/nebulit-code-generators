@@ -1,72 +1,40 @@
-package <%= _rootPackageName%>.<%=_slice%>
-
-import <%= _rootPackageName%>.ContainerConfiguration
-import <%= _rootPackageName%>.common.CommandException
-
-import <%= _rootPackageName%>.common.DelegatingCommandHandler
-import <%= _rootPackageName%>.common.DelegatingQueryHandler
-import <%= _rootPackageName%>.common.persistence.EventsEntityRepository
-import <%= _rootPackageName%>.support.<%=_aggregate%>Repository
-import <%= _rootPackageName%>.common.persistence.InternalEvent
-
-
+import <%= _rootPackageName%>.common.Event
+import <%= _rootPackageName%>.common.support.RandomData
+import <%= _rootPackageName%>.domain.<%=_aggregate%>
+import org.axonframework.test.aggregate.AggregateTestFixture;
+import org.axonframework.test.aggregate.FixtureConfiguration;
+import org.junit.jupiter.api.BeforeEach
+import org.hamcrest.Matcher
+import org.hamcrest.Matchers
+import org.junit.jupiter.api.Test
 <%= _elementImports%>
 <%= _typeImports%>
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Assertions
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Import
-import <%= _rootPackageName%>.common.support.RandomData
-import org.springframework.modulith.test.ApplicationModuleTest
-import org.springframework.modulith.test.Scenario
-import java.util.*
-
-@ApplicationModuleTest(mode = ApplicationModuleTest.BootstrapMode.DIRECT_DEPENDENCIES)
-@Import(ContainerConfiguration::class)
 class <%=_name%> {
 
-    @Autowired
-    lateinit var repository: EventsEntityRepository
-    @Autowired
-    lateinit var commandHandler: DelegatingCommandHandler
-    @Autowired
-    lateinit var queryHandler: DelegatingQueryHandler
-    @Autowired
-    lateinit var aggregateRepository: <%=_aggregate%>Repository
+    private lateinit var fixture: FixtureConfiguration<<%=_aggregate%>>
 
     @BeforeEach
     fun setUp() {
-        aggregateRepository.save(RandomData.newInstance(listOf("events")) {
-            this.aggregateId = AGGREGATE_ID
-            this.events = mutableListOf()
-        })
+        fixture = AggregateTestFixture(<%=_aggregate%>::class.java)
     }
 
     @Test
-    fun `<%=_name%>`(scenario: Scenario) {
+    fun `<%=_name%>`() {
+      //GIVEN
+      val events = mutableListOf<Event>()
+      <%- _given%>
 
-       var whenResult = prepare(scenario)
+      //WHEN
+      <%- _when %>
 
-       //THEN
-    <%-_then%>
-    }
+      //THEN
+      val expectedEvents = mutableListOf<Event>()
+      <%- _thenExpectations %>
 
-    private fun prepare(scenario: Scenario): Scenario.When<Void> {
-      return scenario.stimulate { stimulus, eventPublisher ->
-                    run {
-                        stimulus.executeWithoutResult {
-                            //GIVEN
-                            <%-_given%>
-                            //WHEN
-                            <%-_when%>
-                        }
-                    }}
-    }
-
-    companion object {
-        var AGGREGATE_ID = UUID.fromString("<%=_aggregateId%>")
+      fixture.given(events)
+        .`when`(command)
+        <%- _then %>
     }
 
 }

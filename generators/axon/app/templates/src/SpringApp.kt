@@ -9,7 +9,7 @@ import org.springframework.modulith.Modulith
 
 @Modulith(
         systemName = "System",
-        sharedModules =["<%= rootPackageName%>.support","<%= rootPackageName%>.common","<%= rootPackageName%>.domain"],
+        sharedModules =["<%= rootPackageName%>.common","<%= rootPackageName%>.domain"],
         useFullyQualifiedModuleNames = true
 )
 @EnableJpaRepositories

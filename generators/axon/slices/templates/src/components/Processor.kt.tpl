@@ -7,6 +7,7 @@ import <%= _rootPackageName%>.common.persistence.EventsEntityRepository
 import org.springframework.modulith.events.ApplicationModuleListener
 import org.springframework.stereotype.Component
 import mu.KotlinLogging
+import <%= _rootPackageName%>.domain.commands.<%=_slice%>.<%- _command%>
 
 <%= _eventsImports %>
 

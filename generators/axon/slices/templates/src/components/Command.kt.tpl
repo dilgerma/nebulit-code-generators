@@ -1,4 +1,4 @@
-package <%= _rootPackageName%>.<%=_slice%>.internal
+package <%= _rootPackageName%>.domain.commands.<%=_slice%>
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier
 import <%= _rootPackageName%>.common.Command
