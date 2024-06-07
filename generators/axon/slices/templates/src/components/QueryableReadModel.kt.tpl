@@ -1,29 +1,16 @@
 package <%= _rootPackageName%>.<%=_slice%>
 
-import <%= _rootPackageName%>.common.Query
-import <%= _rootPackageName%>.common.ReadModel
-import <%= _rootPackageName%>.common.persistence.InternalEvent
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+
+import org.hibernate.annotations.JdbcTypeCode
+import java.sql.Types
 <%= _typeImports %>
-<%= _eventsImports %>
 
-import mu.KotlinLogging
+data class <%-_name%>Query(val aggregateId: UUID)
 
-class <%= _name%>Query(var aggregateId: UUID)
-
-class <%= _name%> : ReadModel<<%= _name%>> {
-
-    var logger = KotlinLogging.logger {}
-
-<%- _fields%>
-
-    override fun applyEvents(events: List<InternalEvent>): <%= _name%> {
-        events.forEach {
-            when (it.value) {
-                <%-_switchCase%>
-            }
-        }
-        return this
-    }
-
+@Entity
+class <%-_name%> {
+	<%- _entityFields %>
 }
-

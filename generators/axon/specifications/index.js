@@ -1,10 +1,6 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var slugify = require('slugify')
-const {ensureDirSync} = require("fs-extra");
-const {answers} = require("../app");
-const {slice} = require("../slices");
-const {givenAnswers} = require("./index");
 const {v4: uuidv4} = require('uuid');
 const {_eventTitle, _readmodelTitle, _commandTitle, _aggregateTitle} = require("../../common/util/naming");
 
@@ -59,7 +55,12 @@ module.exports = class extends Generator {
             var when = specification.when?.[0] ?? []
             var then = specification.then
 
-            var allElements = given.concat(when).concat(then)
+            if (then.some(it => it.type === "SPEC_READMODEL")) {
+                //for now only result events supported
+                return
+            }
+
+            var allElements = given.concat(when).concat(then);
             var allFields = allElements.flatMap((item) => item.fields)
             var _elementImports = generateImports(this.givenAnswers.rootPackageName, title, allElements)
             var _typeImports = typeImports(allFields)
@@ -100,42 +101,6 @@ module.exports = class extends Generator {
 };
 
 
-const typeMapping = (fieldType, fieldCardinality) => {
-    var fieldType;
-    switch (fieldType?.toLowerCase()) {
-        case "string":
-            fieldType = "String";
-            break
-        case "double":
-            fieldType = "Double";
-            break
-        case "long":
-            fieldType = "Long";
-            break
-        case "boolean":
-            fieldType = "Boolean";
-            break
-        case "date":
-            fieldType = "LocalDate";
-            break
-        case "uuid":
-            fieldType = "UUID";
-            break
-        case "custom":
-            fieldType = "CUSTOM";
-            break
-        default:
-            fieldType = "String";
-            break
-    }
-    if (fieldCardinality?.toLowerCase() === "list") {
-        return `List<${fieldType}>`
-    } else {
-        return fieldType
-    }
-
-}
-
 const generateImports = (rootPackageName, sliceName, elements) => {
     var imports = elements?.map((element) => {
         switch (element.type?.toLowerCase()) {
@@ -173,19 +138,6 @@ const typeImports = (fields) => {
     return Array.from(new Set(imports?.flat()))?.join(";\n")
 
 }
-
-const invocation = (type, fields) => {
-    return `new ${type}(${fields.map((it) => variableNameOrMapping(it)).join(",")})`
-}
-
-const receiverInvocation = (type, receiver) => {
-    return `new ${type.title}(${type.fields.map((it) => receiver + "." + variableNameOrMapping(it)).join(",")})`
-}
-
-const variableNameOrMapping = (field) => {
-    return (field.mapping && field.mapping !== "") ? field.mapping : field.name
-}
-
 
 const defaultValue = (type, cardinality = "single", name, defaults) => {
     if (cardinality?.toLowerCase() !== "list" && defaults[name]) {
