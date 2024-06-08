@@ -3,7 +3,6 @@ var chalk = require('chalk');
 const {ensureDirSync} = require("fs-extra");
 var slugify = require('slugify')
 const {answers} = require("../app");
-const prettier = require('prettier')
 const {
     _eventTitle,
     _commandTitle,
