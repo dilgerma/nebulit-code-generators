@@ -9,8 +9,11 @@ const variables = (elements, separator = "\n") => {
 
 const variableAssignments = (elementFields, sourceName, source, separator, assignmentOperator) => {
     var fields = elementFields?.map(field => {
-        return `\t\t\t${processSourceMapping(field, sourceName, source, assignmentOperator)}`
-    }).join(separator ? separator : ",\n")
+        var sourceMapping = processSourceMapping(field, sourceName, source, assignmentOperator)
+        if (sourceMapping) {
+            return `\t\t\t${sourceMapping}`
+        }
+    }).filter(it => it).join(separator ? separator : ",\n")
     return fields
 }
 
@@ -25,7 +28,8 @@ const processSourceMapping = (targetField, sourceName, source, assigmentOperator
     if (mapping) {
         return `${targetField.name}${assigmentOperator}${sourceName}.${targetField.mapping}`
     }
-    return `${targetField.name}${assigmentOperator}${sourceName}.${targetField.name}`
+    //return `${targetField.name}${assigmentOperator}${sourceName}.${targetField.name}`
+    return ``
 }
 
 const variablesDefaults = (elements) => {

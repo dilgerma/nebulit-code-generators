@@ -63,14 +63,14 @@ module.exports = class extends Generator {
                 name: 'liveReportModels',
                 message: 'Which ReadModels should read directly from the Eventstream?',
                 when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.readmodels?.length > 0) ?? false,
-                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).flatMap((slice) => slice.readmodels).map(item => item.title)
+                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).filter((item)=>item.title === items.slice).flatMap((slice) => slice.readmodels).map(item => item.title)
             },
             {
                 type: 'checkbox',
                 name: 'processTriggers',
                 message: 'Which event triggers the processor?',
                 when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.processors?.length > 0) ?? false,
-                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).flatMap((slice) => slice.events).map(item => item.title)
+                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).filter((item)=>item.title === items.slice).flatMap((slice) => slice.events).map(item => item.title)
             }]);
 
     }
@@ -304,7 +304,7 @@ fun on(event: ${_eventTitle(it.title)}) {
     //throws exception if not available (adjust logic)
     val entity = this.repository.findById(event.aggregateId).get()
     entity.apply {
-        ${variableAssignments(it.fields, "event", readModel.fields, "\n")}
+        ${variableAssignments(readModel.fields, "event", it, "\n")}
     }.also { this.repository.save(it) }
 }`
         }).join("\n")
