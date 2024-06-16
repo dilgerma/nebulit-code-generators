@@ -422,20 +422,21 @@ fun on(event: ${_eventTitle(it.title)}) {
        `
     }
 
-    _generateGetRestCall(slice, restVariables, readModel) {
+    _generateQuery(slice, readModel) {
         var readModelTitle = _readmodelTitle(readModel.title)
         if (readModel.listElement ?? false) {
+            return `queryGateway.query(${readModelTitle}Query(), ${readModelTitle}::class.java)`
+        } else {
+            return `queryGateway.query(${readModelTitle}Query(aggregateId), ${readModelTitle}::class.java)`
+        }
+    }
+
+    _generateGetRestCall(slice, restVariables, readModel) {
+        var readModelTitle = _readmodelTitle(readModel.title)
         return `@GetMapping("/${slice}")
            fun findReadModel():${readModelTitle} {
-            return queryGateway.query(${readModelTitle}Query(), ${readModelTitle}::class.java).get()    }
-                 `
-        } else {
-
-            return `@GetMapping("/${slice}")
-    fun findReadModel(${restVariables}):${readModelTitle} {
-     return queryGateway.query(${readModelTitle}Query(aggregateId), ${readModelTitle}::class.java).get()    }
-      `
-        }
+                ${this._generateQuery(slice, readModel)}.get()  
+           }`
 
     }
 
@@ -460,7 +461,14 @@ fun on(event: ${_eventTitle(it.title)}) {
         var title = _slicePackage(slice.title).toLowerCase()
         var command = slice.commands.length > 0 ? slice.commands[0] : null
 
+
         slice.processors?.filter((processor) => processor.title).forEach((processor) => {
+
+            var readModelDependency = processor?.dependencies?.filter((it) => it.type === "INBOUND" && it.elementType === "READMODEL")[0]
+
+            var readModel = config.slices.flatMap(it => it.readmodels).find(it => it.id === readModelDependency?.id)
+
+
             this.fs.copyTpl(
                 this.templatePath(`src/components/Processor.kt.tpl`),
                 this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/internal/${_processorTitle(processor.title)}.kt`),
@@ -469,10 +477,9 @@ fun on(event: ${_eventTitle(it.title)}) {
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _name: _processorTitle(processor.title),
                     _eventsImports: this._eventsImports(this.answers.processTriggers),
+                    _query: readModel ? `/*var result = ${this._generateQuery(slice, readModel)}*/` : "",
+                    _commandInvocation: `/*${this._renderCommandInvocation(command, readModel)}*/`,
                     _triggers: this._renderTriggers(this.answers.processTriggers),
-                    _variables: command ? VariablesGenerator.generateInvocation(
-                        command.fields
-                    ) : "",
                     _command: command ? _commandTitle(command.title) : ""
 
                 }
@@ -480,6 +487,18 @@ fun on(event: ${_eventTitle(it.title)}) {
         })
 
 
+    }
+
+    _renderCommandInvocation(command,readModel) {
+        if (!command || !readModel) {
+            return `// TODO implement logic (no readmodel or command defined)`
+        }
+        return `
+         commandGateway.send<${_commandTitle(command.title)}>(
+                ${_commandTitle(command.title)}(
+                    ${variableAssignments(command.fields, "result", readModel, "\n","=" )}
+                )
+            )`;
     }
 
     _eventsImports(triggers) {
@@ -491,10 +510,10 @@ fun on(event: ${_eventTitle(it.title)}) {
 
     _renderTriggers(triggers) {
         return triggers.map((trigger) => {
-            return `\t@ApplicationModuleListener
+            return `\t@EventHandler
 \tfun on(event: ${_eventTitle(trigger)}) {
 \t     logger.info("Processing ${_eventTitle(trigger)}")
-\t     process()     
+\t     process()
 \t}`
         }).join("\n\n")
     }
