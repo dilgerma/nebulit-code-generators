@@ -13,7 +13,9 @@ function _sliceTitle(title) {
     return slugify(title.replaceAll(" ","").replace("slice:", "")).replaceAll("-", "").toLowerCase()
 }
 
-
+function _sliceSpecificClassTitle(slice, title) {
+    return `${capitalizeFirstCharacter(_sliceTitle(slice))}${title}`
+}
 
 function _processorTitle(title) {
     return `${slugify(capitalizeFirstCharacter(title.replaceAll(" ","")), "").replaceAll("-","")}Processor`
@@ -37,4 +39,4 @@ function _screenTitle(title) {
 
 
 
-module.exports = {_processorTitle, _restResourceTitle, _readmodelTitle, _eventTitle, _commandTitle, _aggregateTitle, _screenTitle, _sliceTitle}
+module.exports = {_processorTitle, _restResourceTitle, _readmodelTitle, _eventTitle, _commandTitle, _aggregateTitle, _screenTitle, _sliceTitle,_sliceSpecificClassTitle}

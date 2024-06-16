@@ -13,6 +13,8 @@ const {
     _restResourceTitle
 } = require("./../../../generators/common/util/naming");
 const {variableAssignments, processSourceMapping} = require("../../typescript-prototype/common/domain");
+const {ClassesGenerator, typeMapping, typeImports} = require("../../common/util/generator");
+const {_sliceSpecificClassTitle} = require("../../common/util/naming");
 
 
 let config = {}
@@ -62,14 +64,14 @@ module.exports = class extends Generator {
                 name: 'liveReportModels',
                 message: 'Which ReadModels should read directly from the Eventstream?',
                 when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.readmodels?.length > 0) ?? false,
-                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).filter((item)=>item.title === items.slice).flatMap((slice) => slice.readmodels).map(item => item.title)
+                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).filter((item) => item.title === items.slice).flatMap((slice) => slice.readmodels).map(item => item.title)
             },
             {
                 type: 'checkbox',
                 name: 'processTriggers',
                 message: 'Which event triggers the processor?',
                 when: (input) => (config.slices.find((slice) => slice.title === input.slice)?.processors?.length > 0) ?? false,
-                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).filter((item)=>item.title === items.slice).flatMap((slice) => slice.events).map(item => item.title)
+                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).filter((item) => item.title === items.slice).flatMap((slice) => slice.events).map(item => item.title)
             }]);
 
     }
@@ -207,6 +209,14 @@ module.exports = class extends Generator {
 
     }
 
+    _repositoryQuery(readModel) {
+        if (readModel.listElement ?? false) {
+            return `return ${_readmodelTitle(readModel.title)}(repository.findAll())`
+        } else {
+            return `return ${_readmodelTitle(readModel.title)}(repository.findById(query.aggregateId).orElse(null))`
+        }
+    }
+
     _writeLiveReportReadModel(slice, readmodel, inboundEvents) {
         this.fs.copyTpl(
             this.templatePath(`src/components/LiveReportReadModel.kt.tpl`),
@@ -241,25 +251,39 @@ module.exports = class extends Generator {
         )
     }
 
-    _writeQueryableReportReadModel(slice, readModel, inboundEvents) {
-        this.fs.copyTpl(
-            this.templatePath(`src/components/QueryableReadModelProjector.kt.tpl`),
-            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${slice}/internal/${_readmodelTitle(readModel.title)}Projector.kt`),
-            {
-                _slice: slice,
-                _rootPackageName: this.givenAnswers.rootPackageName,
-                _name: _readmodelTitle(readModel.title),
-                _fields: VariablesGenerator.generateVariables(
-                    readModel.fields
-                ),
-                //for now take first aggregate
-                _aggregate: _aggregateTitle((readModel.aggregateDependencies || ["AGGREGATE"])[0]),
-                _eventsImports: this._eventsImports(inboundEvents.map(it => it.title)),
-                _eventHandlers: this._renderEventHandlers(readModel, inboundEvents),
+    _readModelQueryElement(readModel) {
+        if (readModel.listElement ?? false) {
+            return `class ${_readmodelTitle(readModel.title)}Query()`
+        } else {
+            return `data class ${_readmodelTitle(readModel.title)}Query(aggregateId:UUID)
+`
+        }
+    }
 
-                _typeImports: typeImports(readModel.fields)
-            }
-        )
+    _writeQueryableReportReadModel(slice, readModel, inboundEvents) {
+
+        let liveReport = this.answers.liveReportModels?.includes(readModel.title)
+        if (!liveReport) {
+            this.fs.copyTpl(
+                this.templatePath(`src/components/QueryableReadModelProjector.kt.tpl`),
+                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${slice}/internal/${_readmodelTitle(readModel.title)}Projector.kt`),
+                {
+                    _slice: slice,
+                    _rootPackageName: this.givenAnswers.rootPackageName,
+                    _name: _readmodelTitle(readModel.title),
+                    _fields: VariablesGenerator.generateVariables(
+                        readModel.fields
+                    ),
+                    //for now take first aggregate
+                    _aggregate: _aggregateTitle((readModel.aggregateDependencies || ["AGGREGATE"])[0]),
+                    _eventsImports: this._eventsImports(inboundEvents.map(it => it.title)),
+                    _eventHandlers: this._renderEventHandlers(readModel, inboundEvents),
+
+                    //no UUID, as this is fixed in the Projector
+                    _typeImports: typeImports(readModel.fields, "import java.util.UUID")
+                }
+            )
+        }
 
         this.fs.copyTpl(
             this.templatePath(`src/components/QueryableReadModelQueryHandler.kt.tpl`),
@@ -270,7 +294,7 @@ module.exports = class extends Generator {
                 _name: _readmodelTitle(readModel.title),
                 //for now take first aggregate
                 _aggregate: _aggregateTitle((readModel.aggregateDependencies || ["AGGREGATE"])[0]),
-
+                _query: this._repositoryQuery(readModel),
                 _typeImports: typeImports(readModel.fields)
 
             }
@@ -281,6 +305,8 @@ module.exports = class extends Generator {
             this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${slice}/${_readmodelTitle(readModel.title)}.kt`),
             {
                 _slice: slice,
+                _data: this._readModelData(readModel),
+                _queryElement: this._readModelQueryElement(readModel),
                 _rootPackageName: this.givenAnswers.rootPackageName,
                 _name: _readmodelTitle(readModel.title),
                 //for now take first aggregate
@@ -301,7 +327,7 @@ module.exports = class extends Generator {
 @EventHandler
 fun on(event: ${_eventTitle(it.title)}) {
     //throws exception if not available (adjust logic)
-    val entity = this.repository.findById(event.aggregateId).get()
+    val entity = this.repository.findById(event.aggregateId).orElse(${_readmodelTitle(readModel.title)}Entity())
     entity.apply {
         ${variableAssignments(readModel.fields, "event", it, "\n")}
     }.also { this.repository.save(it) }
@@ -334,11 +360,14 @@ fun on(event: ${_eventTitle(it.title)}) {
                     _command: _commandTitle(command.title),
                     _controller: capitalizeFirstCharacter(title),
                     _typeImports: typeImports(command.fields),
-                    _endpoint: this._generatePostRestCall(title, VariablesGenerator.generateRestParamInvocation(
+                    _debugendpoint: this._generateDebugPostRestCall(title, VariablesGenerator.generateRestParamInvocation(
                         command.fields
                     ), _commandTitle(command.title), VariablesGenerator.generateInvocation(
                         command.fields
-                    ))
+                    )),
+                    _payload: ClassesGenerator.generateDataClass(_sliceSpecificClassTitle(sliceName, "Payload"), command.fields),
+                    _endpoint: this._generatePostRestCall(title, _commandTitle(command.title),
+                        variableAssignments(command.fields, "payload", command, ",\n", "="))
                 }
             )
         })
@@ -356,7 +385,7 @@ fun on(event: ${_eventTitle(it.title)}) {
                     _endpoint: this._generateGetRestCall(title, VariablesGenerator.generateRestParamInvocation(
                         //only provide aggregateId (so that proper imports are generated)
                         readmodel.fields?.filter(item => item.name === "aggregateId")
-                    ), _readmodelTitle(readmodel.title))
+                    ), readmodel)
                 }
             )
         })
@@ -364,21 +393,49 @@ fun on(event: ${_eventTitle(it.title)}) {
 
     }
 
-    _generatePostRestCall(slice, restVariables, command, variables) {
+    _readModelData(readModel) {
+        if (readModel?.listElement) {
+            return `val data: List<${_readmodelTitle(readModel.title)}Entity>`
+        } else {
+            return `val data: ${_readmodelTitle(readModel.title)}Entity`
+        }
+    }
+
+    _generateDebugPostRestCall(slice, restVariables, command, variables) {
         return `
-    @PostMapping("${slice}")
-    fun processCommand(${restVariables}) {
+    @PostMapping("/debug/${slice}")
+    fun processDebugCommand(${restVariables}) {
         commandGateway.send<${command}>(${command}(${variables}))
     }
     `
     }
 
-    _generateGetRestCall(slice, restVariables, readModel) {
+    _generatePostRestCall(slice, command, variableAssignments) {
+        return `
+       @PostMapping("/${slice}/{aggregateId}")
+    fun processCommand(
+        @PathVariable("aggregateId") aggregateId: UUID,
+        @RequestBody payload: ${_sliceSpecificClassTitle(slice, "Payload")}
+    ) {
+         commandGateway.send<${command}>(${command}(${variableAssignments}))
+        }
+       `
+    }
 
+    _generateGetRestCall(slice, restVariables, readModel) {
+        var readModelTitle = _readmodelTitle(readModel.title)
+        if (readModel.listElement ?? false) {
         return `@GetMapping("/${slice}")
-    fun findReadModel(${restVariables}):${readModel} {
-     return queryGateway.query(${readModel}Query(aggregateId), ${readModel}::class.java).get()    }
+           fun findReadModel():${readModelTitle} {
+            return queryGateway.query(${readModelTitle}Query(), ${readModelTitle}::class.java).get()    }
+                 `
+        } else {
+
+            return `@GetMapping("/${slice}")
+    fun findReadModel(${restVariables}):${readModelTitle} {
+     return queryGateway.query(${readModelTitle}Query(aggregateId), ${readModelTitle}::class.java).get()    }
       `
+        }
 
     }
 
@@ -520,62 +577,6 @@ class VariablesGenerator {
     }
 }
 
-const typeMapping = (fieldType, fieldCardinality) => {
-    var fieldType;
-    switch (fieldType?.toLowerCase()) {
-        case "string":
-            fieldType = "String";
-            break
-        case "double":
-            fieldType = "Double";
-            break
-        case "long":
-            fieldType = "Long";
-            break
-        case "boolean":
-            fieldType = "Boolean";
-            break
-        case "date":
-            fieldType = "LocalDate";
-            break
-        case "uuid":
-            fieldType = "UUID";
-            break
-        default:
-            fieldType = "String";
-            break
-    }
-    if (fieldCardinality?.toLowerCase() === "list") {
-        return `List<${fieldType}>`
-    } else {
-        return fieldType
-    }
-
-}
-
-const typeImports = (fields) => {
-    if (!fields || fields.length === 0) {
-        return []
-    }
-    var imports = fields?.map((field) => {
-        switch (field.type?.toLowerCase()) {
-            case "date":
-                return ["import java.time.LocalDate", "import org.springframework.format.annotation.DateTimeFormat"]
-            case "uuid":
-                return ["import java.util.UUID"]
-            default:
-                return []
-        }
-        switch (field.cardinality?.toLowerCase()) {
-            case "LIST":
-                return ["java.util.List"]
-            default:
-                return []
-        }
-    })
-    return Array.from([...new Set(imports?.flat() ?? [])]).flat().join(";\n")
-
-}
 
 const invocation = (type, fields) => {
     return `new ${type}(${fields.map((it) => variableNameOrMapping(it)).filter(it => it).join(",")})`

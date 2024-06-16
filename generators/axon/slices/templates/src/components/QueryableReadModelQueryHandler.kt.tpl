@@ -12,7 +12,7 @@ class <%= _name%>QueryHandler(private val repository:<%-_name%>Repository) {
 
   @QueryHandler
   fun handleQuery(query: <%-_name%>Query): <%-_name%>? {
-      return repository.findById(query.aggregateId).orElse(null)
+      <%- _query%>
   }
 
 }

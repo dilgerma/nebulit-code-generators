@@ -8,9 +8,11 @@ import org.hibernate.annotations.JdbcTypeCode
 import java.sql.Types
 <%= _typeImports %>
 
-data class <%-_name%>Query(val aggregateId: UUID)
+<%-_queryElement %>
 
 @Entity
-class <%-_name%> {
+class <%-_name%>Entity {
 	<%- _entityFields %>
 }
+
+data class <%-_name%>(<%- _data %>)

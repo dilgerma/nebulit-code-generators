@@ -34,6 +34,8 @@ module.exports = class extends Generator {
     }
 
     _writeAggregates(aggregate) {
+        var fields = aggregate?.fields?.filter(it => it.name !== "aggregateId")
+
         this.fs.copyTpl(
             this.templatePath(`src/components/Aggregate.kt.tpl`),
             this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain/${_aggregateTitle(aggregate.title)}.kt`),
@@ -41,9 +43,10 @@ module.exports = class extends Generator {
                 _rootPackageName: this.givenAnswers.rootPackageName,
                 _name: _aggregateTitle(aggregate.title),
                 _fields: VariablesGenerator.generateVariables(
-                    aggregate.fields
+                    //aggregate Id is rendered anyways. for this case just filter it
+                    fields
                 ),
-                _typeImports: typeImports(aggregate.fields)
+                _typeImports: typeImports(fields)
 
             }
         )
