@@ -18,10 +18,8 @@ class <%= _controller%>Ressource(private var commandGateway: CommandGateway) {
 
     var logger = KotlinLogging.logger {}
 
-    @CrossOrigin
     <%-_debugendpoint%>
 
-    @CrossOrigin
     <%-_endpoint%>
 
 }

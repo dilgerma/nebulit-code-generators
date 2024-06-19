@@ -30,7 +30,6 @@ module.exports = class extends Generator {
     }
 
     writing() {
-
         this._writeReactSkeleton();
         this.composeWith(require.resolve('../aggregates'), {
             answers: this.answers,

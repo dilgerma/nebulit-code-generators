@@ -403,6 +403,7 @@ fun on(event: ${_eventTitle(it.title)}) {
 
     _generateDebugPostRestCall(slice, restVariables, command, variables) {
         return `
+    @CrossOrigin
     @PostMapping("/debug/${slice}")
     fun processDebugCommand(${restVariables}) {
         commandGateway.send<${command}>(${command}(${variables}))
@@ -412,6 +413,7 @@ fun on(event: ${_eventTitle(it.title)}) {
 
     _generatePostRestCall(slice, command, variableAssignments) {
         return `
+       @CrossOrigin
        @PostMapping("/${slice}/{aggregateId}")
     fun processCommand(
         @PathVariable("aggregateId") aggregateId: UUID,

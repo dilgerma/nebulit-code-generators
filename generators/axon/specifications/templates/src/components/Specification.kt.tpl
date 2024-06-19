@@ -1,7 +1,7 @@
 import <%= _rootPackageName%>.common.Event
 import <%= _rootPackageName%>.common.support.RandomData
 import <%= _rootPackageName%>.domain.<%=_aggregate%>
-import de.nebulit.common.CommandException
+import <%= _rootPackageName%>.common.CommandException
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.jupiter.api.BeforeEach
