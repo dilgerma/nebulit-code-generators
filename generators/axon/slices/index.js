@@ -196,7 +196,7 @@ module.exports = class extends Generator {
             let liveReport = this.answers.liveReportModels?.includes(readmodel.title)
 
             let sliceEvents = config.slices.flatMap(it => it.events)
-            let inboundEvents = readmodel.dependencies?.filter(it => it.type === "INBOUND").filter(it => it.elementType === "EVENT").map(it => sliceEvents.find(sliceEvent => it.id === sliceEvent.id))
+            let inboundEvents = readmodel.dependencies?.filter(it => it.type === "INBOUND").filter(it => it.elementType === "EVENT").map(it => sliceEvents.find(sliceEvent => it.id === sliceEvent.id)).filter(it => it)
 
             if (liveReport) {
                 this._writeLiveReportReadModel(title, readmodel, inboundEvents)
@@ -213,7 +213,11 @@ module.exports = class extends Generator {
         if (readModel.listElement ?? false) {
             return `return ${_readmodelTitle(readModel.title)}(repository.findAll())`
         } else {
-            return `return ${_readmodelTitle(readModel.title)}(repository.findById(query.aggregateId).orElse(null))`
+            return `
+            if(!repository.existsById(query.aggregateId)) {
+                return null
+            }
+            return ${_readmodelTitle(readModel.title)}(repository.findById(query.aggregateId).get())`
         }
     }
 
@@ -255,7 +259,7 @@ module.exports = class extends Generator {
         if (readModel.listElement ?? false) {
             return `class ${_readmodelTitle(readModel.title)}Query()`
         } else {
-            return `data class ${_readmodelTitle(readModel.title)}Query(aggregateId:UUID)
+            return `data class ${_readmodelTitle(readModel.title)}Query(val aggregateId:UUID)
 `
         }
     }
@@ -263,6 +267,7 @@ module.exports = class extends Generator {
     _writeQueryableReportReadModel(slice, readModel, inboundEvents) {
 
         let liveReport = this.answers.liveReportModels?.includes(readModel.title)
+
         if (!liveReport) {
             this.fs.copyTpl(
                 this.templatePath(`src/components/QueryableReadModelProjector.kt.tpl`),
@@ -276,7 +281,7 @@ module.exports = class extends Generator {
                     ),
                     //for now take first aggregate
                     _aggregate: _aggregateTitle((readModel.aggregateDependencies || ["AGGREGATE"])[0]),
-                    _eventsImports: this._eventsImports(inboundEvents.map(it => it.title)),
+                    _eventsImports: this._eventsImports(inboundEvents.map(it => it?.title)),
                     _eventHandlers: this._renderEventHandlers(readModel, inboundEvents),
 
                     //no UUID, as this is fixed in the Projector
@@ -405,8 +410,8 @@ fun on(event: ${_eventTitle(it.title)}) {
         return `
     @CrossOrigin
     @PostMapping("/debug/${slice}")
-    fun processDebugCommand(${restVariables}) {
-        commandGateway.send<${command}>(${command}(${variables}))
+    fun processDebugCommand(${restVariables}):CompletableFuture<CommandResult> {
+        return commandGateway.send(${command}(${variables}))
     }
     `
     }
@@ -418,8 +423,8 @@ fun on(event: ${_eventTitle(it.title)}) {
     fun processCommand(
         @PathVariable("aggregateId") aggregateId: UUID,
         @RequestBody payload: ${_sliceSpecificClassTitle(slice, "Payload")}
-    ) {
-         commandGateway.send<${command}>(${command}(${variableAssignments}))
+    ):CompletableFuture<CommandResult> {
+         return commandGateway.send(${command}(${variableAssignments}))
         }
        `
     }
@@ -435,10 +440,17 @@ fun on(event: ${_eventTitle(it.title)}) {
 
     _generateGetRestCall(slice, restVariables, readModel) {
         var readModelTitle = _readmodelTitle(readModel.title)
-        return `@GetMapping("/${slice}")
-           fun findReadModel():${readModelTitle} {
-                ${this._generateQuery(slice, readModel)}.get()  
-           }`
+        if (readModel.listElement) {
+            return `@GetMapping("/${slice}")
+                    fun findReadModel():${readModelTitle} {
+                         return ${this._generateQuery(slice, readModel)}.get()  
+                    }`
+        } else {
+            return `@GetMapping("/${slice}/{aggregateId}")
+                      fun findReadModel(@PathVariable("aggregateId") aggregateId: UUID):${readModelTitle} {
+                           return ${this._generateQuery(slice, readModel)}.get()  
+                      }`
+        }
 
     }
 
@@ -491,14 +503,14 @@ fun on(event: ${_eventTitle(it.title)}) {
 
     }
 
-    _renderCommandInvocation(command,readModel) {
+    _renderCommandInvocation(command, readModel) {
         if (!command || !readModel) {
             return `// TODO implement logic (no readmodel or command defined)`
         }
         return `
          commandGateway.send<${_commandTitle(command.title)}>(
                 ${_commandTitle(command.title)}(
-                    ${variableAssignments(command.fields, "result", readModel, "\n","=" )}
+                    ${variableAssignments(command.fields, "result", readModel, "\n", "=")}
                 )
             )`;
     }

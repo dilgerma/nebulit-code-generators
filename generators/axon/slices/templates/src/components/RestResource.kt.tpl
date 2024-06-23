@@ -9,7 +9,11 @@ import org.springframework.web.bind.annotation.RestController
 import mu.KotlinLogging
 import org.axonframework.commandhandling.gateway.CommandGateway
 import <%= _rootPackageName%>.domain.commands.<%=_slice%>.<%- _command%>
+import <%= _rootPackageName%>.common.CommandResult
+
 <%= _typeImports %>
+import java.util.concurrent.CompletableFuture
+
 
 <%-_payload%>
 

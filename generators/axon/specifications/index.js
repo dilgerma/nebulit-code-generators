@@ -3,6 +3,8 @@ var chalk = require('chalk');
 var slugify = require('slugify')
 const {v4: uuidv4} = require('uuid');
 const {_eventTitle, _readmodelTitle, _commandTitle, _aggregateTitle} = require("../../common/util/naming");
+const {findSlice} = require("../../common/util/config");
+const {lowercaseFirstCharacter} = require("../../common/util/util");
 
 
 function _sliceTitle(title) {
@@ -55,11 +57,6 @@ module.exports = class extends Generator {
             var when = specification.when?.[0] ?? []
             var then = specification.then
 
-            if (then.some(it => it.type === "SPEC_READMODEL")) {
-                //for now only result events supported
-                return
-            }
-
             var allElements = given.concat(when).concat(then);
             var allFields = allElements.flatMap((item) => item.fields)
             var _elementImports = generateImports(this.givenAnswers.rootPackageName, title, allElements)
@@ -68,33 +65,118 @@ module.exports = class extends Generator {
             var defaults = {
                 "aggregateId": aggregateId
             }
-            this.fs.copyTpl(
-                this.templatePath(`src/components/Specification.kt.tpl`),
-                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/test/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${specificationName}.kt`),
-                {
-                    _slice: title,
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _name: specificationName,
-                    _elementImports: _elementImports,
-                    _typeImports: _typeImports,
-                    _given: renderGiven(given, defaults),
-                    _when: renderWhen(when, then, defaults),
-                    _then: renderThen(when, then, defaults),
-                    _thenExpectations: renderThenExpectation(when, then, defaults),
-                    // take first aggregate
-                    _aggregate: _aggregateTitle((slice.aggregates || [])[0]),
-                    _aggregateId: aggregateId
+            if (then.some(it => it.type === "SPEC_READMODEL")) {
 
-                }
-            )
+                var events = given?.map(it => {
+                    return config.slices.flatMap(it => it.events).find(item => item.id === it.linkedId)
+                }).map(it => it)
+
+                var readModel = then.find(it => it.type === "SPEC_READMODEL")
+
+
+                var commands = events.flatMap(it => it.dependencies).filter(it => it.type === "INBOUND").filter(it => it.elementType === "COMMAND").map(it => config.slices.flatMap(item => item.commands).find(item => item.id === it.id)).filter(it => it)
+
+                var _commandImports = this._commandImports(this.givenAnswers.rootPackageName, commands)
+                var _queryImports = this._queryImports(title, this.givenAnswers.rootPackageName, _readmodelTitle(readModel.title))
+
+                //for now only result events supported
+                this.fs.copyTpl(
+                    this.templatePath(`src/components/ReadModelSpecification.kt.tpl`),
+                    this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/test/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/integration/${specificationName}.kt`),
+                    {
+                        _slice: title,
+                        _rootPackageName: this.givenAnswers.rootPackageName,
+                        _name: specificationName,
+                        _elementImports: _elementImports,
+                        _commandImports: _commandImports,
+                        _queryImports: _queryImports,
+                        _typeImports: _typeImports,
+                        _given: this._renderReadModelGiven(commands),
+                        _then: this._renderReadModelThen(commands, then, defaults),
+                        // take first aggregate
+                        _aggregate: _aggregateTitle((slice.aggregates || [])[0]),
+                        _aggregateId: aggregateId
+
+                    }
+                )
+            } else {
+                this.fs.copyTpl(
+                    this.templatePath(`src/components/Specification.kt.tpl`),
+                    this.destinationPath(`${slugify(this.givenAnswers?.appName)}/src/test/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/${title}/${specificationName}.kt`),
+                    {
+                        _slice: title,
+                        _rootPackageName: this.givenAnswers.rootPackageName,
+                        _name: specificationName,
+                        _elementImports: _elementImports,
+                        _typeImports: _typeImports,
+                        _given: renderGiven(given, defaults),
+                        _when: renderWhen(when, then, defaults),
+                        _then: renderThen(when, then, defaults),
+                        _thenExpectations: renderThenExpectation(when, then, defaults),
+                        // take first aggregate
+                        _aggregate: _aggregateTitle((slice.aggregates || [])[0]),
+                        _aggregateId: aggregateId
+
+                    }
+                )
+            }
         })
 
+    }
 
+    _commandImports(rootPackage, commands) {
+        return commands.map(it => `import ${rootPackage}.domain.commands.${_sliceTitle(this._findSliceByCommandId(it.id)?.title)}.${_commandTitle(it.title)}`).join("\n")
+    }
+
+    _queryImports(slice, rootPackage, readModel) {
+        return `import ${rootPackage}.${slice}.${readModel}Query
+ import ${rootPackage}.${slice}.${readModel}`
+    }
+
+    _renderReadModelGiven(commands) {
+
+        return commands.map(it => `
+       
+        val aggregateId = UUID.randomUUID()
+        
+        var ${lowercaseFirstCharacter(_commandTitle(it.title))} = RandomData.newInstance<${_commandTitle(it.title)}>{
+            this.aggregateId = aggregateId
+        }
+       
+        var ${lowercaseFirstCharacter(_commandTitle(it.title))}Result = commandGateway.sendAndWait<CommandResult>(${lowercaseFirstCharacter(_commandTitle(it.title))})
+        `).join("\n")
+    }
+
+
+    _renderReadModelThen(commands, then) {
+        return then.map(it => `
+        awaitUntilAssserted {
+            var readModel = ${this._generateQuery(it)}
+            ${commands.map(command => {
+                return `assertThat(${lowercaseFirstCharacter(_commandTitle(command.title))}Result.identifier).isEqualTo(aggregateId)`
+                
+        }).join("\n")}
+            TODO("implement condition")
+        }
+        `)
+    }
+
+    _generateQuery(readModel) {
+        var readModelTitle = _readmodelTitle(readModel.title)
+        if (readModel.listElement ?? false) {
+            return `queryGateway.query(${readModelTitle}Query(), ${readModelTitle}::class.java)`
+        } else {
+            return `queryGateway.query(${readModelTitle}Query(aggregateId), ${readModelTitle}::class.java)`
+        }
     }
 
 
     _findSlice(sliceName) {
         return config.slices.find((item) => item.title === sliceName)
+    }
+
+    _findSliceByCommandId(id) {
+        return config.slices.filter(it => it.commands.some(item => item.id === id))[0]
     }
 
 
@@ -193,7 +275,7 @@ function renderThen(whenList, thenList, defaults) {
 
     if (thenList.some((error) => error.type === "SPEC_ERROR")) {
         // in case error render erro
-          return `.expectException(CommandException::class.java)`
+        return `.expectException(CommandException::class.java)`
     } else {
         return `.expectSuccessfulHandlerExecution()
                 .expectEvents(*expectedEvents.toTypedArray())`

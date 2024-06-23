@@ -36,6 +36,10 @@ abstract class BaseIntegrationTest {
 
 }
 
-fun waitForAssertion(block: () -> Unit, duration: Duration = Duration.ofSeconds(15)) {
-    Awaitility.await().atLeast(duration).untilAsserted(block)
-}
+fun awaitUntilAssserted(fn: () -> Unit) {
+       Awaitility.await().pollInSameThread()
+           .atMost(Duration.ofSeconds(15))
+           .untilAsserted {
+               fn()
+           }
+   }

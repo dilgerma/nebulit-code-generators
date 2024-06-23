@@ -1,3 +1,5 @@
+package <%= _rootPackageName%>.<%=_slice%>
+
 import <%= _rootPackageName%>.common.Event
 import <%= _rootPackageName%>.common.support.RandomData
 import <%= _rootPackageName%>.domain.<%=_aggregate%>
