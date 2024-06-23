@@ -1,24 +1,17 @@
 var Generator = require('yeoman-generator');
-var {findSlice, buildLink} = require('../../common/util/config')
+var {findSlice, buildLink, findSliceByCommandId} = require('../../common/util/config')
 var slugify = require('slugify')
 var {
     _screenTitle,
-    _aggregateTitle,
-    _eventTitle,
     _sliceTitle,
     _commandTitle,
-    _readmodelTitle, _processorTitle
+    _readmodelTitle
 } = require('../../common/util/naming')
-var {capitalizeFirstCharacter, uniqBy, lowercaseFirstCharacter} = require('../../common/util/util')
+var {capitalizeFirstCharacter} = require('../../common/util/util')
 const {
     variables,
-    variableAssignments,
-    renderUnionTypes,
-    renderImports,
-    variablesDefaults
 } = require("../common/domain");
 const {parseSchema} = require("../../common/util/jsonschema");
-const {renderSwitchStatement, renderLoadFromStream} = require("../common/tools");
 
 
 let config = {}
@@ -33,93 +26,60 @@ module.exports = class extends Generator {
 
     }
 
-    async prompting() {
-        var aggregates = config.aggregates?.map((item, idx) => item.title).sort()
-        this.answers = await this.prompt([
-            {
-                type: 'checkbox',
-                name: 'slices',
-                choices: config.slices.map(it => it.title),
-                loop: false,
-                message: 'Which Slice should be generated?'
-            }])
 
-    }
-
-
-    writeScreensAndProcessors() {
-        var slices = this.answers.slices
+    writeScreens() {
+        var slices = this.givenAnswers.slices
         slices.forEach((slice) => {
             this._writeScreen(slice)
-            this._writeProcessorView(slice)
-            //this._writeProcessor(slice)
         });
     }
 
-    _writeProcessor(sliceName) {
-        var slice = findSlice(config, sliceName)
-        var processors = slice.processors
-        processors.forEach((processor) => {
-            var title = _processorTitle(processor.title)
-            var commands = processor?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND")
-            var readmodels = processor?.dependencies?.filter(dep => dep.type === "INBOUND").filter(it => it.elementType === "READMODEL")
-
-            //import {initialState as , loadFromStream} from '@/app/components/slices/inventory/<!%-_readModelName%>';
-
-            this.fs.copyTpl(
-                this.templatePath('processor.ts.tpl'),
-                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${title}.ts`),
-                {
-                    _name: title,
-                    _pageName: capitalizeFirstCharacter(title),
-                }
-            )
-        })
-
-    }
-
-    _writeProcessorView(sliceName) {
-        var slice = findSlice(config, sliceName)
-        var processors = slice.processors
-        processors.forEach((processor) => {
-            var title = _processorTitle(processor.title)
-            var commands = processor?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND")
-
-
-            this.fs.copyTpl(
-                this.templatePath('processorView.tsx.tpl'),
-                this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${title}.tsx`),
-                {
-                    _name: title,
-                    _pageName: capitalizeFirstCharacter(title),
-                }
-            )
-
-        })
-
-    }
 
     _writeScreen(sliceName) {
         var slice = findSlice(config, sliceName)
-        var screens = slice.screens
-        var processors = slice.processors
+        var screens = this._findScreensForSlice(slice)
 
         screens.forEach((screen) => {
 
             var title = _screenTitle(screen.title)
 
+            var commands = screen?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND").map((it) => {
+                return config.slices.flatMap(item => item.commands).find(item => item.id === it.id)
+            })
 
-            var commands = screen?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND")
+            var readModels = screen?.dependencies?.filter(dep => dep.type === "INBOUND").filter(it => it.elementType === "READMODEL").map((it) => {
+                return config.slices.flatMap(item => item.readmodels).find(item => item.id === it.id)
+            })
 
-            var commandHandlerImports = commands.map(command => `import {handle${_commandTitle(command.title)}} from './${_commandTitle(command.title)}'`).join("\n")
+            commands.forEach((command) => {
+                this._writeCommand(slice, command)
+                this._writeCommandSchema(slice, command)
+            })
+            readModels.forEach((readModel) => {
+                this._writeReadModel(slice, readModel)
+            })
+
             var schemaImports = commands.map(command => `import ${_commandTitle(command.title)}Schema from './${_commandTitle(command.title)}.json'`).join("\n")
 
-            var handlerMapping = `[${commands.map((command) => {
+            var readModelImports = readModels.map(readModel => `import ${_readmodelTitle(readModel.title)} from './${_readmodelTitle(readModel.title)}'`).join("\n")
+
+
+            var commandMapping = `[${commands.map((command) => {
+                var commandSlice = findSliceByCommandId(config, command.id)
                 return `{
                     "command":"${_commandTitle(command.title)}",
-                    "handler": handle${_commandTitle(command.title)} ,
+                    "endpoint": "/${_sliceTitle(commandSlice.title)}/{aggregateId}",
                     "schema": ${_commandTitle(command.title) + "Schema"}
                 }`
+            }).join(",")}]`
+
+            var readModelMapping = `[${readModels.map((readModel) => {
+                return `{
+                                "readModel":"${_readmodelTitle(readModel.title)}",
+                                "endpoint": "${this._readModelEndpoint(sliceName, readModel)}" ,
+                                "readModelView" : ${_readmodelTitle(readModel.title)}
+                                
+                            }`
             }).join(",")}]`
 
             this.fs.copyTpl(
@@ -129,63 +89,16 @@ module.exports = class extends Generator {
                     _name: title,
                     _pageName: capitalizeFirstCharacter(title),
                     _commands: commands.map((it) => `"${_sliceTitle(sliceName)}/${_commandTitle(it.title)}"`).join(","),
-                    _commandHandlerImports: commandHandlerImports,
                     _schemaImports: schemaImports,
-                    _handlerMapping: handlerMapping
+                    _commandMapping: commandMapping,
+                    _readModelMapping: readModelMapping,
+                    _readModelImports: readModelImports
 
                 }
             )
         })
 
 
-    }
-
-    processSlices() {
-        var slices = this.answers.slices.map(slice => findSlice(config, slice))
-
-        slices.forEach((slice) => {
-            this._writeCommands(slice)
-            this._writeReadModels(slice, config.slices.flatMap(it => it.events))
-        });
-    }
-
-    _writeReadModels(slice, allEvents) {
-        var readModels = slice?.readmodels
-        if (!readModels || readModels.length == 0) {
-            return
-        }
-        readModels.filter(readModel => readModel).forEach((readModel) => {
-            this._writeReadModel(slice, readModel, allEvents)
-        })
-    }
-
-    _writeReadModel(slice, readmodel, allEvents) {
-        var dependencyEvents = readmodel.dependencies.filter(it => it.type === "INBOUND" && it.elementType === "EVENT")
-
-        var events = allEvents.filter(it => dependencyEvents.find(item => item.id === it.id) !== undefined).filter(it => it)
-
-        var aggregateEventImports = readmodel.aggregateDependencies?.map(depdendency => {
-            return `import { ${_aggregateTitle(depdendency)}Events } from "@/app/core/events/${_aggregateTitle(depdendency)}/${_aggregateTitle(depdendency)}Events"`;
-        }).join("\n")
-
-        var aggregateEvents = readmodel.aggregateDependencies?.map(aggregate => `${_aggregateTitle(aggregate)}Events`).join("|")
-
-        this.fs.copyTpl(
-            this.templatePath(`readmodel.ts.tpl`),
-            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${_readmodelTitle(readmodel?.title)}.ts`),
-            {
-                _readModelName: _readmodelTitle(readmodel.title),
-                _aggregateEventImports: aggregateEventImports,
-                _fields: variables([readmodel]),
-                _fieldDefaults: variablesDefaults([readmodel]),
-                _aggregateEvents: aggregateEvents,
-                _switchStatement: renderSwitchStatement(readmodel, "type", "state", events, (readmodel, event) => {
-                    return variableAssignments(readmodel, "data", event, ",\n", ":")
-                }),
-                _loadFromStream: renderLoadFromStream(readmodel)
-
-            }
-        )
     }
 
     _writeCommands(slice) {
@@ -196,6 +109,16 @@ module.exports = class extends Generator {
         commands.filter(command => command).forEach((command) => {
             this._writeCommand(slice, command)
             this._writeCommandSchema(slice, command)
+        })
+    }
+
+    _writeReadModels(slice) {
+        var readModels = slice?.readmodels
+        if (!readModels || readModels.length == 0) {
+            return
+        }
+        readModels.filter(readModel => readModel).forEach((readModel) => {
+            this._writeCommand(slice, readModel)
         })
     }
 
@@ -211,106 +134,42 @@ module.exports = class extends Generator {
 
     _writeCommand(slice, command) {
 
-        let eventsDependencies = command.dependencies.filter((it) => it.type === "OUTBOUND")
-
-        var events = config.slices.flatMap(slice => slice.events).filter(event => eventsDependencies.map(it => it.id).includes(event.id))
-
-        var eventsImports = Array.from(new Set(events.filter(event => event.aggregate).map(event => renderImports(`@/app/components/events/${_aggregateTitle(event.aggregate)}`, [`${_eventTitle(event.title)}`])))).join("\n")
-
-
-        var aggregates = Array.from(new Set(events.filter(it => it.aggregate).map(it => it.aggregate)))
-
-        var aggregateEventImport = aggregates.map(aggregate => renderImports(`@/app/components/events/${_aggregateTitle(aggregate)}`, [`${_aggregateTitle(aggregate)}Events`])).join("\n")
-
-        var aggregateImports = aggregates.map(aggregate => renderImports(`@/app/components/domain`, [`${_aggregateTitle(aggregate)}`])).join("\n")
 
         this.fs.copyTpl(
             this.templatePath(`command.ts.tpl`),
             this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${_commandTitle(command?.title)}.ts`),
             {
-                _aggregateEventImports: aggregateEventImport,
-                _aggregateImports: aggregateImports,
-                _eventImports: eventsImports,
                 _commandName: _commandTitle(command.title),
                 _commandFields: variables([command]),
-                _resultEventNames: Array.from(new Set(events.map(event => _eventTitle(event.title)))),
-                _handlePerAggregate: this.renderCommandHandler(aggregates, command),
-                _cartAggregateHandlers: this.renderEmmetCommandHandler(aggregates),
-                _cartAggregateHandlerImports: this.renderAggregateHandlerImports(aggregates),
-                _handleCommand: this.handleCommand(command, aggregates)
             }
         )
 
 
     }
 
-    handleCommand(command, aggregates) {
-        if (!command) {
-            return
-        }
-        return `
-        export const handle${_commandTitle(command?.title)} = async (command:${_commandTitle(command.title)}): Promise<any> => {
-        
-            ${aggregates.map(aggregate => `return await ${lowercaseFirstCharacter(_aggregateTitle(aggregate))}Handler(
-                                findEventStore(),
-                                command.data.aggregateId,
-                                (state:${_aggregateTitle(aggregate)}) => _handle${_aggregateTitle(aggregate)}(command, state)`)
-        })
-        }
-        `;
+    _writeReadModel(slice, readModel) {
+        this.fs.copyTpl(
+            this.templatePath(`readmodel.ts.tpl`),
+            this.destinationPath(`${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${_readmodelTitle(readModel?.title)}.tsx`),
+            {
+                _readModelName: _readmodelTitle(readModel.title),
+                _endpoint: this._readModelEndpoint(slice.title, readModel)
+            }
+        )
+
+
     }
 
-    /**
-     * _handle(command) {
-     *     return [event, event, event]
-     * }
-     */
-    renderCommandHandler(aggregateTitles, command) {
-        let dependenciesForEvents = command?.dependencies ?? [].filter((it) => it.type === "OUTBOUND")
-
-        var events = config.slices.flatMap(slice => slice.events).filter(event => dependenciesForEvents.map(it => it.id).includes(event.id))
-
-        if (events?.length === 0) {
-            return ""
-        }
-
-        return aggregateTitles.map(aggregate => {
-            return `const _handle${_aggregateTitle(aggregate)} = (command: ${_commandTitle(command.title)}, state: ${_aggregateTitle(aggregate)} ):${_aggregateTitle(aggregate)}Events[] => {
-                return ${this.renderResultEvents(command, events)}
-                }
-                    `
-        }).join("\n");
+    _readModelEndpoint(sliceName, readModel) {
+        return `${readModel.listElement ? "/" + _sliceTitle(sliceName) : "/" + _sliceTitle(sliceName) + "/{aggregateId}"}`
     }
 
-    renderEmmetCommandHandler(aggregateTitles) {
-        if (!aggregateTitles || aggregateTitles.length === 0) {
-            return ""
-        }
+    _findScreensForSlice(slice) {
+        var screens = slice.screens
 
-        return aggregateTitles.map((aggregate) => `const ${lowercaseFirstCharacter(_aggregateTitle(aggregate))}Handler = CommandHandler(${lowercaseFirstCharacter(_aggregateTitle(aggregate))}Evolve, ${lowercaseFirstCharacter(_aggregateTitle(aggregate))}InitialState, ${lowercaseFirstCharacter(_aggregateTitle(aggregate))}MapToStreamId)`).join("\n")
-    }
+        var inboundScreens = slice.readmodels.flatMap(it => it.dependencies).filter(it => it.type === "OUTBOUND" && it.elementType === "SCREEN").map(it => config.slices.flatMap(it => it.screens).find(item => item.id === it.id))
 
-    renderAggregateHandlerImports(aggregateTitles) {
-        if (!aggregateTitles || aggregateTitles.length === 0) {
-            return ""
-        }
-        return aggregateTitles.map((aggregateTitle) => `import {evolve as ${lowercaseFirstCharacter(_aggregateTitle(aggregateTitle))}Evolve, initialState as ${lowercaseFirstCharacter(_aggregateTitle(aggregateTitle))}InitialState, mapToStreamId as ${lowercaseFirstCharacter(_aggregateTitle(aggregateTitle))}MapToStreamId} from "@/app/components/domain/${_aggregateTitle(aggregateTitle)}"`).join("\n")
-    }
-
-    renderResultEvents(command, events) {
-        if (command === undefined || events === undefined) {
-            return ""
-        }
-        var resultEventsFromCommand = uniqBy(events, (event) => event.title).map(event => {
-            return `{
-                type: '${_eventTitle(event.title)}',
-                data: {
-                    ${variableAssignments(event, "command.data", command, ",\n", ":")}
-                }
-            }`
-        });
-        return `[${resultEventsFromCommand.join(",")}]`
-
+        return screens.concat(inboundScreens).filter(it => it)
     }
 
 }

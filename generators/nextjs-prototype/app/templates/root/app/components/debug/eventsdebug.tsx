@@ -1,8 +1,6 @@
 "use client"
 import {useState, useEffect} from "react";
 import Draggable from "react-draggable";
-import {debugAllStreams, findEventStore} from "../../core/infrastructure/inmemoryEventstore";
-import {EventEnvelope} from "@event-driven-io/emmett";
 import {v4} from "uuid"
 
 function CopyToClipboard(id: any) {
@@ -24,16 +22,27 @@ export function DebugEvents(props: any) {
 
     //Map<string, EventEnvelope[]>
     var [showEvents, setShowEvents] = useState(true)
-    const [events, setEvents] = useState<{ [k: string]: EventEnvelope[] }>({})
+    const [events, setEvents] = useState<[]>([])
     const [stream, setStream] = useState<string | undefined>("")
     const [currentUUID, setCurrentUUID] = useState<string>()
+    const [aggregateId, setAggregateId] = useState<string | undefined>()
 
     useEffect(() => {
         const timer = setInterval((cartItems) => {
-            setEvents(Object.fromEntries(debugAllStreams()))
+            if (aggregateId) {
+                fetchEvents(aggregateId).then((events) => {
+                    setEvents(events)
+                })
+            }
         }, 2000);
         return () => clearInterval(timer);
-    }, []);
+    }, [aggregateId]);
+
+    function applyAggregateId(aggregateId: string) {
+        setAggregateId(aggregateId)
+        if (props.applyAggregateIdFn)
+            props?.applyAggregateIdFn(aggregateId)
+    }
 
     return <Draggable>
         <div className={"debug"}>
@@ -42,35 +51,36 @@ export function DebugEvents(props: any) {
                        onChange={() => setShowEvents(!showEvents)}/>
                 <div id={"uuid"}>{currentUUID}</div>
                 <button onClick={() => setCurrentUUID(v4())} className={"button"}>UUID</button>
-                <div onClick={() => CopyToClipboard("uuid")} className={"button"}><i className="fa-regular fa-copy"></i></div>
+                <div onClick={() => CopyToClipboard("uuid")} className={"button"}><i className="fa-regular fa-copy"></i>
+                </div>
             </div>
             <hr/>
             <div>
-                <select onChange={(evt) => {
-                    setStream(evt.target.value)
-                }} className={"select"}>
-                    <option value={""}>Bitte wählen</option>
-                    {Object.keys(events).map((item) => {
-                        return <option value={item}>{item}</option>
-                    })}
-                </select>
+                <label>
+                    <span>AggregateId:</span>
+                    <input value={aggregateId} onChange={(evt) => applyAggregateId(evt.target.value)} type={"text"}
+                           className={"input"}/>
+                </label>
             </div>
 
-            {showEvents && stream ?
+            {showEvents ?
 
                 <div>
-                    {events[stream]?.map((item) => {
+                    {events.map((item) => {
+                        <h3 className={"has-text-centered padding"}>{item.type}</h3>
                         return <div>
-                            <h3 className={"has-text-centered padding"}>{item.event.type}</h3>
+                            <div>
+                                <span>Sequence:</span><span>{item.sequenceNumber}</span></div>
+                            <div><span>Type:</span><span>{item.payloadType}</span></div>
                             <pre>
-                                                                               {JSON.stringify(item.event.data, (key, value) =>
+                                                                               {JSON.stringify(item.payload, (key, value) =>
                                                                                        typeof value === 'bigint'
                                                                                            ? value.toString()
                                                                                            : value
                                                                                    , 2)}
                                 <details>
                                     <summary>Metadaten</summary>
-                                    {JSON.stringify(item.metadata, (key, value) =>
+                                    {JSON.stringify(item.metaData, (key, value) =>
                                             typeof value === 'bigint'
                                                 ? value.toString()
                                                 : value
@@ -85,4 +95,27 @@ export function DebugEvents(props: any) {
                 </div> : <span/>}
         </div>
     </Draggable>
+
+
+}
+
+async function fetchEvents(aggregateId: string) {
+    try {
+        const response = await fetch(`http://localhost:8080/internal/debug/events/${aggregateId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data; // This will be a list of objects
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return null;
+    }
 }

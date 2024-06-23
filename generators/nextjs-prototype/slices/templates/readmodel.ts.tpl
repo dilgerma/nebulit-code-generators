@@ -1,21 +1,12 @@
-import type { Event, ReadStreamResult } from '@event-driven-io/emmett';
-import {findEventStore} from '@/app/core/infrastructure/inmemoryEventstore';
-<%-_aggregateEventImports%>
+"use client"
+// @ts-ignore
+import DataTable from '@/app/components/commandselection/DataTable';
 
-export type <%-_readModelName%> = {
 
-<%-_fields%>
+export default function <%-_readModelName%>(props: any) {
+
+    return <DataTable aggregateId={props.aggregateId} endpoint={props.endpoint}/>
 }
 
-export const initialState = (): <%-_readModelName%> => {
-    return {
-        <%-_fieldDefaults%>
-    };
-}
 
-export const evolve = (state: <%-_readModelName%>, _eventData: <%=_aggregateEvents%>): <%-_readModelName%> => {
-    const {type, data} = _eventData;
-    <%-_switchStatement%>
-}
 
-<%-_loadFromStream%>

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import mu.KotlinLogging
 import org.axonframework.queryhandling.QueryGateway
+import java.util.concurrent.CompletableFuture
 <%= _typeImports %>
 
 

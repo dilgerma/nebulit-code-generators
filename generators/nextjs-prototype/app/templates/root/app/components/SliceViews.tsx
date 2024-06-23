@@ -1,17 +1,16 @@
 "use client"
 import React from 'react';
 import {useEffect, useState} from "react"
-import {ProcessorSelection, ViewSelection} from '@/app/core/types';
+import {ViewSelection} from '@/app/core/types';
 
 
-export default function SliceViews(props: { views?: ViewSelection[], processors?: ProcessorSelection[] }) {
+export default function SliceViews(props: { aggregateId:string|undefined, views?: ViewSelection[]}) {
 
     const [selectedView, setSelectedView] = useState<ViewSelection>()
-    const [selectedProcessor, setSelectedProcessor] = useState<ProcessorSelection>()
 
 
     const viewToRender = (): React.FC<any> | undefined => {
-        return selectedView ? selectedView.view : selectedProcessor?.view
+        return selectedView?.commandView
     }
     return (
         <div>
@@ -21,8 +20,8 @@ export default function SliceViews(props: { views?: ViewSelection[], processors?
                     {props?.views?.map((viewSelection) => <li
                         className={selectedView?.viewName == viewSelection.viewName ? "view is-active" : "view"}
                         onClick={() => {
-                            setSelectedProcessor(undefined)
-                            setSelectedView(props.views?.find(it => it.viewName == viewSelection.viewName))}}>
+                            setSelectedView(props.views?.find(it => it.viewName == viewSelection.viewName))
+                        }}>
                         <a>
                             <div>
                                 <div><b>{viewSelection.slice}</b></div>
@@ -32,33 +31,14 @@ export default function SliceViews(props: { views?: ViewSelection[], processors?
                     </li>)}
                 </ul>
             </div>
-            <div className="tabs">
-                <ul>
-                    <li>Processor:</li>
 
-                    {props?.processors?.map((processorSelection) => <li
-                        className={selectedProcessor?.processorName == processorSelection.processorName ? "processor is-active" : "processor"}
-                        onClick={() => {
-                            setSelectedView(undefined)
-                            setSelectedProcessor(props.processors?.find(it => it.processorName == processorSelection.processorName))
-                        }}>
-                            <a>
+            {
+                viewToRender() ? React.createElement(viewToRender()!!,{aggregateId: props?.aggregateId}) : <span/>
+            }
+        </div>
 
-                            <div>
-                            <div><b>{processorSelection.slice}</b></div>
-                            <div>{processorSelection.processorType}</div>
-                        </div>
-                        </a>
-                        </li>)}
-</ul>
-</div>
-{
-    viewToRender() ? React.createElement(viewToRender()!!) : <span/>
-}
-</div>
-
-)
-;
+    )
+        ;
 }
 
 

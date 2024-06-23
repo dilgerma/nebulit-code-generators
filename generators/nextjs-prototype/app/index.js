@@ -20,7 +20,15 @@ module.exports = class extends Generator {
             name: 'appName',
             message: 'Projectname?',
             when: () => !config?.codeGen?.application,
-        }]);
+        },
+            {
+                type: 'checkbox',
+                name: 'slices',
+                choices: config.slices.map(it => it.title),
+                loop: false,
+                message: 'Which Slice should be generated?'
+            }]);
+
     }
 
     setDefaults() {
@@ -39,49 +47,30 @@ module.exports = class extends Generator {
 
     _writeReactSkeleton() {
 
-        var sliceViews = config.slices.flatMap((slice) => {
-            return slice.screens?.map((screen) => {
-                var componentName = _screenTitle(screen.title)
+        var sliceViews = this.answers.slices.flatMap((sliceName) => {
+            var slice = config.slices.find(it => it.title === sliceName)
+            var screens = this._findScreensForSlice(slice)
+
+            return screens?.map((screen) => {
                 return `
                           {
                               "slice":"${_sliceTitle(slice.title)}",
-                              "viewType":"${componentName}",
-                              "viewName" : "${_sliceTitle(slice.title)}/${componentName}",
-                              "view" : ${_sliceTitle(slice.title)}${componentName}
+                              "viewType":"${screen}",
+                              "viewName" : "${_sliceTitle(slice.title)}/${screen}",
+                              "commandView" : ${_sliceTitle(slice.title)}${screen}
                           }`
             })
 
         }).join(",")
 
-        var processorViews = config.slices.flatMap((slice) => {
-            return slice.processors?.map((processor) => {
-                var componentName = _processorTitle(processor.title)
-                return `
-                                 {
-                                     "slice":"${_sliceTitle(slice.title)}",
-                                     "processorType":"${componentName}",
-                                     "processorName" : "${_sliceTitle(slice.title)}/${componentName}",
-                                     "view" : ${_sliceTitle(slice.title)}${componentName}
-                                 }`
-            })
-
-        }).join(",")
-
-        var componentImports = config.slices.flatMap((slice) => {
-            var screens = slice.screens?.map((screen) => {
-                var componentName = _screenTitle(screen.title)
+        var componentImports = this.answers.slices.flatMap((sliceName) => {
+            var slice = config.slices.find(it => it.title === sliceName)
+            var screens = this._findScreensForSlice(slice)
+            return screens?.map((screen) => {
                 var sliceName = _sliceTitle(slice.title)
-                return `import ${sliceName}${componentName} from '@/app/components/slices/${sliceName}/${componentName}';
+                return `import ${sliceName}${screen} from '@/app/components/slices/${sliceName}/${screen}';
                       `
             })
-            var processors = slice.processors?.map((processor) => {
-                var componentName = _processorTitle(processor.title)
-                var sliceName = _sliceTitle(slice.title)
-                return `import ${sliceName}${componentName} from '@/app/components/slices/${sliceName}/${componentName}';
-                                 `
-            })
-
-            return screens.concat(processors)
 
         }).join("\n")
 
@@ -93,7 +82,6 @@ module.exports = class extends Generator {
                 rootPackageName: this.answers.rootPackageName,
                 appName: this.answers.appName,
                 _views: sliceViews,
-                _processors: processorViews,
                 _imports: componentImports
             }
         )
@@ -109,10 +97,14 @@ module.exports = class extends Generator {
     }
 
     end() {
-        this.log(chalk.green('------------'))
-        this.log(chalk.magenta('***---***'))
-        this.log(chalk.blue('Jobs is Done!'))
-        this.log(chalk.green('------------'))
-        this.log(chalk.magenta('***---***'))
+    }
+
+    _findScreensForSlice(slice) {
+        var screenNames = slice.screens.map(it => _screenTitle(it.title))
+
+        var inboundScreens = slice.readmodels.flatMap(it => it.dependencies).filter(it => it.type === "OUTBOUND" && it.elementType === "SCREEN").map(it => _screenTitle(it.title))
+
+        return screenNames.concat(inboundScreens)
     }
 };
+

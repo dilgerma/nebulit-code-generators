@@ -1,6 +1,5 @@
 var Generator = require('yeoman-generator');
 var chalk = require('chalk');
-const {ensureDirSync} = require("fs-extra");
 var slugify = require('slugify')
 const {answers} = require("../app");
 const {
@@ -442,12 +441,12 @@ fun on(event: ${_eventTitle(it.title)}) {
         var readModelTitle = _readmodelTitle(readModel.title)
         if (readModel.listElement) {
             return `@GetMapping("/${slice}")
-                    fun findReadModel():${readModelTitle} {
-                         return ${this._generateQuery(slice, readModel)}.get()  
+                    fun findReadModel():CompleteableFuture<${readModelTitle}> {
+                         return ${this._generateQuery(slice, readModel)}  
                     }`
         } else {
             return `@GetMapping("/${slice}/{aggregateId}")
-                      fun findReadModel(@PathVariable("aggregateId") aggregateId: UUID):${readModelTitle} {
+                      fun findReadModel(@PathVariable("aggregateId") aggregateId: UUID):CompleteableFuture<${readModelTitle}> {
                            return ${this._generateQuery(slice, readModel)}.get()  
                       }`
         }

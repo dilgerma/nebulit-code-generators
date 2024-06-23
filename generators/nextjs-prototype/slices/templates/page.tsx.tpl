@@ -3,8 +3,10 @@ import Head from 'next/head';
 import React from 'react';
 // @ts-ignore
 import {CommandSelection} from '@/app/components/commandselection/CommandSelection';
-<%-_commandHandlerImports%>
+import {ReadModelSelection} from '@/app/components/commandselection/ReadModelSelection';
+
 <%-_schemaImports%>
+<%-_readModelImports%>
 
 export default function <%=_pageName%>(props: any) {
 
@@ -18,7 +20,14 @@ export default function <%=_pageName%>(props: any) {
                     <link rel="icon" href="/favicon.ico"/>
                 </Head>
                 <main>
-                    <CommandSelection commands={<%-_handlerMapping%>}/>
+                    <div className={"columns"}>
+                        <div className={"column"}>
+                            <CommandSelection commands={<%-_commandMapping%>}/>
+                        </div>
+                        <div className={"column"}>
+                            <ReadModelSelection aggregateId={props.aggregateId} readModels={<%-_readModelMapping%>}/>
+                        </div>
+                    </div>
                 </main>
             </div>
         </div>

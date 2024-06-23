@@ -1,5 +1,4 @@
 var Generator = require('yeoman-generator');
-const {ensureDirSync} = require("fs-extra");
 var chalk = require('chalk');
 var slugify = require('slugify')
 
