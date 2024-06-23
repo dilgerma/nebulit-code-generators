@@ -102,9 +102,8 @@ module.exports = class extends Generator {
     _findScreensForSlice(slice) {
         var screenNames = slice.screens.map(it => _screenTitle(it.title))
 
-        var inboundScreens = slice.readmodels.flatMap(it => it.dependencies).filter(it => it.type === "OUTBOUND" && it.elementType === "SCREEN").map(it => _screenTitle(it.title))
-
-        return screenNames.concat(inboundScreens)
+        return screenNames
     }
 };
+
 

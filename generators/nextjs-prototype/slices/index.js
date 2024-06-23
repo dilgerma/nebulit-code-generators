@@ -7,7 +7,7 @@ var {
     _commandTitle,
     _readmodelTitle
 } = require('../../common/util/naming')
-var {capitalizeFirstCharacter} = require('../../common/util/util')
+var {capitalizeFirstCharacter, uniqBy, uniq} = require('../../common/util/util')
 const {
     variables,
 } = require("../common/domain");
@@ -43,13 +43,13 @@ module.exports = class extends Generator {
 
             var title = _screenTitle(screen.title)
 
-            var commands = screen?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND").map((it) => {
+            var commands = uniqBy(screen?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND").map((it) => {
                 return config.slices.flatMap(item => item.commands).find(item => item.id === it.id)
-            })
+            }), (it)=>it.id)
 
-            var readModels = screen?.dependencies?.filter(dep => dep.type === "INBOUND").filter(it => it.elementType === "READMODEL").map((it) => {
+            var readModels = uniq(screen?.dependencies?.filter(dep => dep.type === "INBOUND").filter(it => it.elementType === "READMODEL").map((it) => {
                 return config.slices.flatMap(item => item.readmodels).find(item => item.id === it.id)
-            })
+            }),(it)=>it.id)
 
             commands.forEach((command) => {
                 this._writeCommand(slice, command)
@@ -60,6 +60,7 @@ module.exports = class extends Generator {
             })
 
             var schemaImports = commands.map(command => `import ${_commandTitle(command.title)}Schema from './${_commandTitle(command.title)}.json'`).join("\n")
+
 
             var readModelImports = readModels.map(readModel => `import ${_readmodelTitle(readModel.title)} from './${_readmodelTitle(readModel.title)}'`).join("\n")
 
@@ -167,9 +168,10 @@ module.exports = class extends Generator {
     _findScreensForSlice(slice) {
         var screens = slice.screens
 
-        var inboundScreens = slice.readmodels.flatMap(it => it.dependencies).filter(it => it.type === "OUTBOUND" && it.elementType === "SCREEN").map(it => config.slices.flatMap(it => it.screens).find(item => item.id === it.id))
+        var outboundScreens = slice.readmodels.flatMap(it => it.dependencies).filter(it => it.type === "OUTBOUND" && it.elementType === "SCREEN").map(it => config.slices.flatMap(it => it.screens).find(item => item.id === it.id))
+        var allScreens = screens.concat(outboundScreens).filter(it => it)
 
-        return screens.concat(inboundScreens).filter(it => it)
+        return uniqBy(allScreens, (it)=>it.id)
     }
 
 }

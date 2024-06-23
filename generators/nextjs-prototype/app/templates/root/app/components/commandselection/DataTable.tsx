@@ -12,6 +12,8 @@ const DataTable = (props: any) => {
         fetchData(parseEndpoint(props.endpoint, {aggregateId: props.aggregateId})).then((data) => {
             if(!data)
                 return
+            if(Array.isArray(data) && !data[0])
+                return
             if(Array.isArray(data)) {
                 setData(data)
                 setHeaders(Object.keys(data[0]))

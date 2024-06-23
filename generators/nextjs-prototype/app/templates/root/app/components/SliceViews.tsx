@@ -4,9 +4,10 @@ import {useEffect, useState} from "react"
 import {ViewSelection} from '@/app/core/types';
 
 
-export default function SliceViews(props: { aggregateId:string|undefined, views?: ViewSelection[]}) {
+export default function SliceViews(props: { aggregateId: string | undefined, views?: ViewSelection[] }) {
 
     const [selectedView, setSelectedView] = useState<ViewSelection>()
+    const [filter, setFilter] = useState<RegExp>()
 
 
     const viewToRender = (): React.FC<any> | undefined => {
@@ -14,10 +15,17 @@ export default function SliceViews(props: { aggregateId:string|undefined, views?
     }
     return (
         <div>
+            <label>
+                Filter:
+                <div className={"control"}>
+                    <input onChange={(evt)=>setFilter(evt.target.value ? new RegExp(evt.target.value, 'i') : undefined)} type={"text"} className={"input"}/>
+                </div>
+            </label>
             <div className="tabs">
+
                 <ul>
                     <li>Screens:</li>
-                    {props?.views?.map((viewSelection) => <li
+                    {props?.views?.filter(view => !filter || filter.test(view.viewName)).map((viewSelection) => <li
                         className={selectedView?.viewName == viewSelection.viewName ? "view is-active" : "view"}
                         onClick={() => {
                             setSelectedView(props.views?.find(it => it.viewName == viewSelection.viewName))
@@ -33,7 +41,7 @@ export default function SliceViews(props: { aggregateId:string|undefined, views?
             </div>
 
             {
-                viewToRender() ? React.createElement(viewToRender()!!,{aggregateId: props?.aggregateId}) : <span/>
+                viewToRender() ? React.createElement(viewToRender()!!, {aggregateId: props?.aggregateId}) : <span/>
             }
         </div>
 
