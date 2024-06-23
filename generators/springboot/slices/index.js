@@ -171,7 +171,7 @@ module.exports = class extends Generator {
         slice.readmodels?.filter((readmodel) => readmodel.title).forEach((readmodel) => {
 
             let sliceEvents = config.slices.flatMap(it => it.events)
-            let inboundEvents = readmodel.dependencies?.filter(it => it.type === "INBOUND").filter(it => it.elementType === "EVENT").map(it => sliceEvents.find(sliceEvent => it.id === sliceEvent.id))
+            let inboundEvents = readmodel.dependencies?.filter(it => it.type === "INBOUND").filter(it => it.elementType === "EVENT").map(it => sliceEvents.find(sliceEvent => it.id === sliceEvent.id)).filter(it => it !== null)
 
             this.fs.copyTpl(
                 this.templatePath(`src/components/ReadModel.kt.tpl`),

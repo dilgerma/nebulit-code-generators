@@ -21,7 +21,7 @@ module.exports = class extends Generator {
             type: 'list',
             name: 'generator',
             message: 'Which generator?',
-            choices: ["springboot", "axon","typescript-prototype","eventcatalog"]
+            choices: ["springboot", "axon","nextjs-prototype","typescript-prototype","eventcatalog"]
         }]);
     }
 
