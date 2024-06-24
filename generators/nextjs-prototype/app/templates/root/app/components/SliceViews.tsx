@@ -32,8 +32,8 @@ export default function SliceViews(props: { aggregateId: string | undefined, vie
                         }}>
                         <a>
                             <div>
-                                <div><b>{viewSelection.slice}</b></div>
-                                <div>{viewSelection.viewName}</div>
+                                <h3>{viewSelection.viewType}</h3>
+                                <div>(Slice:{viewSelection.slice})</div>
                             </div>
                         </a>
                     </li>)}

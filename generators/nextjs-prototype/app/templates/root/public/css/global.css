@@ -60,3 +60,15 @@ img {
   padding: 10px;
   color:white
 }
+
+
+
+.readmodel {
+  cursor: pointer;
+  text-align: center;
+  background-color: lightgreen;
+  max-width: 250px;
+  margin-top: 15px;
+  padding: 10px;
+  color:white
+}

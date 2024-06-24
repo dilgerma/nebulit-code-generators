@@ -441,13 +441,13 @@ fun on(event: ${_eventTitle(it.title)}) {
         var readModelTitle = _readmodelTitle(readModel.title)
         if (readModel.listElement) {
             return `@GetMapping("/${slice}")
-                    fun findReadModel():CompleteableFuture<${readModelTitle}> {
+                    fun findReadModel():CompletableFuture<${readModelTitle}> {
                          return ${this._generateQuery(slice, readModel)}  
                     }`
         } else {
             return `@GetMapping("/${slice}/{aggregateId}")
-                      fun findReadModel(@PathVariable("aggregateId") aggregateId: UUID):CompleteableFuture<${readModelTitle}> {
-                           return ${this._generateQuery(slice, readModel)}.get()  
+                      fun findReadModel(@PathVariable("aggregateId") aggregateId: UUID):CompletableFuture<${readModelTitle}> {
+                           return ${this._generateQuery(slice, readModel)}  
                       }`
         }
 

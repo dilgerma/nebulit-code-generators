@@ -22,3 +22,7 @@ spring:
 axon:
   axonserver:
     enabled: false
+
+application:
+  debug:
+    enabled: true

@@ -4,8 +4,6 @@ import <%= _rootPackageName%>.common.CommandResult
 import <%= _rootPackageName%>.common.support.BaseIntegrationTest
 import <%= _rootPackageName%>.common.support.RandomData
 import <%= _rootPackageName%>.common.support.awaitUntilAssserted
-import <%= _rootPackageName%>.selectedperson.SelectedPersonReadModel
-import <%= _rootPackageName%>.selectedperson.SelectedPersonReadModelQuery
 <%-_commandImports%>
 <%-_queryImports%>
 import org.axonframework.commandhandling.gateway.CommandGateway

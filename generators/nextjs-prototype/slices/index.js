@@ -1,5 +1,5 @@
 var Generator = require('yeoman-generator');
-var {findSlice, buildLink, findSliceByCommandId} = require('../../common/util/config')
+var {findSlice, buildLink, findSliceByCommandId, findSliceByReadModelId} = require('../../common/util/config')
 var slugify = require('slugify')
 var {
     _screenTitle,
@@ -162,7 +162,8 @@ module.exports = class extends Generator {
     }
 
     _readModelEndpoint(sliceName, readModel) {
-        return `${readModel.listElement ? "/" + _sliceTitle(sliceName) : "/" + _sliceTitle(sliceName) + "/{aggregateId}"}`
+        var slice = findSliceByReadModelId(config,readModel.id)
+        return `${readModel.listElement ? "/" + _sliceTitle(slice.title) : "/" + _sliceTitle(slice.title) + "/{aggregateId}"}`
     }
 
     _findScreensForSlice(slice) {

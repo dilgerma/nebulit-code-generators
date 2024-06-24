@@ -12,11 +12,11 @@ const DataTable = (props: any) => {
         fetchData(parseEndpoint(props.endpoint, {aggregateId: props.aggregateId})).then((data) => {
             if(!data)
                 return
-            if(Array.isArray(data) && !data[0])
+            if(Array.isArray(data.data) && !data.data[0])
                 return
-            if(Array.isArray(data)) {
-                setData(data)
-                setHeaders(Object.keys(data[0]))
+            if(Array.isArray(data.data)) {
+                setData(data.data)
+                setHeaders(Object.keys(data.data[0]))
             } else {
                 setData([data])
                 setHeaders(Object.keys(data))
@@ -74,8 +74,7 @@ async function fetchData(endpoint: string) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
-        return data.data; // This will be a list of objects
+        return await response.json(); // This will be a list of objects
     } catch (error) {
         console.error('Error fetching data:', error);
         return null;

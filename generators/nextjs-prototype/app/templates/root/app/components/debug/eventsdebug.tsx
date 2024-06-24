@@ -66,12 +66,12 @@ export function DebugEvents(props: any) {
             {showEvents ?
 
                 <div>
-                    {events.map((item) => {
+                    {events?.map((item) => {
                         <h3 className={"has-text-centered padding"}>{item.type}</h3>
                         return <div>
                             <div>
-                                <span>Sequence:</span><span>{item.sequenceNumber}</span></div>
-                            <div><span>Type:</span><span>{item.payloadType}</span></div>
+                                <b>Sequence:</b><span>{item.sequenceNumber}</span></div>
+                            <div><b>Type:</b><span>{item.payloadType}</span></div>
                             <pre>
                                                                                {JSON.stringify(item.payload, (key, value) =>
                                                                                        typeof value === 'bigint'
