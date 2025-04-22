@@ -1,0 +1,1 @@
+package <%= rootPackageName%>.domain;

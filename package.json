@@ -1,20 +1,21 @@
 {
-  "name": "generator-prototype",
-  "version": "0.1.0",
+  "name": "@dilgerma/generator-nebulit",
+  "version": "0.1.153",
   "description": "scaffold example project",
+  "repository": "https://github.com/dilgerma/generator-spring-boot.git",
   "files": [
-    "app",
-    "generators",
-    "commands",
-    "package.json"
+    "generators"
   ],
   "keywords": [
     "yeoman-generator"
   ],
   "dependencies": {
-    "chalk": "^2.4.2",
-    "slug": "^8.2.3",
-    "slugify": "^1.6.6",
-    "yeoman-generator": "^3.2.0"
+    "fluent-json-schema": "^4.2.1",
+    "uuid": "^9.0.1",
+    "yeoman-generator": "^3.2.0",
+    "slugify": "^1.6.6"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   }
 }
