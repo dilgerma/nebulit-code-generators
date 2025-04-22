@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 var Generator = require('yeoman-generator');
 var {findSlice, buildLink, findSliceByCommandId, findSliceByReadModelId} = require('../../common/util/config')
 var slugify = require('slugify')

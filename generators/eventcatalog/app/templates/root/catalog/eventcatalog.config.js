@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 /** @type {import('@eventcatalog/core/bin/eventcatalog.config').Config} */
 export default {
   title: 'EventCatalog',

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 var Generator = require('yeoman-generator');
 var slugify = require('slugify')
 const schema = require('fluent-json-schema')

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 const {_eventTitle, _aggregateTitle, _readmodelTitle} = require("../../common/util/naming")
 const {variableAssignments} = require("../common/domain")
 

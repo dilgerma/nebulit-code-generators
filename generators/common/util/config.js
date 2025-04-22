@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 function findSlice(config, sliceName) {
     return config.slices.find((item) => item.title === sliceName)
 }

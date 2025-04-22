@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 var slugify = require('slugify')
 
 const variables = (elements, separator = "\n") => {

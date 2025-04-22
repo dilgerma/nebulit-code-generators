@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 var Generator = require('yeoman-generator');
 var slugify = require('slugify')
 var ejs = require('ejs')

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 const serviceURI = "http://localhost:8080"
 
 export function parseEndpoint(endpoint:string, data?:any) {

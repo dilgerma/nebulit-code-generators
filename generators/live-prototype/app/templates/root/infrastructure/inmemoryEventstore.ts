@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 import type { Event, EventEnvelope } from '@event-driven-io/emmett'
 import {v4} from "uuid"
 import {

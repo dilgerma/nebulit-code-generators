@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 const schema = require('fluent-json-schema')
 
 function parseSchema(element) {

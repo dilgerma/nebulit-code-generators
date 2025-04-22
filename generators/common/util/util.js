@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 const groupBy = function groupBy(array, callback) {
     return array.reduce((acc, currentValue) => {
         const key = callback(currentValue);

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Nebulit GmbH
+ * Licensed under the MIT License.
+ */
+
 /** @type {import('next').NextConfig} */
 // next.configjs
 // export default {
