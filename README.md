@@ -36,6 +36,20 @@ This project is licensed under the **MIT License**. See the [LICENSE](./LICENSE)
 Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
 
 ---
+## How to use the Generators
+
+The Generators use a json representation of an Event Model to generate Code or Documentation.
+The Tool to generate the json-file is the [Miro Event Modeling Toolkit](https://miro.com/marketplace/eventmodeling/)
+
+To learn how to use Event Modeling, you can start with the Book:
+[Understanding Eventsourcing](https://leanpub.com/eventmodeling-and-eventsourcing)
+
+To apply it in practice, you can use the companion course to the book.
+[Implementing Eventsourcing](https://www.eventsourcingcourse.com)
+
+The course includes a free Miro Toolkit License.
+
+---
 
 ## 📬 Contact
 
