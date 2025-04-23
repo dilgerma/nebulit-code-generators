@@ -35,9 +35,13 @@ function _processorTitle(title) {
     return `${slugify(capitalizeFirstCharacter(titleElements), "").replaceAll("-", "")}Processor`
 }
 
-function _restResourceTitle(title) {
+function _misspelledRestResourceTitle(title) {
     var titleElements = title.split(" ").map(it => capitalizeFirstCharacter(it.replaceAll("-", ""))).join("")
     return `${slugify(capitalizeFirstCharacter(titleElements), "").replaceAll("-", "")}Ressource`
+}
+function _restResourceTitle(title) {
+    var titleElements = title.split(" ").map(it => capitalizeFirstCharacter(it.replaceAll("-", ""))).join("")
+    return `${slugify(capitalizeFirstCharacter(titleElements), "").replaceAll("-", "")}Resource`
 }
 
 function _readmodelTitle(title) {
@@ -72,6 +76,7 @@ function _packageFolderName(basePackage, contextPackage, infrastructure) {
 
 module.exports = {
     _processorTitle,
+    _misspelledRestResourceTitle,
     _restResourceTitle,
     _readmodelTitle,
     _eventTitle,

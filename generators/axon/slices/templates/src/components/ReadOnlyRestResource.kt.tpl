@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture
 Boardlink: <%- link%>
 */
 @RestController
-class <%= _controller%>Ressource(
+class <%= _controller%><%-_resource%>(
     private var queryGateway: QueryGateway
     ) {
 

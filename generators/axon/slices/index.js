@@ -13,6 +13,7 @@ const {
     _readmodelTitle,
     _sliceTitle,
     _aggregateTitle,
+    _misspelledRestResourceTitle,
     _restResourceTitle
 } = require("./../../../generators/common/util/naming");
 const {variableAssignments, processSourceMapping} = require("../../common/util/variables");
@@ -387,14 +388,17 @@ module.exports = class extends Generator {
             }
         )
 
+        let restResource = this._restResource(slice, readModel.title)
+
         this.fs.copyTpl(
             this.templatePath(`src/components/ReadOnlyRestResource.kt.tpl`),
-            this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${slice}/internal/ReadOnly${_restResourceTitle(readModel.title)}.kt`),
+            restResource.destination,
             {
                 _slice: slice,
                 _rootPackageName: this.givenAnswers.rootPackageName,
                 _packageName: _packageName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false),
                 _name: slice,
+                _resource: restResource.resourceSpelling,
                 _readModel: _readmodelTitle(readModel.title),
                 _controller: capitalizeFirstCharacter(slice),
                 _typeImports: typeImports(readModel.fields),
@@ -408,12 +412,13 @@ module.exports = class extends Generator {
 
         this.fs.copyTpl(
             this.templatePath(`src/components/ReadOnlyRestResource.kt.tpl`),
-            this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${slice}/internal/ReadOnly${_restResourceTitle(readModel.title)}.kt`),
+            restResource.destination,
             {
                 _slice: slice,
                 _rootPackageName: this.givenAnswers.rootPackageName,
                 _packageName: _packageName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false),
                 _name: slice,
+                _resource: restResource.resourceSpelling,
                 _readModel: _readmodelTitle(readModel.title),
                 _controller: capitalizeFirstCharacter(slice),
                 _typeImports: typeImports(readModel.fields),
@@ -427,6 +432,24 @@ module.exports = class extends Generator {
 
     _keyFields(readModel) {
         return ConstructorGenerator.generateConstructorVariables(readModel.fields?.filter(it => it.idAttribute))
+    }
+
+    _restResource(slice, title) {
+        let readModelTitle = _misspelledRestResourceTitle(title);
+        let destination = this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${slice}/internal/ReadOnly${readModelTitle}.kt`);
+        let resourceSpelling = 'Ressource';
+
+        if (!this.fs.exists(destination)) {
+            readModelTitle = _restResourceTitle(title);
+            destination = this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${slice}/internal/ReadOnly${readModelTitle}.kt`);
+            resourceSpelling = 'Resource';
+        }
+
+        return {
+            destination,
+            resourceSpelling,
+            title: readModelTitle
+        }
     }
 
     _writeQueryableReportReadModel(slice, readModel, inboundEvents) {
@@ -494,14 +517,17 @@ module.exports = class extends Generator {
             }
         )
 
+        let restResource = this._restResource(slice, readModel.title)
+
         this.fs.copyTpl(
             this.templatePath(`src/components/ReadOnlyRestResource.kt.tpl`),
-            this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${slice}/internal/ReadOnly${_restResourceTitle(readModel.title)}.kt`),
+            restResource.destination,
             {
                 _slice: slice,
                 _rootPackageName: this.givenAnswers.rootPackageName,
                 _packageName: _packageName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false),
                 _name: slice,
+                _resource: restResource.resourceSpelling,
                 _readModel: _readmodelTitle(readModel.title),
                 _controller: capitalizeFirstCharacter(slice),
                 _typeImports: typeImports(readModel.fields),
@@ -549,16 +575,19 @@ fun on(event: ${_eventTitle(it.title)}) {
 
 
         slice.commands?.filter((command) => command.title).forEach((command) => {
+
+            let restResource = this._restCommand(title, command.title)
+
             this.fs.copyTpl(
                 this.templatePath(`src/components/RestResource.kt.tpl`),
-                this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${title}/internal/${_restResourceTitle(command.title)}.kt`),
+                restResource.destination,
                 {
                     _slice: title,
                     _rootPackageName: this.givenAnswers.rootPackageName,
                     _packageName: _packageName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false),
                     _name: title,
                     _command: _commandTitle(command.title),
-                    _controller: _restResourceTitle(command.title),
+                    _controller: restResource.title,
                     _typeImports: typeImports(command.fields),
                     _debugendpoint: this._generateDebugPostRestCall(title, VariablesGenerator.generateRestParamInvocation(
                         command.fields
@@ -573,6 +602,24 @@ fun on(event: ${_eventTitle(it.title)}) {
             )
         })
 
+    }
+
+    _restCommand(slice, title) {
+        let readModelTitle = _misspelledRestResourceTitle(title);
+        let destination = this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${slice}/internal/${readModelTitle}.kt`);
+        let resourceSpelling = 'Ressource';
+
+        if (!this.fs.exists(destination)) {
+            readModelTitle = _restResourceTitle(title);
+            destination = this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${slice}/internal/${readModelTitle}.kt`);
+            resourceSpelling = 'Resource';
+        }
+
+        return {
+            destination,
+            resourceSpelling,
+            title: readModelTitle
+        }
     }
 
     _readModelData(readModel) {
