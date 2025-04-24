@@ -37,7 +37,7 @@ function _processorTitle(title) {
 
 function _restResourceTitle(title) {
     var titleElements = title.split(" ").map(it => capitalizeFirstCharacter(it.replaceAll("-", ""))).join("")
-    return `${slugify(capitalizeFirstCharacter(titleElements), "").replaceAll("-", "")}Ressource`
+    return `${slugify(capitalizeFirstCharacter(titleElements), "").replaceAll("-", "")}Resource`
 }
 
 function _readmodelTitle(title) {
