@@ -2,6 +2,8 @@
 
 **Nebulit Code Generators** is a modular toolkit designed to automate code scaffolding, streamline development workflows, and enhance developer productivity. Built with flexibility in mind, it supports multiple programming languages and integrates seamlessly with modern development environments.
 
+Seamlessly combine Software Modelling with Code Generation.
+
 There is an [8-Day E-Mail Course (free)](https://newsletter.nebulit.de/generator), that guides you through the process to build your own code generator.
 
 
