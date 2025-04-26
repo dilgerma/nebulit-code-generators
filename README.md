@@ -2,11 +2,12 @@
 
 **Nebulit Code Generators** is a modular toolkit designed to automate code scaffolding, streamline development workflows, and enhance developer productivity. Built with flexibility in mind, it supports multiple programming languages and integrates seamlessly with modern development environments.
 
+There is an [8-Day E-Mail Course (free)](https://newsletter.nebulit.de/generator), that guides you through the process to build your own code generator.
+
+
 ---
 
 ## 🚀 Features
-
-### Axon Code Generator
 
 - **Multi-Language Support**  
   Generate boilerplate code for various programming languages including JavaScript, TypeScript, Kotlin, and more.
@@ -17,11 +18,11 @@
 - **Docker Integration**  
   Leverage Docker for isolated and reproducible development environments.
 
-- **Extensible Configuration**  
-  Easily adjust settings via the `config.json` file to tailor the generators to specific project needs.
+- **Build Custom Code Generators in minutes**  
+  Use the existing code generators as blue print to AI to build custom generators in minutes
 
-- **Automated Publishing**  
-  Streamline the release process with the included `publish.sh` script.
+- **Easily extensible**
+  Adjust the existing code generators and combine them seamlessly with Event Modeling
 
 ---
 
