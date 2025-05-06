@@ -82,6 +82,7 @@ module.exports = class extends Generator {
     _writeFlow(flow) {
         var title = _flowTitle(flow.name)
         var screens = uniqBy(this._loadScreensForFlow(flow).filter(it => it), item => item.title)
+            .sort((a, b) => (a.prototype?.order ?? -1) - (b.prototype?.order ?? -1))
 
         this.fs.copyTpl(this.templatePath(`screens/flow.tsx.tpl`), this.destinationPath(`./app/prototype/components/flows/${title}.tsx`), {
             name: title,
