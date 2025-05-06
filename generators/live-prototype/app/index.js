@@ -123,6 +123,7 @@ module.exports = class extends Generator {
 
     _writeFlow_viewDisplay(screens) {
         var screensToRender = screens.concat({"title": "Automations"})
+            .sort((a, b) => (a.prototype?.order ?? -1) - (b.prototype?.order ?? -1))
 
         return screensToRender.map((screen) => {
             var title = _screenTitle(screen.title)
@@ -137,7 +138,7 @@ module.exports = class extends Generator {
         var screensToRender = screens.concat({"title": "Automations"})
 
         return screensToRender.map((screen) => {
-            return `import ${_screenTitle(screen.title)} from "@/app/prototype/${_flowTitle(flow.name)}/screens/${_screenTitle(screen.title)}"`
+            return `import $    {_screenTitle(screen.title)} from "@/app/prototype/${_flowTitle(flow.name)}/screens/${_screenTitle(screen.title)}"`
         }).join("\n")
     }
 
