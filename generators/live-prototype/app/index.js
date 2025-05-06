@@ -138,7 +138,7 @@ module.exports = class extends Generator {
         var screensToRender = screens.concat({"title": "Automations"})
 
         return screensToRender.map((screen) => {
-            return `import $    {_screenTitle(screen.title)} from "@/app/prototype/${_flowTitle(flow.name)}/screens/${_screenTitle(screen.title)}"`
+            return `import ${_screenTitle(screen.title)} from "@/app/prototype/${_flowTitle(flow.name)}/screens/${_screenTitle(screen.title)}"`
         }).join("\n")
     }
 
