@@ -191,7 +191,6 @@ module.exports = class extends Generator {
                             event.fields
                         ),
                         //for now take first aggregate
-                        _aggregate: _aggregateTitle((event.aggregateDependencies || ["AGGREGATE"])[0]),
                         _typeImports: typeImports(event.fields),
                         link: boardlLink(config.boardId, event.id),
 
@@ -263,8 +262,6 @@ module.exports = class extends Generator {
                     _fields: ConstructorGenerator.generateConstructorVariables(
                         readmodel.fields
                     ),
-                    //for now take first aggregate
-                    _aggregate: _aggregateTitle((readmodel.aggregateDependencies || ["AGGREGATE"])[0]),
                     _eventsImports: this._eventsImports(inboundEvents.map(it => it.title)),
 
                     _eventLoop: _renderReadModelSwitchCase(readmodel, inboundEvents),
@@ -285,8 +282,6 @@ module.exports = class extends Generator {
                     _fields: VariablesGenerator.generateLiveReportVariables(
                         readmodel.fields
                     ),
-                    //for now take first aggregate
-                    _aggregate: _aggregateTitle((readmodel.aggregateDependencies || ["AGGREGATE"])[0]),
                     _eventsImports: this._eventsImports(inboundEvents.map(it => it.title)),
 
                     _eventLoop: _renderReadModelSwitchCase(readmodel, inboundEvents),
@@ -337,8 +332,6 @@ module.exports = class extends Generator {
                 _fields: VariablesGenerator.generateVariables(
                     readModel.fields
                 ),
-                //for now take first aggregate
-                _aggregate: _aggregateTitle((readModel.aggregateDependencies || ["AGGREGATE"])[0]),
                 _eventsImports: this._eventsImports(inboundEvents.map(it => it?.title)),
                 _eventHandlers: this._renderMultiKeyEventHandlers(readModel, inboundEvents),
 
@@ -356,8 +349,6 @@ module.exports = class extends Generator {
                 _rootPackageName: this.givenAnswers.rootPackageName,
                 _packageName: _packageName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false),
                 _name: _readmodelTitle(readModel.title),
-                //for now take first aggregate
-                _aggregate: _aggregateTitle((readModel.aggregateDependencies || ["AGGREGATE"])[0]),
                 _query: this._repositoryQuery(readModel),
                 _typeImports: typeImports(readModel.fields),
                 _fields: VariablesGenerator.generateInvocation(readModel.fields.filter(it => it.idAttribute), "query"),
@@ -382,7 +373,6 @@ module.exports = class extends Generator {
                     readModel.fields,
                     readModel?.fields.find(it => it?.idAttribute).name??"aggregateId"
                 ),
-                _aggregate: _aggregateTitle((readModel.aggregateDependencies || ["AGGREGATE"])[0]),
                 link: boardlLink(config.boardId, readModel.id),
             }
         )
@@ -443,8 +433,6 @@ module.exports = class extends Generator {
                 _fields: VariablesGenerator.generateVariables(
                     readModel.fields
                 ),
-                //for now take first aggregate
-                _aggregate: _aggregateTitle((readModel.aggregateDependencies || ["AGGREGATE"])[0]),
                 _eventsImports: this._eventsImports(inboundEvents.map(it => it?.title)),
                 _eventHandlers: this._renderEventHandlers(readModel, inboundEvents),
 
@@ -463,7 +451,6 @@ module.exports = class extends Generator {
                 _packageName: _packageName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false),
                 _name: _readmodelTitle(readModel.title),
                 //for now take first aggregate
-                _aggregate: _aggregateTitle((readModel.aggregateDependencies || ["AGGREGATE"])[0]),
                 _query: this._repositoryQuery(readModel),
                 _typeImports: typeImports(readModel.fields),
                 link: boardlLink(config.boardId, readModel.id),
@@ -482,8 +469,6 @@ module.exports = class extends Generator {
                 _packageName: _packageName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false),
                 _name: _readmodelTitle(readModel.title),
                 //for now take first aggregate
-                _aggregate: _aggregateTitle((readModel.aggregateDependencies || ["AGGREGATE"])[0]),
-
                 _entityFields: VariablesGenerator.generateEntityVariables(
                     slice,
                     readModel.fields,
