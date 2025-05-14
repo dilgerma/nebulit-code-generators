@@ -122,7 +122,7 @@ module.exports = class extends Generator {
     }
 
     _writeFlow_viewDisplay(screens) {
-        var screensToRender = screens.concat({"title": "Automations"})
+        var screensToRender = screens.concat({"title": "Automations", "prototype": {order: 99999}})
             .sort((a, b) => (a.prototype?.order ?? -1) - (b.prototype?.order ?? -1))
 
         return screensToRender.map((screen) => {
