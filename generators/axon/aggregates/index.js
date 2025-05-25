@@ -32,28 +32,25 @@ module.exports = class extends Generator {
     async prompting() {
         this.answers = await this.prompt([
             {
-                type: 'checkbox',
-                name: 'aggregates',
+                type: 'list',
+                name: 'aggregate',
                 message: 'Which Aggregate should be generated?',
                 choices: config?.aggregates?.map((item, idx) => item.title).sort()
             },
             {
-                type: 'confirm',
-                name: 'commandhandlers',
-                message: 'Generate Commands and Eventsourcing Handlers?',
-            },
-            {
-                type: 'confirm',
-                name: 'override',
-                message: 'Should existing Code be overridden?',
+                type: 'checkbox',
+                name: 'aggregate_slices',
+                loop: false,
+                message: 'Choose for which Slices to genereate Command and Eventsourcing Handlers. (generates to .tmp file)',
+                choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context))
+                    .filter(slice => {return slice.commands?.some(command => command.aggregateDependencies?.includes(items.aggregate))})
+                    .map((item, idx) => item.title).sort(),
             }]);
 
     }
 
     writeAggregates() {
-        this.answers.aggregates.forEach((aggregate) => {
-            this._writeAggregates(config.aggregates.find(item => item.title === aggregate))
-        });
+       this._writeAggregates(config.aggregates.find(item => item.title === this.answers.aggregate))
     }
 
     _writeAggregates(aggregate) {
@@ -61,9 +58,13 @@ module.exports = class extends Generator {
         var idFields = idField(aggregate)
         var idFieldType = idType(aggregate)
 
+        var aggregateFile = this.answers.aggregate_slices?.length > 0 ?
+            `${_aggregateTitle(aggregate.title)}.kt.tmp`:
+            `${_aggregateTitle(aggregate.title)}.kt`
+
         this.fs.copyTpl(
             this.templatePath(`src/components/Aggregate.kt.tpl`),
-            this.destinationPath(`./src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain/${_aggregateTitle(aggregate.title)}${this.answers.override ?? false ? "" : ".tmp"}.kt`),
+            this.destinationPath(`./src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain/${aggregateFile}`),
             {
                 _rootPackageName: this.givenAnswers.rootPackageName,
                 _packageName: _packageName(this.givenAnswers.rootPackageName, config?.codeGen?.contextPackage, false),
@@ -84,10 +85,11 @@ module.exports = class extends Generator {
 
     _renderCommandHandlers(aggregate) {
 
-        if (!this.answers.commandhandlers) {
-            return ""
-        }
-        var commands = config.slices.flatMap(it => it.commands).filter(it => it.aggregateDependencies?.includes(aggregate.title));
+
+        var commands = config.slices
+            .filter(slice => this.answers.aggregate_slices?.includes(slice.title))
+            .flatMap(it => it.commands)
+            .filter(it => it.aggregateDependencies?.includes(aggregate.title));
 
         var handlers = commands.map((command) => {
             var eventDeps = uniqBy(command.dependencies.filter(it => it.type === "OUTBOUND")
@@ -120,7 +122,11 @@ module.exports = class extends Generator {
 
     _generateImports(aggregate, rootPackageName, contextPackage) {
 
-        var commands = config.slices.flatMap(it => it.commands).filter(it => it.aggregateDependencies?.includes(aggregate.title))
+        var commands = config.slices
+            .filter(slice => this.answers.aggregate_slices?.includes(slice.title))
+            .flatMap(it => it.commands)
+            .filter(it => it.aggregateDependencies?.includes(aggregate.title));
+
         var events = commands.flatMap(command => command.dependencies.filter(it => it.type === "OUTBOUND")
             .filter(it => it.elementType === "EVENT"))
         var commandImports = commands?.map((command) =>

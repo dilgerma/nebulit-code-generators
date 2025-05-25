@@ -304,6 +304,24 @@ module.exports = class extends Generator {
                 link: boardlLink(config.boardId, readmodel.id),
             }
         )
+
+        this.fs.copyTpl(
+            this.templatePath(`src/components/ReadOnlyRestResource.kt.tpl`),
+            this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${slice}/internal/ReadOnly${_restResourceTitle(readmodel.title)}.kt`),
+            {
+                _slice: slice,
+                _rootPackageName: this.givenAnswers.rootPackageName,
+                _packageName: _packageName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false),
+                _name: slice,
+                _readModel: _readmodelTitle(readmodel.title),
+                _controller: capitalizeFirstCharacter(slice),
+                _typeImports: typeImports(readmodel.fields),
+                _endpoint: this._generateGetRestCall(slice, VariablesGenerator.generateRestParamInvocation(
+                    readmodel.fields
+                ), readmodel, readmodel.apiEndpoint),
+                link: boardlLink(config.boardId, readmodel.id),
+            }
+        )
     }
 
     _readModelQueryElement(readModel) {
