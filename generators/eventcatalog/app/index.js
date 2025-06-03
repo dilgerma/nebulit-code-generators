@@ -94,7 +94,7 @@ module.exports = class extends Generator {
             })
             var services = uniq(aggregateServices.flatMap(it => it.service))
             this.fs.copyTpl(
-                this.templatePath('root/domains/domainname/index.md'),
+                this.templatePath('root/domains/domainname/index.mdx'),
                 this.destinationPath(`${slugify(this.answers.appName)}/domains/${config.codeGen?.domain}/index.md`),
                 {
                     name: config.codeGen?.domain,
@@ -124,8 +124,8 @@ module.exports = class extends Generator {
             var receives = asList(allCommands, (item) => `id: ${simpleSlugify(item)}\n    version: 0.0.0`)
             var descriptions = aggregates.map(it => it.description).join("\n\n")
             this.fs.copyTpl(
-                this.templatePath('root/services/index.md'),
-                this.destinationPath(`${slugify(this.answers.appName)}/services/${simpleSlugify(service)}/index.md`),
+                this.templatePath('root/services/index.mdx'),
+                this.destinationPath(`${slugify(this.answers.appName)}/services/${simpleSlugify(service)}/index.mdx`),
                 {
                     _name: simpleSlugify(service),
                     _description: descriptions ?? "",
@@ -142,8 +142,8 @@ module.exports = class extends Generator {
     _writeActors() {
         config.aggregates?.forEach((actor) => {
             this.fs.copyTpl(
-                this.templatePath('root/domains/domainname/index.md'),
-                this.destinationPath(`${slugify(this.answers.appName)}/domains/${actor?.title}/index.md`),
+                this.templatePath('root/domains/domainname/index.mdx'),
+                this.destinationPath(`${slugify(this.answers.appName)}/domains/${actor?.title}/index.mdx`),
                 {
                     name: actor?.title,
                     _description: actor.description ?? "",
@@ -182,8 +182,8 @@ module.exports = class extends Generator {
             if (event.aggregate) {
                 let service = serviceName(event.aggregate)
                 this.fs.copyTpl(
-                    this.templatePath('root/events/index.md'),
-                    this.destinationPath(`${slugify(this.answers.appName)}/events/${simpleSlugify(service)}/${simpleSlugify(event.title)}/index.md`),
+                    this.templatePath('root/events/index.mdx'),
+                    this.destinationPath(`${slugify(this.answers.appName)}/events/${simpleSlugify(event.title)}/index.mdx`),
                     {
                         name: simpleSlugify(event?.title),
                         //_producers: renderProducers(event.dependencies?.filter(it => it.type === "INBOUND").filter(item => item.elementType === "COMMAND").map(elementDependency => toListElement(elementDependency.title))),
@@ -208,8 +208,8 @@ module.exports = class extends Generator {
                 let service = serviceName(readModel.aggregate)
 
                 this.fs.copyTpl(
-                    this.templatePath('root/queries/index.md'),
-                    this.destinationPath(`${slugify(this.answers.appName)}/queries/${simpleSlugify(service)}/${simpleSlugify(readModel.title)}/index.md`),
+                    this.templatePath('root/queries/index.mdx'),
+                    this.destinationPath(`${slugify(this.answers.appName)}/queries/${simpleSlugify(readModel.title)}/index.mdx`),
                     {
                         name: simpleSlugify(readModel?.title),
                         //_producers: renderProducers(event.dependencies?.filter(it => it.type === "INBOUND").filter(item => item.elementType === "COMMAND").map(elementDependency => toListElement(elementDependency.title))),
@@ -233,8 +233,8 @@ module.exports = class extends Generator {
             if (command.aggregate) {
                 let service = serviceName(command.aggregate)
                 this.fs.copyTpl(
-                    this.templatePath('root/commands/index.md'),
-                    this.destinationPath(`${slugify(this.answers.appName)}/commands/${simpleSlugify(service)}/${simpleSlugify(command.title)}/index.md`),
+                    this.templatePath('root/commands/index.mdx'),
+                    this.destinationPath(`${slugify(this.answers.appName)}/commands/${simpleSlugify(command.title)}/index.mdx`),
                     {
                         name: simpleSlugify(command?.title),
                         //_producers: renderProducers(event.dependencies?.filter(it => it.type === "INBOUND").filter(item => item.elementType === "COMMAND").map(elementDependency => toListElement(elementDependency.title))),
