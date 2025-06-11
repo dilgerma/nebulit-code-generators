@@ -47,7 +47,9 @@ module.exports = class extends Generator {
                 type: 'checkbox',
                 name: 'liveReportModels',
                 message: 'Which ReadModels should read directly from the Eventstream?',
-                when: (input) => {return input.slice?.length == 1 && config.slices.find((slice) => slice.title === input.slice[0])?.readmodels?.length > 0},
+                when: (input) => {
+                    return input.slice?.length == 1 && config.slices.find((slice) => slice.title === input.slice[0])?.readmodels?.length > 0
+                },
                 choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).filter((item) => item.title === items.slice[0]).flatMap((slice) => slice.readmodels).map(item => item.title)
             },
             {
@@ -154,7 +156,7 @@ module.exports = class extends Generator {
                     _fields: ConstructorGenerator.generateCommandConstructorVariables(
                         command.fields,
                         [],
-                        idField(command)??"aggregateId"
+                        idField(command) ?? "aggregateId"
                     ),
                     link: boardlLink(config.boardId, command.id),
                     _typeImports: typeImports(command.fields)
@@ -236,7 +238,7 @@ module.exports = class extends Generator {
     }
 
     _repositoryQuery(readModel) {
-        var idField = readModel.fields?.find(it => it.idAttribute)?.name??"aggregateId"
+        var idField = readModel.fields?.find(it => it.idAttribute)?.name ?? "aggregateId"
         if (readModel.listElement ?? false) {
             return `return ${_readmodelTitle(readModel.title)}(repository.findAll())`
         } else {
@@ -327,7 +329,7 @@ module.exports = class extends Generator {
     _readModelQueryElement(readModel) {
         var idField = readModel.fields?.find(it => it.idAttribute)
         var idFieldName = idField?.name ?? "aggregateId"
-        var idType = idField ? typeMapping(idField?.type,idField?.cardinality,idField?.optional, idField?.mutable) : "UUID"
+        var idType = idField ? typeMapping(idField?.type, idField?.cardinality, idField?.optional, idField?.mutable) : "UUID"
 
         if (readModel.listElement ?? false) {
             return `class ${_readmodelTitle(readModel.title)}Query()`
@@ -389,7 +391,7 @@ module.exports = class extends Generator {
                 _entityFields: VariablesGenerator.generateEntityVariables(
                     slice,
                     readModel.fields,
-                    readModel?.fields.find(it => it?.idAttribute).name??"aggregateId"
+                    readModel?.fields.find(it => it?.idAttribute).name ?? "aggregateId"
                 ),
                 link: boardlLink(config.boardId, readModel.id),
             }
@@ -490,7 +492,7 @@ module.exports = class extends Generator {
                 _entityFields: VariablesGenerator.generateEntityVariables(
                     slice,
                     readModel.fields,
-                    readModel.fields?.find(it => it.idAttribute)?.name??"aggregateId"
+                    readModel.fields?.find(it => it.idAttribute)?.name ?? "aggregateId"
                 ),
                 _typeImports: typeImports(readModel.fields),
                 link: boardlLink(config.boardId, readModel.id),
@@ -569,7 +571,7 @@ fun on(event: ${_eventTitle(it.title)}) {
                         command.fields
                     ), command.apiEndpoint),
                     _payload: ClassesGenerator.generateDataClass(_sliceSpecificClassTitle(sliceName, "Payload"), command.fields),
-                    _endpoint: this._generatePostRestCall(slice.title, _commandTitle(command.title),
+                    _endpoint: this._generatePostRestCall(slice.title, command,
                         variableAssignments(command.fields, "payload", command, ",\n", "="), command.apiEndpoint),
                     link: boardlLink(config.boardId, command.id),
                 }
@@ -597,6 +599,7 @@ fun on(event: ${_eventTitle(it.title)}) {
     }
 
     _generatePostRestCall(slice, command, variableAssignments, endpoint) {
+        let commandTitle = _commandTitle(command.title)
         return `
        @CrossOrigin
        @PostMapping(${endpoint ? `"${endpoint}/{id}"`
@@ -605,7 +608,7 @@ fun on(event: ${_eventTitle(it.title)}) {
         @PathVariable("id") ${idField(command)}: ${idType(command)},
         @RequestBody payload: ${_sliceSpecificClassTitle(slice, "Payload")}
     ):CompletableFuture<Any> {
-         return commandGateway.send(${command}(${variableAssignments}))
+         return commandGateway.send(${commandTitle}(${variableAssignments}))
         }
        `
     }
@@ -634,14 +637,14 @@ fun on(event: ${_eventTitle(it.title)}) {
                          return ${this._generateQuery(slice, readModel)}  
                     }`
         } else {
-            if(readModelIdAttributes.length <= 1) {
+            if (readModelIdAttributes.length <= 1) {
                 return `@GetMapping(${endpoint ? `"${endpoint}/{id}"` : `"/${slice}/{id}"`})
                       fun findReadModel(@PathVariable("id") ${idField(readModel)}: ${idType(readModel)}):CompletableFuture<${readModelTitle}> {
                            return ${this._generateQuery(slice, readModel)}  
                       }`
             } else {
                 var idAttributes = readModelIdAttributes.filter(it => it.name !== "aggregateId")
-                var requestParams = idAttributes.map(it => `@RequestParam("${it.name}") ${it.name}:${typeMapping(it.type, it.cardinality,it.optional, it.mutable)}`).join(",\n")
+                var requestParams = idAttributes.map(it => `@RequestParam("${it.name}") ${it.name}:${typeMapping(it.type, it.cardinality, it.optional, it.mutable)}`).join(",\n")
                 return `@GetMapping(${endpoint ? `"${endpoint}"` : `"/${slice}"`})
                       fun findReadModel(${requestParams}):CompletableFuture<${readModelTitle}> {
                            return ${this._generateQuery(slice, readModel)}  
@@ -706,6 +709,7 @@ fun on(event: ${_eventTitle(it.title)}) {
 
     _renderStatelessProcessorTriggers(readModel, triggers, events, command) {
         return triggers.map((event) => {
+
             return `
                 @EventHandler
                 fun on(event: ${_eventTitle(event)}) {
@@ -871,7 +875,7 @@ function capitalizeFirstCharacter(inputString) {
     }
 }
 
-function boardlLink(boardId, componentId){
+function boardlLink(boardId, componentId) {
     var link = `https://miro.com/app/board/${boardId}/?moveToWidget=${componentId}`
     return boardId && componentId ? link : undefined
 }

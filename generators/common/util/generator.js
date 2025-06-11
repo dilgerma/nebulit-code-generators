@@ -17,7 +17,14 @@ class ClassesGenerator {
             if (variable.cardinality?.toLowerCase() === "list") {
                 return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality, variable.optional)}`;
             } else {
-                return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality, variable.optional)}`;
+                if(variable.type?.toLowerCase() === "date") {
+                    return `\t@JsonFormat(pattern = "dd.MM.yyyy") var ${variable.name}:${typeMapping(variable.type, variable.cardinality, variable.optional)}`;
+                } else if(variable.type?.toLowerCase() === "datetime") {
+                    return `\t@JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss") var ${variable.name}:${typeMapping(variable.type, variable.cardinality, variable.optional)}`;
+                } else {
+                    return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality, variable.optional)}`;
+
+                }
             }
         }).join(separator)
     }
@@ -76,9 +83,9 @@ const typeImports = (fields, additionalImports) => {
     var imports = fields?.map((field) => {
         switch (field.type?.toLowerCase()) {
             case "date":
-                return ["import java.time.LocalDate", "import org.springframework.format.annotation.DateTimeFormat"]
+                return ["import java.time.LocalDate", "import org.springframework.format.annotation.DateTimeFormat", "import com.fasterxml.jackson.annotation.JsonFormat"]
             case "datetime":
-                return ["import java.time.LocalDateTime", "import org.springframework.format.annotation.DateTimeFormat"]
+                return ["import java.time.LocalDateTime", "import org.springframework.format.annotation.DateTimeFormat", "import com.fasterxml.jackson.annotation.JsonFormat"]
             case "uuid":
                 return ["import java.util.UUID"]
         }
