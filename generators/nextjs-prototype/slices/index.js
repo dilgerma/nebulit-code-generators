@@ -50,11 +50,11 @@ module.exports = class extends Generator {
 
             var commands = uniqBy(screen?.dependencies?.filter(dep => dep.type === "OUTBOUND").filter(it => it.elementType === "COMMAND").map((it) => {
                 return config.slices.flatMap(item => item.commands).find(item => item.id === it.id)
-            }), (it) => it.id)
+            }).filter(it => it), (it) => it.id)
 
             var readModels = uniq(screen?.dependencies?.filter(dep => dep.type === "INBOUND").filter(it => it.elementType === "READMODEL").map((it) => {
                 return config.slices.flatMap(item => item.readmodels).find(item => item.id === it.id)
-            }), (it) => it.id)
+            }).filter(it => it), (it) => it.id)
 
             commands.forEach((command) => {
                 this._writeCommand(slice, command)
@@ -72,9 +72,10 @@ module.exports = class extends Generator {
 
             var commandMapping = `[${commands.map((command) => {
                 var commandSlice = findSliceByCommandId(config, command.id)
+                var idAttribute = command.fields.find(it => it?.idAttribute)?.name??"aggregateId"
                 return `{
                     "command":"${_commandTitle(command.title)}",
-                    "endpoint": ${command.apiEndpoint ? `"${command.apiEndpoint}/{aggregateId}"` : `"/${_sliceTitle(commandSlice.title)}/{aggregateId}"`},
+                    "endpoint": ${command.apiEndpoint ? `"${command.apiEndpoint}/${idAttribute}"` : `"/${_sliceTitle(commandSlice.title)}/{${idAttribute}}"`},
                     "schema": ${_commandTitle(command.title) + "Schema"}
                 }`
             }).join(",")}]`
@@ -168,7 +169,8 @@ module.exports = class extends Generator {
 
     _readModelEndpoint(sliceName, readModel) {
         var slice = findSliceByReadModelId(config, readModel.id)
-        return readModel.apiEndpoint ? readModel.apiEndpoint : `${readModel.listElement ? "/" + _sliceTitle(slice.title) : "/" + _sliceTitle(slice.title) + "/{aggregateId}"}`
+        var idAttribute = readModel.fields?.find(it => it.idAttribute)?.name??"aggregateId"
+        return readModel.apiEndpoint ? readModel.apiEndpoint : `${readModel.listElement ? "/" + _sliceTitle(slice.title) : "/" + _sliceTitle(slice.title) + `/{${idAttribute}}`}`
     }
 
     _findScreensForSlice(slice) {

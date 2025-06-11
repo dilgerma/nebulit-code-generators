@@ -18,8 +18,8 @@ export const CommandSelection = (props: { commands: CommandConfig[] }) => {
                         <div className={"cell command"} key={idx}
                              onClick={() => setSelectedCommand(props.commands?.find(it => it.command == command.command))}>
                             <h3>Command</h3>
-                            <div>
-                                {command?.command}</div>
+                            <div title={command?.command}>
+                                {shorten(command?.command,20)}</div>
                             <div className={"cell"}/>
                         </div>
                         <div className={"top-margin"}/>
@@ -47,3 +47,9 @@ export const CommandSelection = (props: { commands: CommandConfig[] }) => {
     </div>
 }
 
+function shorten(text, length = 15)  {
+    if (!text || text.length <= length) {
+        return text;
+    }
+    return text.substring(0, length) + "...";
+};

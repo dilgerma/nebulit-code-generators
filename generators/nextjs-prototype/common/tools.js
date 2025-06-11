@@ -60,4 +60,6 @@ function renderSwitchStatement(element, typeName = "type", stateName = "state", 
     }`
 }
 
-module.exports = {renderSwitchStatement, renderLoadFromStream}
+
+
+module.exports = {renderSwitchStatement, renderLoadFromStream, shorten}

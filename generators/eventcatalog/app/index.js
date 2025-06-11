@@ -165,7 +165,7 @@ module.exports = class extends Generator {
         event.fields?.forEach(field => {
             element = element.prop(field.name, this._fieldType(field.type, field.cardinality))
         })
-        let destinationPath = event.aggregate ? `${slugify(this.answers.appName)}/${path}/${service}/${simpleSlugify(event.title)}/schema.json` : `${slugify(this.answers.appName)}/events/${event.title}/schema.json`;
+        let destinationPath = event.aggregate ? `${slugify(this.answers.appName)}/${path}/${simpleSlugify(event.title)}/schema.json` : `${slugify(this.answers.appName)}/events/${event.title}/schema.json`;
         this.fs.copyTpl(
             this.templatePath('root/events/schema.tpl.json'),
             this.destinationPath(destinationPath),

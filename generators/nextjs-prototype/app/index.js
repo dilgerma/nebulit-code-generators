@@ -78,22 +78,6 @@ module.exports = class extends Generator {
 
         }).join("\n")
 
-
-        var flows = config.flows?.map((flow) => {
-            return {
-                name: flow.name,
-                description: flow.description,
-                slices: flow.slices?.map((slice) => {
-                    return {
-                        sliceSlug: _sliceTitle(slice.slice),
-                        slice: slice.slice,
-                        step: slice.step
-                    }
-                })
-
-            }
-        })
-
         this.fs.copyTpl(
             this.templatePath('root'),
             this.destinationPath(slugify(this.answers.appName)),
@@ -102,7 +86,6 @@ module.exports = class extends Generator {
                 appName: this.answers.appName,
                 _views: sliceViews,
                 _imports: componentImports,
-                _flows: JSON.stringify(flows)
             }
         )
 
