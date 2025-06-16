@@ -29,6 +29,45 @@ module.exports = class extends Generator {
         config = require(this.env.cwd + "/config.json");
     }
 
+    _analyzeSpecs(spec) {
+        if (!spec) return '';
+
+        const comments = spec?.comments?.length > 0
+            ? `\nComments:\n${spec.comments.map(comment => `  - ${comment.description}`).join('\n')}`
+            : '';
+
+        const given = spec.given?.length > 0
+            ? `\n### Given (Events):\n${spec.given.map(event => this._elementAnalyze(event)).join('\n')}`
+            : '\n### Given (Events): None';
+
+        const when = spec.when?.length > 0
+            ? `\n### When (Command):\n${spec.when.map(command => this._elementAnalyze(command)).join('\n')}`
+            : '\n### When (Command): None';
+
+        const then = spec.error
+            ? '\n### Then: Expect error'
+            : spec.then?.length > 0
+                ? `\n### Then:\n${spec.then.map(event => this._elementAnalyze(event)).join('\n')}`
+                : '\n### Then: None';
+
+        return `
+# Spec Start
+Title: ${spec.title}${comments}${given}${when}${then}
+# Spec End`;
+    }
+
+    _elementAnalyze(element) {
+        if (!element) return '';
+
+        const fieldsWithExamples = element?.fields?.filter(field => field.example) || [];
+
+        const fieldsSection = fieldsWithExamples.length > 0
+            ? `\n  #### Fields:\n${fieldsWithExamples.map(field => `    - ${field.name}: ${field.example}`).join('\n')}`
+            : '';
+
+        return `  * ${element.title}${fieldsSection}`;
+    }
+
     async prompting() {
         this.answers = await this.prompt([
             {
@@ -41,7 +80,7 @@ module.exports = class extends Generator {
                 type: 'checkbox',
                 name: 'aggregate_slices',
                 loop: false,
-                message: 'Choose for which Slices to genereate Command and Eventsourcing Handlers. (generates to .tmp file)',
+                message: 'Choose for which Slices to generate Commands- and Eventsourcing Handlers. (generates to .tmp file)',
                 choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context))
                     .filter(slice => {return slice.commands?.some(command => command.aggregateDependencies?.includes(items.aggregate))})
                     .map((item, idx) => item.title).sort(),
@@ -96,8 +135,14 @@ module.exports = class extends Generator {
                 .filter(it => it.elementType === "EVENT").map(item => item.id), (eventId) => eventId)
             var events = uniqBy(config.slices.flatMap(slice => slice.events).filter(item => eventDeps.includes(item.id)), (event) => event.id)
 
+            var slice = config.slices.find(it => it.title === command.slice)
+            var specs = slice?.specifications?.map(spec => this._analyzeSpecs(spec))
+
             return `
     ${command.createsAggregate ? "@CreationPolicy(AggregateCreationPolicy.CREATE_IF_MISSING)" : ""}
+        /*
+        ${specs.join("\n")}
+        */
         @CommandHandler
         fun handle(command: ${_commandTitle(command.title)}) {
            ${events.map(event => {
