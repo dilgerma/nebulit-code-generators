@@ -39,6 +39,18 @@ module.exports = class extends Generator {
         });
     }
 
+    _writeBase64Image(base64Data, index) {
+        try {
+            // Remove data URL prefix if present (e.g., "data:image/png;base64,")
+            const base64String = base64Data.replace(/^data:image\/[a-z]+;base64,/, '');
+
+            // Convert base64 to buffer
+            return Buffer.from(base64String, 'base64');
+        } catch (error) {
+            this.log(`✗ Error writing screen image ${index + 1}: ${error.message}`);
+        }
+    }
+
 
     _writeScreen(sliceName) {
         var slice = findSlice(config, sliceName)
@@ -72,7 +84,7 @@ module.exports = class extends Generator {
 
             var commandMapping = `[${commands.map((command) => {
                 var commandSlice = findSliceByCommandId(config, command.id)
-                var idAttribute = command.fields.find(it => it?.idAttribute)?.name??"aggregateId"
+                var idAttribute = command.fields.find(it => it?.idAttribute)?.name ?? "aggregateId"
                 return `{
                     "command":"${_commandTitle(command.title)}",
                     "endpoint": ${command.apiEndpoint ? `"${command.apiEndpoint}/${idAttribute}"` : `"/${_sliceTitle(commandSlice.title)}/{${idAttribute}}"`},
@@ -88,6 +100,17 @@ module.exports = class extends Generator {
                                 
                             }`
             }).join(",")}]`
+
+            let screenImages = config.sliceImages?.filter(it => it.slice === sliceName)
+
+            for(let screenImage of screenImages) {
+                let buffer = this._writeBase64Image(screenImage.base64Image, screenImages.indexOf(screenImage))
+
+                // Write to destination
+                this.fs.write(
+                    `${slugify(this.givenAnswers?.appName)}/app/components/slices/${_sliceTitle(slice.title)}/${screenImage.title}-${screenImage.id}.png`, buffer
+                );
+            }
 
             this.fs.copyTpl(
                 this.templatePath('page.tsx.tpl'),
@@ -169,7 +192,7 @@ module.exports = class extends Generator {
 
     _readModelEndpoint(sliceName, readModel) {
         var slice = findSliceByReadModelId(config, readModel.id)
-        var idAttribute = readModel.fields?.find(it => it.idAttribute)?.name??"aggregateId"
+        var idAttribute = readModel.fields?.find(it => it.idAttribute)?.name ?? "aggregateId"
         return readModel.apiEndpoint ? readModel.apiEndpoint : `${readModel.listElement ? "/" + _sliceTitle(slice.title) : "/" + _sliceTitle(slice.title) + `/{${idAttribute}}`}`
     }
 
