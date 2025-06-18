@@ -12,30 +12,18 @@ When I say "adjust screen", start the process for all slices in app/components/s
 2. Develop a clear, step-by-step plan. Break down the fix into manageable, incremental steps.
 3. Your working Directory is /app/components/slices/*
 5. if a subfolder in /app/components/slices/* contains a Screen.tsx and one or several .png files, the Styling of the Screen.tsx must be adjusted to match the png file. Before you start, ask for the image to be pasted.
-6. parse the Screen.tsx and use the AIHint-Comments as guideline. Replace CommandSelection and ReadModelSelection with custom code to access the APIs.
-7. Before each code change, always consult the relevant rule files, and follow the rules very carefully.
+6. Use the pasted png as guideline for the layout, fields are coming from the provided schema.
+7. if Command Enabled is true, screen should perform a POST request using fetch, if Read Model is enabled, should be a GET request to retrieve the information to display.
+8. parse the Screen.tsx and use the AIHint-Comments as guideline. Replace CommandSelection and ReadModelSelection with custom code to access the APIs.
+9. Before each code change, always consult the relevant rule files in .cursor, and follow the rules very carefully.
    - Failure to follow the rules is the main reason for making unacceptable changes.
-8. Iterate until you are extremely confident the fix is complete.
+10. Iterate until you are extremely confident the fix is complete.
    - When changing code, do not add comments about what you changed.
-
-If you a CommandSelection with non-empty commands, it means the user will can act, and POST to an endpoint.
-
- <CommandSelection commands={[{
-                    "command":"BikeCommand",
-                    "endpoint": "/bike/{aggregateId}",
-                    "schema": BikeCommandSchema
-                }]}
-
-URL is endpoint, stick to the schema in "schema"
-
-If you find a Read Model Selection with non-empty Read Models, it means data is loaded and displayed.
-
-<ReadModelSelection aggregateId={props.aggregateId} readModels={[]}/>
-
-URL is endpoint, stick to the schema in "schema"
 
 
 Follow the instructions in @Tools Rules Tools and Rules mentioned here take precedence.
+
+For images, use "/placeholder.png" as a placeholder.
 
 ## Rules for implementing changes
 
