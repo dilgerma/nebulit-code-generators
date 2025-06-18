@@ -12,7 +12,7 @@ export default function PrototypePage() {
         <div className="">
             <div className="columns">
 
-                <div className="column is-2">
+                {<%-showFlowSelection ? <div className="column is-2">
                     <aside className="menu">
                       <p className={"menu-label"}>
                                         <img width={100} src="<%- logo%>"/>
@@ -24,7 +24,7 @@ export default function PrototypePage() {
                             <%- flows %>
                         </ul>
 
-                    </aside>
+                    </aside> : <span/>}
 
 
                 </div>
