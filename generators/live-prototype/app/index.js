@@ -213,6 +213,7 @@ module.exports = class extends Generator {
         let screenImages = config.sliceImages?.filter(it => screensWithSameTitle?.map(item => item.id).includes(it.id))
 
         let imageList = []
+        let descriptionList = []
         for(let screenImage of screenImages) {
             let buffer = this._writeBase64Image(screenImage.base64Image, screenImages.indexOf(screenImage))
 
@@ -221,11 +222,14 @@ module.exports = class extends Generator {
                 `./public/screens/${screenImage.title}-${screenImage.id}.png`, buffer
             );
             imageList.push(`"${screenImage.title}-${screenImage.id}"`)
+            let description = config.flatMap(it => it.screens)?.find(it => it.id === screenImage.id)?.description
+            descriptionList.push(`"${description}"`)
         }
 
         this.fs.copyTpl(this.templatePath(`screens/screen.tsx.tpl`), this.destinationPath(`./app/prototype/${_flowTitle(flow.name)}/screens/${_screenTitle(screenTitle)}.tsx`), {
             name: _screenTitle(screenTitle),
             images: imageList,
+            descriptionList: descriptionList,
             firstImage: imageList[0],
             readModelResolvers: this._writeScreen_readModelResolvers(readModels),
             commmandHandlers: this._writeScreen_commandHandlers(commands),

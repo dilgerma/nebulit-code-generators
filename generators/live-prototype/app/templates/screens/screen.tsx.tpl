@@ -18,6 +18,8 @@ export default function <%-name%>() {
     const [activeCommand, setActiveCommand] = useState<string>()
     const [currentImage, setCurrentImage] = useState<number>(0)
     const [images, setImages] = useState<string[]>([<%-images%>])
+    const [descriptions, setDescriptions] = useState<string[]>([<%-descriptions%>])
+
 
     const nextImage = ()=>{
         if(currentImage < images.length - 1){
@@ -33,8 +35,10 @@ export default function <%-name%>() {
             <div>
             <%-commandButtons%>
             </div>
+            <div>
             {images[currentImage] ? <div><img width="50%" onClick={()=>nextImage()} src={`screens/${images[currentImage]}.png`} /></div> : <span/>}
-
+            {images[currentImage] && descriptions[currentImage] ? <div><small>{descriptions[currentImage]}</small></div> : <span/>}
+            </div>
         <div className="big-top-margin">
             <%- template %>
         </div>
