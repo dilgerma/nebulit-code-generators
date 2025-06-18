@@ -223,7 +223,7 @@ module.exports = class extends Generator {
                 `./public/screens/${screenImage.title}-${screenImage.id}.png`, buffer
             );
             imageList.push(`"${screenImage.title}-${screenImage.id}"`)
-            let description = config.flatMap(it => it.screens)?.find(it => it.id === screenImage.id)?.description
+            let description = config.screens.flatMap(it => it.screens)?.find(it => it.id === screenImage.id)?.description
             descriptionList.push(`"${description}"`)
         }
 
