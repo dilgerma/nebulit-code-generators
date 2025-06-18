@@ -99,7 +99,7 @@ module.exports = class extends Generator {
             logo: logo,
             screenImports: this._writePage_flowImports(flows),
             flows: this._writePage_flows(flows),
-            showFlowSelection: flows.length > 1,
+            showFlowSelection: true,
             viewList: this._writePage_flowDisplay(flows),
         })
     }
