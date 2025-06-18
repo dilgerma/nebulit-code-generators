@@ -6,7 +6,7 @@ import {DebugEvents} from "@/app/prototype/debug/eventsdebug";
 
 export default function PrototypePage() {
 
-    const [activeFlow, setActiveFlow] = useState<string>()
+    const [activeFlow, setActiveFlow] = useState<string>("DefaultFlow")
 
     return <section className="section main-container">
         <div className="">
