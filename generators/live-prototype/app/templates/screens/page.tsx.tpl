@@ -24,10 +24,10 @@ export default function PrototypePage() {
                             <%- flows %>
                         </ul>
 
-                    </aside> : <span/>}
+                    </aside> </div> : <span/>}
 
 
-                </div>
+
                 <div className="column">
                     <%- viewList %>
                 </div>
