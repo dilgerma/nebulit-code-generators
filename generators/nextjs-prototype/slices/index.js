@@ -51,6 +51,10 @@ module.exports = class extends Generator {
         }
     }
 
+    _idAttribute(element){
+        return element.fields?.find(it => it.idAttribute)?.name ?? "aggregateId"
+    }
+
 
     _writeScreen(sliceName) {
         var slice = findSlice(config, sliceName)
@@ -84,7 +88,7 @@ module.exports = class extends Generator {
 
             var commandMapping = `[${commands.map((command) => {
                 var commandSlice = findSliceByCommandId(config, command.id)
-                var idAttribute = command.fields.find(it => it?.idAttribute)?.name ?? "aggregateId"
+                var idAttribute = this._idAttribute(command)
                 return `{
                     "command":"${_commandTitle(command.title)}",
                     "endpoint": ${command.apiEndpoint ? `"${command.apiEndpoint}/${idAttribute}"` : `"/${_sliceTitle(commandSlice.title)}/{${idAttribute}}"`},
@@ -100,6 +104,31 @@ module.exports = class extends Generator {
                                 
                             }`
             }).join(",")}]`
+
+            const ai_readmodel_comment = `
+            Read Model enabled: ${readModels.length > 0}
+            ${readModels.map(readModel => `
+            ## start read model
+            Title: ${readModel.title}
+            GET Endpoint: http://localhost:8080/${this._readModelEndpoint(sliceName, readModel)}
+            Schema: ${JSON.stringify(parseSchema(readModel))}
+            ## end read model
+            `
+            )}`
+
+              const ai_command_comment = `
+            Command enabled: ${commands.length > 0}
+            ${commands?.map(command => `
+            ## start command
+            Title: ${command.title}
+            POST Endpoint: http://localhost:8080/${command.apiEndpoint ? `"${command.apiEndpoint}/${this._idAttribute(command)}"` : `"/${_sliceTitle(command.slice)}/{${this._idAttribute(command)}}"`}
+            Schema: ${JSON.stringify(parseSchema(command))}
+            ## end command
+            `
+            )}
+            
+            
+            `
 
             let screenImages = config.sliceImages?.filter(it => it.slice === sliceName)
 
@@ -122,7 +151,9 @@ module.exports = class extends Generator {
                     _schemaImports: schemaImports,
                     _commandMapping: commandMapping,
                     _readModelMapping: readModelMapping,
-                    _readModelImports: readModelImports
+                    _readModelImports: readModelImports,
+                    _ai_command_comment: ai_command_comment,
+                    _ai_readmodel_comment: ai_readmodel_comment
 
                 }
             )

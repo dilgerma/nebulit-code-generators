@@ -21,9 +21,18 @@ export default function <%=_pageName%>(props: any) {
                 </Head>
                 <main>
                     <div className={"columns"}>
+                        {/*
+                        AIHint:
+                        <%- _ai_command_comment %>
+                        */}
                         {<%-_commandMapping%>?.length > 0 ? <div className={"column"}>
                             <CommandSelection commands={<%-_commandMapping%>}/>
                         </div> : <span/>}
+
+                         {/*
+                          AIHint:
+                          <%- _ai_readmodel_comment %>
+                         */}
                         {<%-_readModelMapping%>?.length > 0 ? <div className={"column"}>
                             <ReadModelSelection aggregateId={props.aggregateId} readModels={<%-_readModelMapping%>}/>
                         </div> : <span/> }

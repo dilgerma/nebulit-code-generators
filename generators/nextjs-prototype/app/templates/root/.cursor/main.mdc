@@ -17,11 +17,10 @@ When I say "adjust screen", start the process for all slices in app/components/s
 2. Develop a clear, step-by-step plan. Break down the fix into manageable, incremental steps.
 3. Your working Directory is /app/components/slices/*
 5. if a subfolder in /app/components/slices/* contains a Screen.tsx and one or several .png files, the Styling of the Screen.tsx must be adjusted to match the png file
-6. parse the Screen.tsx and extract the relevant API endpoints to call using fetch from the CommandSelection.
-7. Make sure to adjust to the given Schema in the json-file.
-4. Before each code change, always consult the relevant rule files, and follow the rules very carefully.
+6. parse the Screen.tsx and use the AIHint-Comments as guideline.
+7. Before each code change, always consult the relevant rule files, and follow the rules very carefully.
    - Failure to follow the rules is the main reason for making unacceptable changes.
-5. Iterate until you are extremely confident the fix is complete.
+8. Iterate until you are extremely confident the fix is complete.
    - When changing code, do not add comments about what you changed.
 
 If you a CommandSelection with non-empty commands, it means the user will can act, and POST to an endpoint.
