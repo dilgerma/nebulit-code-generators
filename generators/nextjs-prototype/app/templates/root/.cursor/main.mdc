@@ -1,8 +1,3 @@
----
-description: Main entry point for AI-based development and developer reference
-globs:
-alwaysApply: true
----
 # Main Entry Point
 
 This is the main entry point for AI-based development when working with this codebase, but also serves as a great reference for developers.
@@ -16,8 +11,8 @@ When I say "adjust screen", start the process for all slices in app/components/s
 1. Investigate the codebase. Explore relevant files, search for key functions, and gather context.
 2. Develop a clear, step-by-step plan. Break down the fix into manageable, incremental steps.
 3. Your working Directory is /app/components/slices/*
-5. if a subfolder in /app/components/slices/* contains a Screen.tsx and one or several .png files, the Styling of the Screen.tsx must be adjusted to match the png file
-6. parse the Screen.tsx and use the AIHint-Comments as guideline.
+5. if a subfolder in /app/components/slices/* contains a Screen.tsx and one or several .png files, the Styling of the Screen.tsx must be adjusted to match the png file. Before you start, ask for the image to be pasted.
+6. parse the Screen.tsx and use the AIHint-Comments as guideline. Replace CommandSelection and ReadModelSelection with custom code to access the APIs.
 7. Before each code change, always consult the relevant rule files, and follow the rules very carefully.
    - Failure to follow the rules is the main reason for making unacceptable changes.
 8. Iterate until you are extremely confident the fix is complete.
@@ -40,7 +35,7 @@ If you find a Read Model Selection with non-empty Read Models, it means data is 
 URL is endpoint, stick to the schema in "schema"
 
 
-Follow the instructions in [Tools Rules](mdc:.cursor/rules/tools.mdc) Tools and Rules mentioned here take precedence.
+Follow the instructions in @Tools Rules Tools and Rules mentioned here take precedence.
 
 ## Rules for implementing changes
 
