@@ -447,7 +447,7 @@ module.exports = class extends Generator {
 
         let eventsDependencies = readModel.dependencies.filter((it) => it.type === "INBOUND")
 
-        var events = config.slices.flatMap(slice => slice.events).filter(event => eventsDependencies.map(it => it.id).includes(event.id))
+        var events = config.slices.flatMap(slice => slice.events).filter(it => it.context !== "EXTERNAL").filter(event => eventsDependencies.map(it => it.id).includes(event.id))
         var aggregates = uniq(events.map(it => `"${_aggregateTitle(defaultAggregate(it.aggregate))}"`))
 
         this.fs.copyTpl(this.templatePath(`readmodels/readmodel.ts.tpl`), this.destinationPath(`./app/prototype/components/slices/${_sliceTitle(readModel.slice)}/${_readmodelTitle(readModel?.title)}.ts`), {
@@ -477,7 +477,7 @@ module.exports = class extends Generator {
 
     _writeEvents() {
         config.slices.forEach((slice) => {
-            var events = slice?.events
+            var events = slice?.events?.filter(it => it.context !== "EXTERNAL")
             if (!events || events.length === 0) {
                 return
             }
@@ -522,7 +522,7 @@ module.exports = class extends Generator {
     _writeCommand(slice, command) {
 
         let eventsDependencies = command.dependencies.filter((it) => it.type === "OUTBOUND")
-        var events = config.slices.flatMap(slice => slice.events).filter(event => eventsDependencies.map(it => it.id).includes(event.id))
+        var events = config.slices.flatMap(slice => slice.events).filter(it => it.context !== "EXTERNAL").filter(event => eventsDependencies.map(it => it.id).includes(event.id))
         var eventsImports = Array.from(new Set(events.map(event => renderImports(`@/app/prototype/components/events/${_aggregateTitle(defaultAggregate(event.aggregate)).toLowerCase()}`, [`${_eventTitle(event.title)}`])))).join("\n")
         //var eventsWithoutAggregateImports = Array.from(new Set(events.filter(event => !event.aggregate).map(event => renderImports(`@/app/prototype/components/events/`, [`${_eventTitle(event.title)}`])))).join("\n")
         var commandIdField = command?.fields?.find(it => it.identifier)
