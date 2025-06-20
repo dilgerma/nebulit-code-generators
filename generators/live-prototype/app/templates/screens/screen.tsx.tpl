@@ -35,9 +35,9 @@ export default function <%-name%>() {
             <div>
             <%-commandButtons%>
             </div>
-            <div className="has-text-centered">
+            <div className="">
             {images[currentImage] ? <div><img width="50%" onClick={()=>nextImage()} src={`screens/${images[currentImage]}.png`} /></div> : <span/>}
-            {images[currentImage] && descriptions[currentImage] ? <div><small>{descriptions[currentImage]}</small></div> : <span/>}
+            {images[currentImage] && descriptions[currentImage] ? <div className="has-text-centered"><small>{descriptions[currentImage]}</small></div> : <span/>}
             </div>
         <div className="big-top-margin">
             <%- template %>
