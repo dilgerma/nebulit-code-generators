@@ -82,7 +82,7 @@ module.exports = class extends Generator {
     _writeFlow(flow) {
         var title = _flowTitle(flow.name)
         var screens = uniqBy(this._loadScreensForFlow(flow).filter(it => it), item => item.title)
-            .sort((a, b) => (a.prototype?.order ?? -1) - (b.prototype?.order ?? -1))
+            .sort((a, b) => (a.prototype?.order ?? 99) - (b.prototype?.order ?? 99))
 
         this.fs.copyTpl(this.templatePath(`screens/flow.tsx.tpl`), this.destinationPath(`./app/prototype/components/flows/${title}.tsx`), {
             name: title,
@@ -124,7 +124,7 @@ module.exports = class extends Generator {
 
     _writeFlow_viewDisplay(screens) {
         var screensToRender = screens.concat({"title": "Automations", "prototype": {order: 99999}})
-            .sort((a, b) => (a.prototype?.order ?? -1) - (b.prototype?.order ?? -1))
+            .sort((a, b) => (a.prototype?.order ?? 99) - (b.prototype?.order ?? 99))
 
         return screensToRender.map((screen) => {
             var title = _screenTitle(screen.title)
@@ -145,7 +145,7 @@ module.exports = class extends Generator {
 
     _writeFlow_viewList(screens) {
         var screensToRender = screens.concat({"title": "Automations", prototype: {order: 999}})
-            .sort((a, b) => (a.prototype?.order ?? -1) - (b.prototype?.order ?? -1))
+            .sort((a, b) => (a.prototype?.order ?? 99) - (b.prototype?.order ?? 99))
         var result = screensToRender.map((screen) => {
             var title = _screenTitle(screen.title)
             return `<li className={activeView === "${title}" ? "is-active" : ""}>
@@ -175,7 +175,7 @@ module.exports = class extends Generator {
     _writeScreens(flows) {
         flows.forEach((flow) => {
             let screens = this._loadScreensForFlow(flow)
-                .sort((a, b) => (a.prototype?.order ?? -1) - (b.prototype?.order ?? -1))
+                .sort((a, b) => (a.prototype?.order ?? 99) - (b.prototype?.order ?? 99))
 
             let groupedScreens = groupBy(screens, (screen) => screen?.title)
             Object.keys(groupedScreens).filter(it => it).map(title => groupedScreens[title])
@@ -310,7 +310,7 @@ module.exports = class extends Generator {
 
     _writeScreen_readModelMain(readModels, placement, exactPlacement) {
         return uniqBy(readModels.filter(it => (!it.prototype?.placement && !exactPlacement) || it.prototype?.placement === placement), (it => it.id))
-            .sort((a, b) => (a.prototype?.order ?? -1) - (b.prototype?.order ?? -1))
+            .sort((a, b) => (a.prototype?.order ?? 99) - (b.prototype?.order ?? 99))
             .map(readModel => {
                 var title = _readmodelTitle(readModel.title)
 
@@ -339,7 +339,7 @@ module.exports = class extends Generator {
     }
 
     _writeScreen_commandButtons(commands) {
-        return uniq(commands, (it => it.id)).sort((a, b) => (a.prototype?.order ?? -1) - (b.prototype?.order ?? -1)).map((command) => {
+        return uniq(commands, (it => it.id)).sort((a, b) => (a.prototype?.order ?? 99) - (b.prototype?.order ?? 99)).map((command) => {
 
             var title = _commandTitle(command.title)
             var slice = _sliceTitle(command.slice)
@@ -356,7 +356,7 @@ module.exports = class extends Generator {
     }
 
     _writeAutomation_commandButtons(commands) {
-        return uniq(commands, (it => it.id)).sort((a, b) => (a.prototype?.order ?? -1) - (b.prototype?.order ?? -1)).map((command) => {
+        return uniq(commands, (it => it.id)).sort((a, b) => (a.prototype?.order ?? 99) - (b.prototype?.order ?? 99)).map((command) => {
 
             var title = _commandTitle(command.title)
             var slice = _sliceTitle(command.slice)
