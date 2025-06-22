@@ -13,6 +13,7 @@ import mu.KotlinLogging
 
 interface <%-_name%>Repository : JpaRepository<<%-_name%>Entity, <%-_name%>Key>
 
+<%- _aiComment %>
 /*
 Boardlink: <%- link%>
 */
