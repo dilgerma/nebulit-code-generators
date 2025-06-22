@@ -33,7 +33,7 @@ function _elementAnalyze(element) {
     const fieldsWithExamples = element?.fields?.filter(field => field.example) || [];
 
     const fieldsSection = fieldsWithExamples.length > 0
-        ? `\n  #### Fields:\n${fieldsWithExamples.map(field => ` - ${field.name}: ${field.example}`).join('\n')}`
+        ? `\n  Fields:\n${fieldsWithExamples.map(field => ` - ${field.name}: ${field.example}`).join('\n')}`
         : '';
 
     return `  * ${element?.title}${fieldsSection}`;

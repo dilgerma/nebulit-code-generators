@@ -31,7 +31,6 @@ module.exports = class extends Generator {
     }
 
 
-
     async prompting() {
         this.answers = await this.prompt([
             {
@@ -46,14 +45,16 @@ module.exports = class extends Generator {
                 loop: false,
                 message: 'Choose for which Slices to generate Commands- and Eventsourcing Handlers. (generates to .tmp file)',
                 choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context))
-                    .filter(slice => {return slice.commands?.some(command => command.aggregateDependencies?.includes(items.aggregate))})
+                    .filter(slice => {
+                        return slice.commands?.some(command => command.aggregateDependencies?.includes(items.aggregate))
+                    })
                     .map((item, idx) => item.title).sort(),
             }]);
 
     }
 
     writeAggregates() {
-       this._writeAggregates(config.aggregates.find(item => item.title === this.answers.aggregate))
+        this._writeAggregates(config.aggregates.find(item => item.title === this.answers.aggregate))
     }
 
     _writeAggregates(aggregate) {
@@ -62,7 +63,7 @@ module.exports = class extends Generator {
         var idFieldType = idType(aggregate)
 
         var aggregateFile = this.answers.aggregate_slices?.length > 0 ?
-            `${_aggregateTitle(aggregate.title)}.kt.tmp`:
+            `${_aggregateTitle(aggregate.title)}.kt.tmp` :
             `${_aggregateTitle(aggregate.title)}.kt`
 
         this.fs.copyTpl(
@@ -103,10 +104,11 @@ module.exports = class extends Generator {
             var specs = slice?.specifications?.map(spec => analyzeSpecs(spec))
 
             return `
-    ${command.createsAggregate ? "@CreationPolicy(AggregateCreationPolicy.CREATE_IF_MISSING)" : ""}
-        /*
+            ${specs.length > 0 ? `/*
+        //AI-TODO: 
         ${specs.join("\n")}
-        */
+        */` : ``}
+    ${command.createsAggregate ? "@CreationPolicy(AggregateCreationPolicy.CREATE_IF_MISSING)" : ""}
         @CommandHandler
         fun handle(command: ${_commandTitle(command.title)}) {
            ${events.map(event => {

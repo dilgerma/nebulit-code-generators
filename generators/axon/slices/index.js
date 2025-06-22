@@ -343,7 +343,9 @@ module.exports = class extends Generator {
     _writeQueryableMultiKeyReportReadModel(sliceTitle, readModel, inboundEvents, slice) {
 
         var specs = slice?.specifications?.map(spec => analyzeSpecs(spec))
-        var aiComment =  specs?.length  >0 ? `/* ${specs.join(`\n`)} */` : ""
+        var aiComment =  specs?.length  >0 ? `/*
+         // AI-TODO:
+         ${specs.join(`\n`)} */` : ""
 
 
         this.fs.copyTpl(
@@ -448,7 +450,9 @@ module.exports = class extends Generator {
     _writeQueryableReportReadModel(sliceTitle, readModel, inboundEvents, slice) {
 
         var specs = slice?.specifications?.map(spec => analyzeSpecs(spec))
-        var aiComment =  specs?.length  >0 ? `/* ${specs.join(`\n`)} */` : ""
+        var aiComment =  specs?.length  >0 ? `/* 
+        // AI-TODO:
+        ${specs.join(`\n`)} */` : ""
 
         this.fs.copyTpl(
             this.templatePath(`src/components/QueryableReadModelProjector.kt.tpl`),

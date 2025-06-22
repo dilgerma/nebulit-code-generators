@@ -416,7 +416,7 @@ function renderVariable(variableValue, variableType, variableName, defaults) {
             return `LocalDateTime.parse("${value}", DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))`;
         case "boolean":
         case "long":
-            return `${value}L`;
+            return `${value}`;
         case "double":
         case "int":
             return `${value}`;
