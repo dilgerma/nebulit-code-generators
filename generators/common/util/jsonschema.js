@@ -11,7 +11,25 @@ function parseSchema(element) {
     schemaElement = schemaElement.title(element.title)
         .description(element.description)
     element.fields?.forEach(field => {
-        schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality))
+        if (field.type !== "Custom") {
+            schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality));
+        }else {
+            try {
+                let customSchema = field.schema ? JSON.parse(field.schema) : undefined;
+                let customSchemaObject = schema.object()
+
+                // Add properties from the parsed schema
+                Object.keys(customSchema).forEach(key => {
+                    const fieldType = customSchema[key]
+                    customSchemaObject = customSchemaObject.prop(key, getSchemaTypeFromString(fieldType))
+                });
+
+                schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality, customSchemaObject));
+            } catch (e) {
+                console.log(e)
+                schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality));
+            }
+        }
     })
     return schemaElement.valueOf()
 
