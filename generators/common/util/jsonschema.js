@@ -12,7 +12,7 @@ function parseSchema(element) {
         .description(element.description)
     element.fields?.forEach(field => {
         if (field.type !== "Custom") {
-            schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality));
+            schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality).additionalProperties(true));
         }else {
             try {
                 let customSchema = field.schema ? JSON.parse(field.schema) : undefined;
@@ -24,7 +24,7 @@ function parseSchema(element) {
                     customSchemaObject = customSchemaObject.prop(key, getSchemaTypeFromString(fieldType))
                 });
 
-                schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality, customSchemaObject));
+                schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality).additionalProperties(customSchemaObject));
             } catch (e) {
                 console.log(e)
                 schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality));
@@ -56,7 +56,7 @@ function fieldType(type, cardinality) {
             case "DateTime":
                 return schema.string().format("date-time")
             case "Custom":
-                return schema.object().additionalProperties(true)
+                return schema.object()
             default:
                 return schema.string()
         }
