@@ -5,6 +5,25 @@
 
 const schema = require('fluent-json-schema')
 
+
+function buildCustomSchema(schemaString) {
+    try {
+        const customSchema = JSON.parse(schemaString)
+        let customSchemaObject = schema.object()
+
+        // Iterate through the custom schema properties
+        Object.keys(customSchema).forEach(key => {
+            const customFieldType = customSchema[key]
+            customSchemaObject = customSchemaObject.prop(key, fieldType(customFieldType, "Single"))
+        })
+
+        return customSchemaObject
+    } catch (error) {
+        console.error('Error parsing custom schema:', error)
+        return schema.object().additionalProperties(true)
+    }
+}
+
 function parseSchema(element) {
 
     let schemaElement = schema.object()
@@ -12,23 +31,13 @@ function parseSchema(element) {
         .description(element.description)
     element.fields?.forEach(field => {
         if (field.type !== "Custom") {
-            schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality).additionalProperties(true));
-        }else {
-            try {
-                let customSchema = field.schema ? JSON.parse(field.schema) : undefined;
-                let customSchemaObject = schema.object()
-
-                // Add properties from the parsed schema
-                Object.keys(customSchema).forEach(key => {
-                    const fieldType = customSchema[key]
-                    customSchemaObject = customSchemaObject.prop(key, getSchemaTypeFromString(fieldType))
-                });
-
-                schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality).additionalProperties(customSchemaObject));
-            } catch (e) {
-                console.log(e)
-                schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality));
-            }
+            schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality));
+        } else {
+            // Handle custom schema
+            let customSchemaObject = buildCustomSchema(field.schema)
+            schemaElement = schemaElement.prop(field.name,
+                field.cardinality === "Single" ? customSchemaObject : schema.array().items(customSchemaObject)
+            )
         }
     })
     return schemaElement.valueOf()
