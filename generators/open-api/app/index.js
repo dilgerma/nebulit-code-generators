@@ -71,11 +71,24 @@ module.exports = class extends Generator {
 
         config.slices.forEach((slice) => {
             (slice.commands || []).forEach((cmd) => {
-                const id = (cmd.fields?.find(field => field.idAttribute)??"aggregateId").toLowerCase();
+                const id = (cmd.fields?.find(field => field.idAttribute)?.name??"aggregateId").toLowerCase();
                 const schemaName = cmd.title.replace(/\s+/g, '');
-                openapi.paths[`/${slugify(slice.title)}/${id}`] = {
+                const endpoint = `/${cmd?.endpoint??(_sliceTitle(slice.title))}/{${id}}`
+
+                openapi.paths[`${endpoint}`] = {
                     post: {
                         summary: cmd.title,
+                        parameters: [
+                            {
+                                name: `${id}`,
+                                in: 'path',
+                                required: true,
+                                schema: {
+                                    type: 'string'
+                                },
+                                description: 'The aggregate identifier'
+                            }
+                        ],
                         requestBody: {
                             required: true,
                             content: {
@@ -91,12 +104,23 @@ module.exports = class extends Generator {
             });
 
             (slice.readmodels || []).forEach((rm) => {
-                const id = (rm.fields?.find(field => field.idAttribute)??"aggregateId").toLowerCase();
-                const endpoint = rm?.endpoint??(slugify(slice.title))
+                const id = (rm.fields?.find(field => field.idAttribute)?.name??"aggregateId")
+                const endpoint = `/${rm?.endpoint??(_sliceTitle(slice.title))}/{${id}}`
                 const schemaName = rm.title.replace(/\s+/g, '');
-                openapi.paths[`/readmodels/${id}`] = {
+                openapi.paths[`${endpoint}`] = {
                     get: {
                         summary: `Get ${rm.title}`,
+                        parameters: [
+                            {
+                                name: `${id}`,
+                                in: 'path',
+                                required: true,
+                                schema: {
+                                    type: 'string'
+                                },
+                                description: 'The aggregate identifier'
+                            }
+                        ],
                         responses: {
                             200: {
                                 description: 'OK',
@@ -116,4 +140,8 @@ module.exports = class extends Generator {
         return openapi;
     }
 
+}
+
+function _sliceTitle(title) {
+    return slugify(title.replaceAll(" ", "").replace("slice:", "")).replaceAll("-", "").toLowerCase()
 }
