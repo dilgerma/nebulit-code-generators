@@ -37,16 +37,16 @@ module.exports = class extends Generator {
 
     setDefaults() {
         if (!this.answers.appName) {
-            this.answers.appName = config?.codeGen?.application + "Prototype"
+            this.answers.appName = config?.codeGen?.application
         }
     }
 
     writing() {
         this._writeReactSkeleton();
-        this.composeWith(require.resolve('../slices'), {
+        /*this.composeWith(require.resolve('../slices'), {
             answers: this.answers,
             appName: this.answers.appName ?? this.appName
-        });
+        });*/
     }
 
     _writeReactSkeleton() {

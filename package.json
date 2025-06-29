@@ -15,6 +15,16 @@
     "yeoman-generator": "^3.2.0",
     "slugify": "^1.6.6"
   },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.4",
+    "supabase": "^2.26.9",
+    "typescript": "^5"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   }

@@ -25,7 +25,7 @@ module.exports = class extends Generator {
                 name: 'generator',
                 message: 'Which generator?',
                 // choices: ["springboot", "axon","nextjs-prototype","typescript-prototype","eventcatalog"]
-                choices: ["axon", "sample-generator", "eventcatalog", "live-prototype","nextjs-prototype", "open-api"],
+                choices: ["axon","emmet", "sample-generator", "eventcatalog", "live-prototype","nextjs-prototype", "open-api"],
                 default: "axon"
             }]);
         } else {
