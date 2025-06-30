@@ -9,6 +9,7 @@ const {buildLink} = require("../../common/util/config");
 const {uniq} = require("../../common/util/util");
 const {_packageFolderName, _processorTitle} = require("../../common/util/naming");
 const {variableAssignments} = require("./assignments");
+const {analyzeSpecs} = require("../../common/util/specs");
 
 function sliceTitle(slice) {
     return slugify(pascalCase(slice.title.replace("slice:", "")), "").replaceAll("-", "")
@@ -70,9 +71,18 @@ function renderCommand(command) {
 
 function renderReadModel(readmodel) {
     const typeName = pascalCase(readmodel.title);
-    return `export type ${typeName}ReadModel = {
-        ${readmodel.fields.map((f) => `  ${f.name}: ${tsType(f)}`).join(',\n')},
-        };`
+    return `export type ${typeName}ReadModelItem = {
+        ${readmodel.fields.map((f) => `  ${f.name}?: ${tsType(f)}`).join(',\n')},
+        };
+        
+        export type ${typeName}ReadModel = {
+            data: ${readmodel.listElement ? `${typeName}ReadModelItem[]` : `${typeName}ReadModelItem`}
+            }
+        `
+}
+
+function findTargetField(fieldName, target) {
+    return target.fields.find(it => it.name === fieldName || it.mapping === fieldName)?.name
 }
 
 function renderEventAssignment(command, event) {
@@ -178,6 +188,7 @@ module.exports = class extends Generator {
                         .map(item => config.slices.flatMap(it => it.events).find(it => it.id === item.id))
                         .map(event => renderEventAssignment(command, event));
 
+                    const aiComment = slice.specifications?.map(spec => analyzeSpecs(spec)).join("\n")
 
                     this.fs.copyTpl(
                         this.templatePath(`commands.ts.tpl`),
@@ -188,13 +199,14 @@ module.exports = class extends Generator {
                             commandType: commandTitle(command),
                             resultingEvents: resultingEvents,
                             appName: this.answers.appName,
+                            aiComment:aiComment
                         })
 
                     this.fs.copyTpl(
                         this.templatePath(`commandApi.ts.tpl`),
                         this.destinationPath(`${this.answers.appName}/src/app/api/${slicePath?.toLowerCase()}/route.ts`),
                         {
-                            idAttribute: (command.fields.find(it => it.idAttribute)?.name)??"aggregateId",
+                            idAttribute: (command.fields.find(it => it.idAttribute)?.name) ?? "aggregateId",
                             command: commandTitle(command),
                             slice: slicePath,
                         })
@@ -248,6 +260,42 @@ module.exports = class extends Generator {
 
                     const tsCode = renderReadModel(readModel);
                     const slicePath = sliceTitle(slice)
+
+                    const aiComment = slice.specifications?.map(spec => analyzeSpecs(spec)).join("\n")
+
+                    let caseStatements;
+
+                    if (readModel.listElement) {
+                        let idFields = readModel.fields.filter(field => field.idAttribute)
+                        caseStatements = inboundDeps.map(event => {
+                            let query = idFields.map(field => `item.${field.name} === event.${findTargetField(field.name, event)??`noFieldMatch`}`).join(" && ")
+
+                            return `case "${eventTitle(event)}": {
+                                const existing = state.data?.find(item => ${query})
+                                
+                                if(existing) {
+                                   Object.assign(existing,  {
+                                     ${variableAssignments(readModel.fields, "event", event, ",\n", ":")}
+                                   })
+                                } else {
+                                    state?.data?.push({
+                                        ${variableAssignments(readModel.fields, "event", event, ",\n", ":")}
+                                    })
+                                }
+                                return {...state};
+                        }`
+                        });
+
+                    } else {
+                        caseStatements = inboundDeps.map(it => `case "${eventTitle(it)}": 
+                        return {
+                            ...document,
+                            ${variableAssignments(readModel.fields, "event", it, ",\n", ":")}
+                        }`
+                        )
+                    }
+
+
                     this.fs.copyTpl(
                         this.templatePath(`readmodel.ts.tpl`),
                         this.destinationPath(`${this.answers.appName}/src/app/slices/${slicePath}/${readModelTitle(readModel)}Projection.ts`),
@@ -257,8 +305,9 @@ module.exports = class extends Generator {
                             readModel: readModelTitle(readModel),
                             eventsUnion: inboundDeps.map(it => eventTitle(it)).join(` | `),
                             eventsList: inboundDeps.map(it => `"${eventTitle(it)}"`).join(` , `),
-                            caseStatements: inboundDeps.map(it => `case "${eventTitle(it)}":`).join("\n"),
-                            eventImports: imports
+                            caseStatements: caseStatements.join("\n"),
+                            eventImports: imports,
+                            aiComment: aiComment
 
                         })
 
@@ -287,7 +336,6 @@ module.exports = class extends Generator {
         let projections = []
         config.slices.forEach((slice) => {
             const readModels = slice.readmodels || [];
-
 
             readModels
                 .forEach((readModel) => {

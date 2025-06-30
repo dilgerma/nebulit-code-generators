@@ -27,7 +27,13 @@ export const evolve = (
     }
 };
 
-export const decide = (
+/*
+AI-TODO start: implement according to the specifications provided.
+Remove the TODO Comment afterwards.
+<%- aiComment %>
+AI-TODO end
+*/
+    export const decide = (
     command: <%-commandType%>Command,
     state: <%-slice%>State,
 ): <%-appName%>Events[] => {
