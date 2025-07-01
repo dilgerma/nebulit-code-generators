@@ -15,6 +15,15 @@ const eslintConfig = [
     rules: {
       "no-unused-vars": "off", // Disable unused variable warnings
       "@typescript-eslint/no-unused-vars": "off", // Also disable the TypeScript-specific version
+      "@typescript-eslint/ban-types": [
+        "error",
+        {
+          "extendDefaults": true,
+          "types": {
+            "{}": false
+          }
+        }
+      ]
     },
   },
 ];

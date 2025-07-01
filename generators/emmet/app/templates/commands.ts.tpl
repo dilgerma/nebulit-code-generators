@@ -6,12 +6,11 @@ import {findEventstore} from "@/app/common/loadPostgresEventstore";
 
 <%-command%>
 
+// TODO-AI keep attributes in state optional
 export type <%-slice%>State = {
-    _slice:string
 }
 
 export const <%-slice%>InitialState = (): <%-slice%>State => ({
-    _slice: '<%-slice%>',
 });
 
 export const evolve = (

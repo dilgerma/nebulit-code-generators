@@ -10,6 +10,9 @@ const {uniq} = require("../../common/util/util");
 const {_packageFolderName, _processorTitle} = require("../../common/util/naming");
 const {variableAssignments} = require("./assignments");
 const {analyzeSpecs} = require("../../common/util/specs");
+const ejs = require('ejs')
+const {v4} = require("uuid");
+
 
 function sliceTitle(slice) {
     return slugify(pascalCase(slice.title.replace("slice:", "")), "").replaceAll("-", "")
@@ -21,6 +24,10 @@ function commandTitle(cmd) {
 
 function readModelTitle(readmodel) {
     return `${slugify(pascalCase(readmodel.title)?.replaceAll(" ", "").replaceAll("-", ""))}`
+}
+
+function specTitle(spec) {
+    return `${slugify(pascalCase(spec.title)?.replaceAll(" ", "").replaceAll("-", ""))}`
 }
 
 function eventTitle(event) {
@@ -199,7 +206,7 @@ module.exports = class extends Generator {
                             commandType: commandTitle(command),
                             resultingEvents: resultingEvents,
                             appName: this.answers.appName,
-                            aiComment:aiComment
+                            aiComment: aiComment
                         })
 
                     this.fs.copyTpl(
@@ -268,7 +275,7 @@ module.exports = class extends Generator {
                     if (readModel.listElement) {
                         let idFields = readModel.fields.filter(field => field.idAttribute)
                         caseStatements = inboundDeps.map(event => {
-                            let query = idFields.map(field => `item.${field.name} === event.${findTargetField(field.name, event)??`noFieldMatch`}`).join(" && ")
+                            let query = idFields.map(field => `item.${field.name} === event.${findTargetField(field.name, event) ?? `noFieldMatch`}`).join(" && ")
 
                             return `case "${eventTitle(event)}": {
                                 const existing = state.data?.find(item => ${query})
@@ -354,11 +361,94 @@ module.exports = class extends Generator {
             })
     }
 
+    writeSpecs() {
+        config.slices.forEach(slice => {
+
+            const slicePath = sliceTitle(slice)
+
+            const specs = []
+
+            for (let spec of slice.specifications) {
+
+                // Manually load the template
+                const templatePath = this.templatePath('state_change_spec_file.ts.tpl');
+                const templateContent = this.fs.read(templatePath);
+                let command = config.slices.flatMap(it => it.commands).find(it => it.id === spec.when[0]?.linkedId)
+                if (!command) {
+                    continue
+                }
+
+
+                let commandFields = command.fields?.map(it => `${it.name}: ${exampleOrRandomValue(it.example, it.type)}`).join(",\n")
+
+                // Render template to string
+                const renderedContent = ejs.render(templateContent, {
+                    spec: spec,
+                    slice: slicePath,
+                    scenario_title: spec.title,
+                    command: commandTitle(command),
+                    commandFields: commandFields,
+                    given: renderGivenEvents(spec.given),
+                    then: renderThenEvents(spec.then, command),
+                });
+                specs.push(renderedContent)
+
+
+            }
+
+            this.fs.copyTpl(
+                this.templatePath(`state_change_spec.ts.tpl`),
+                this.destinationPath(`${this.answers.appName}/src/app/slices/${slicePath}/${sliceTitle(slice)}.test.ts`),
+                {
+                    slice: slicePath,
+                    scenarios: specs.filter(it => it).join("\n")
+                })
+
+        });
+    }
+
 
     end() {
         this.log(('Jobs is Done!'))
     }
 };
+
+
+function renderGivenEvents(specEvents) {
+    let givenEvents = specEvents.filter(it => it.type === "SPEC_EVENT").map(then => {
+        const event = config.slices.flatMap(it => it.events).find(it => it.id === then.linkedId)
+        if (!event) return ""
+        return `{
+                        type: '${eventTitle(event)}',
+                        data: {
+                            ${event.fields?.map(it => `${it.name}: ${exampleOrRandomValue(it.example, it.type)}`).join(",\n")}
+                        },
+                    }`
+    })
+    return `[${givenEvents.join(",\n")}]`
+}
+
+function renderThenEvents(specEvents, command) {
+
+    let error = specEvents.some(it => it.type === "SPEC_ERROR")
+
+    if (!error) {
+        let events = specEvents.filter(it => it.type === "SPEC_EVENT").map(then => {
+            const event = config.slices.flatMap(it => it.events).find(it => it.id === then.linkedId)
+            if (!event) return ""
+            return `{
+                        type: '${eventTitle(event)}',
+                        data: {
+                            ${variableAssignments(event.fields, "command.data", command, ",\n", ":")}
+                        },
+                    }`
+        }).join(",\n");
+        return `.then([${events}])`
+    } else {
+        return `.thenThrows()`
+    }
+
+}
 
 function serviceName(aggregateName) {
     let aggregate = config.aggregates.find(item => item.title === aggregateName)
@@ -386,3 +476,18 @@ function asList(items, mapping) {
 function toListElement(item, mapping) {
     return `  - ${mapping ? mapping(item) : item}`
 }
+
+function exampleOrRandomValue(example, type) {
+    if (example) return `"${example}"`;
+    if (type === "String") return `"${v4()}"`;
+    else if (type === "Decimal") return Math.random() * 1000;
+    else if (type === "Double") return Math.random() * 1000;
+    else if (type === "Long") return Math.round(Math.random() * 1000);
+    else if (type === "Int") return Math.round(Math.random() * 1000);
+    else if (type === "Boolean") return Math.random() < 0.5;
+    else if (type === "Date") return new Date(Date.now() - Math.random() * 1e12);
+    else if (type === "DateTime") return new Date(Date.now() - Math.random() * 1e12);
+    else if (type === "UUID") return `"${v4()}"`;
+    else return "null // todo: handle complex type";
+}
+
