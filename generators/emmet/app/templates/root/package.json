@@ -24,6 +24,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
     "tsx": "^4.20.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@testcontainers/postgresql": "^11.0.3"
   }
 }

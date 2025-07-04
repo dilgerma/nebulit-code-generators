@@ -1,5 +1,5 @@
 import {DeciderSpecification} from '@event-driven-io/emmett';
-import {<%-slice%>Command, <%-slice%>State, decide, evolve} from "./<%-slice%>Command";
+<%-imports%>
 import {describe, it} from "node:test";
 
 

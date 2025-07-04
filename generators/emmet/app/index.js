@@ -6,7 +6,7 @@
 var Generator = require('yeoman-generator');
 var slugify = require('slugify')
 const {buildLink} = require("../../common/util/config");
-const {uniq} = require("../../common/util/util");
+const {uniq, uniqBy} = require("../../common/util/util");
 const {_packageFolderName, _processorTitle} = require("../../common/util/naming");
 const {variableAssignments} = require("./assignments");
 const {analyzeSpecs} = require("../../common/util/specs");
@@ -111,16 +111,29 @@ module.exports = class extends Generator {
         config = require(this.env.cwd + "/config.json");
     }
 
-    // Async Await
+// Async Await
     async prompting() {
         this.answers = await this.prompt([{
             type: 'input',
             name: 'appName',
             message: 'Projectname?',
             when: () => !config?.codeGen?.application,
-        }])
+        },
+            {
+                type: 'confirm',
+                name: 'skeleton',
+                message: 'Generate skeleton ( say yes, if you run this the first time )'
+            },
+            {
+                type: 'checkbox',
+                name: 'slices',
+                choices: config.slices.map(it => it.title),
+                loop: false,
+                message: 'Which Slice should be generated?'
+            }]);
 
     }
+
 
     setDefaults() {
         if (!this.answers.appName) {
@@ -129,7 +142,9 @@ module.exports = class extends Generator {
     }
 
     writing() {
-        this._writeApp()
+        if(this.answers.skeleton) {
+            this._writeApp()
+        }
     }
 
     _writeApp() {
@@ -178,8 +193,12 @@ module.exports = class extends Generator {
     }
 
 
+
     writingCommands() {
-        const slices = config.slices || [];
+
+        var slicesNames = this.answers.slices
+
+        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
 
         slices.forEach((slice) => {
             const commands = slice.commands || [];
@@ -223,7 +242,9 @@ module.exports = class extends Generator {
     }
 
     writingEvents() {
-        const slices = config.slices || [];
+        var slicesNames = this.answers.slices
+
+        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
 
         slices.forEach((slice) => {
             const events = slice.events || [];
@@ -251,7 +272,9 @@ module.exports = class extends Generator {
     }
 
     writingReadModels() {
-        const slices = config.slices || [];
+        var slicesNames = this.answers.slices
+
+        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
 
         slices.forEach((slice) => {
             const readModels = slice.readmodels || [];
@@ -297,7 +320,9 @@ module.exports = class extends Generator {
                         caseStatements = inboundDeps.map(it => `case "${eventTitle(it)}": 
                         return {
                             ...document,
-                            ${variableAssignments(readModel.fields, "event", it, ",\n", ":")}
+                            data: {
+                                ${variableAssignments(readModel.fields.sort((a,b)=>a?.name?.localeCompare(b.name)), "event", it, ",\n", ":")}
+                            }
                         }`
                         )
                     }
@@ -341,7 +366,11 @@ module.exports = class extends Generator {
 
         let projectionsImports = []
         let projections = []
-        config.slices.forEach((slice) => {
+
+        var slicesNames = this.answers.slices
+        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+
+        slices.forEach((slice) => {
             const readModels = slice.readmodels || [];
 
             readModels
@@ -362,48 +391,135 @@ module.exports = class extends Generator {
     }
 
     writeSpecs() {
-        config.slices.forEach(slice => {
+        var slicesNames = this.answers.slices
+        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+        slices.forEach(slice => {
 
             const slicePath = sliceTitle(slice)
 
             const specs = []
 
+            let globalImports = []
+
             for (let spec of slice.specifications) {
 
                 // Manually load the template
-                const templatePath = this.templatePath('state_change_spec_file.ts.tpl');
-                const templateContent = this.fs.read(templatePath);
+
                 let command = config.slices.flatMap(it => it.commands).find(it => it.id === spec.when[0]?.linkedId)
-                if (!command) {
-                    continue
+
+
+                /**
+                 * THIS BLOCK RENDERS EACH SCENARIO AND PUTS IT INTO AN ARRAY FOR LATER
+                 */
+                if (command) {
+                    // STATE VIEW
+
+                    const templatePath = this.templatePath('spec_given_when_then.ts.tpl');
+                    const templateContent = this.fs.read(templatePath);
+
+                    const imports = [
+                        `import {${commandTitle(command)}Command, ${commandTitle(command)}State, decide, evolve} from "./${commandTitle(command)}Command";`
+                    ];
+                    globalImports = globalImports.concat(imports)
+
+
+                    let commandFields = command.fields?.map(it => `${it.name}: ${exampleOrRandomValue(it.example, it.type)}`).join(",\n");
+
+                    // Render template to string
+                    const renderedContent = ejs.render(templateContent, {
+                        spec: spec,
+                        slice: slicePath,
+                        scenario_title: spec.title,
+                        command: commandTitle(command),
+                        commandFields: commandFields,
+                        given: renderGivenEvents(spec.given),
+                        then: renderThenEvents(spec.then, command),
+                    });
+                    specs.push(renderedContent)
+                } else if(spec.then.filter(it => it.type === "SPEC_READMODEL")?.length  > 0) {
+                    // STATE VIEW
+
+                    const templatePath = this.templatePath('spec_given_then.ts.tpl');
+                    const templateContent = this.fs.read(templatePath);
+
+                    const stream = v4()
+
+
+                    let givenFields = uniqBy(spec.given.filter(it => it.type === "SPEC_EVENT").flatMap((it) => it.fields), (it) => it.name).sort((a,b)=>a?.name?.localeCompare(b.name))
+                    let givenFieldNames = givenFields.map(it => it.name).sort((a,b)=>a?.name?.localeCompare(b.name))
+                    let givenFieldInitializations = givenFields.map(it => `const ${it.name} = ${exampleOrRandomValue(it.example, it.type)}`)
+
+                    let specReadModel = spec.then[0]
+                    let readModel = slice.readmodels.find(it => it.id === specReadModel.linkedId)
+                    if (readModel) {
+                        let expectedFields = uniq(specReadModel.fields.map(it => `${(!givenFieldNames.includes(it.name) && !it.example) ? "// " : ""}${it.name}: ${it.example ? it.example : it.name}`)).sort((a,b)=>a?.name?.localeCompare(b.name))
+                        let expectedProjectionValues = `{
+                        data: ${readModel.listElement ? "[" : ""}{
+                            ${expectedFields.join(",\n")}
+                            }${readModel.listElement ? "]" : ""}
+                    }`
+
+                        // Render template to string
+                        const renderedContent = ejs.render(templateContent, {
+                            stream: stream,
+                            spec: spec,
+                            slice: slicePath,
+                            scenario_title: spec.title,
+                            given: renderGivenEvents(spec.given, stream, true),
+                            givenFields: givenFieldInitializations.join("\n"),
+                            readModel: readModelTitle(specReadModel),
+                            expectedProjectionValues: expectedProjectionValues
+                        });
+                        specs.push(renderedContent)
+                    } else {
+                        console.log(`Could not render spec. Read Model ${specReadModel.linkedId} not found in slice ${slice.title} and spec ${spec.title}`)
+                    }
                 }
-
-
-                let commandFields = command.fields?.map(it => `${it.name}: ${exampleOrRandomValue(it.example, it.type)}`).join(",\n")
-
-                // Render template to string
-                const renderedContent = ejs.render(templateContent, {
-                    spec: spec,
-                    slice: slicePath,
-                    scenario_title: spec.title,
-                    command: commandTitle(command),
-                    commandFields: commandFields,
-                    given: renderGivenEvents(spec.given),
-                    then: renderThenEvents(spec.then, command),
-                });
-                specs.push(renderedContent)
-
 
             }
 
-            this.fs.copyTpl(
-                this.templatePath(`state_change_spec.ts.tpl`),
-                this.destinationPath(`${this.answers.appName}/src/app/slices/${slicePath}/${sliceTitle(slice)}.test.ts`),
-                {
-                    slice: slicePath,
-                    scenarios: specs.filter(it => it).join("\n")
-                })
+            /**
+             * THIS BLOCK RENDERS THE FULL SPECIFICATION AND PUTS THE ALREADY
+             * RENDERED SCENARIOS TOGETHER
+             */
+            if (specs.length > 0) {
+                if (slice.commands?.length > 0) {
+                    // STATE CHANGE
+                    this.fs.copyTpl(
+                        this.templatePath(`spec_state_change.ts.tpl`),
+                        this.destinationPath(`${this.answers.appName}/src/app/slices/${slicePath}/${sliceTitle(slice)}.test.ts`),
+                        {
+                            slice: slicePath,
+                            scenarios: specs.filter(it => it).join("\n"),
+                            imports: uniq(globalImports).join("\n")
 
+                        });
+                } else if(slice.readmodels.length > 0) {
+                    // STATE VIEW
+                    // TODO check whether we should support multiple RMs in one slice
+                    let readModel = slice.readmodels[0]
+
+                    let eventsUnion = readModel?.dependencies?.filter(it => it.type === "INBOUND" && it.elementType === "EVENT")
+                        .map(it => eventTitle(it)).join(" | ")
+                    let eventsImports = readModel?.dependencies?.filter(it => it.type === "INBOUND" && it.elementType === "EVENT")
+                        .map(it => `import {${eventTitle(it)}} from "../../events/${eventTitle(it)}"`)
+                    globalImports = globalImports.concat(eventsImports)
+
+                    // STATE VIEW
+                    this.fs.copyTpl(
+                        this.templatePath(`spec_state_view.ts.tpl`),
+                        this.destinationPath(`${this.answers.appName}/src/app/slices/${slicePath}/${sliceTitle(slice)}Projection.test.ts`),
+                        {
+                            eventsUnion: eventsUnion,
+                            readModel: readModelTitle(readModel),
+                            slice: slicePath,
+                            scenarios: specs.filter(it => it).join("\n"),
+                            imports: uniq(globalImports).join("\n")
+
+                        });
+                }
+
+            }
         });
     }
 
@@ -413,16 +529,23 @@ module.exports = class extends Generator {
     }
 };
 
-
-function renderGivenEvents(specEvents) {
+/**
+ *
+ * @param specEvents
+ * @param stream
+ * @param useInitializedVars - if true, then we will use variables that are already initialized, otherwise we will use random values
+ * @returns {string}
+ */
+function renderGivenEvents(specEvents, stream, useInitializedVars) {
     let givenEvents = specEvents.filter(it => it.type === "SPEC_EVENT").map(then => {
         const event = config.slices.flatMap(it => it.events).find(it => it.id === then.linkedId)
         if (!event) return ""
         return `{
                         type: '${eventTitle(event)}',
                         data: {
-                            ${event.fields?.map(it => `${it.name}: ${exampleOrRandomValue(it.example, it.type)}`).join(",\n")}
+                            ${event.fields?.map(it => `${it.name}: ${useInitializedVars ? it.name : exampleOrRandomValue(it.example, it.type)}`).join(",\n")}
                         },
+                        ${stream ? `metadata: {streamName: '${stream}'}` : ""}
                     }`
     })
     return `[${givenEvents.join(",\n")}]`
@@ -449,6 +572,7 @@ function renderThenEvents(specEvents, command) {
     }
 
 }
+
 
 function serviceName(aggregateName) {
     let aggregate = config.aggregates.find(item => item.title === aggregateName)
@@ -478,16 +602,16 @@ function toListElement(item, mapping) {
 }
 
 function exampleOrRandomValue(example, type) {
-    if (example) return `"${example}"`;
-    if (type === "String") return `"${v4()}"`;
-    else if (type === "Decimal") return Math.random() * 1000;
-    else if (type === "Double") return Math.random() * 1000;
-    else if (type === "Long") return Math.round(Math.random() * 1000);
-    else if (type === "Int") return Math.round(Math.random() * 1000);
-    else if (type === "Boolean") return Math.random() < 0.5;
-    else if (type === "Date") return new Date(Date.now() - Math.random() * 1e12);
-    else if (type === "DateTime") return new Date(Date.now() - Math.random() * 1e12);
-    else if (type === "UUID") return `"${v4()}"`;
+
+    if (type === "String") return example ? `"${example}"`:`"${v4()}"`;
+    else if (type === "Decimal") return example ? example : Math.random() * 1000;
+    else if (type === "Double") return example ? example : Math.random() * 1000;
+    else if (type === "Long") return example ? example : Math.round(Math.random() * 1000);
+    else if (type === "Int") return example ? example : Math.round(Math.random() * 1000);
+    else if (type === "Boolean") return example ? `${example}` :Math.random() < 0.5;
+    else if (type === "Date") return example ? `"${example}"` :new Date(Date.now() - Math.random() * 1e12);
+    else if (type === "DateTime") example ? `"${example}"` : new Date(Date.now() - Math.random() * 1e12);
+    else if (type === "UUID") return example ? `"${example}"`: `"${v4()}"`;
     else return "null // todo: handle complex type";
 }
 

@@ -28,7 +28,11 @@ export const evolve = (
 
 /*
 AI-TODO start: implement according to the specifications provided.
+
+in case an error is expected - throw an error
+
 Remove the TODO Comment afterwards.
+
 <%- aiComment %>
 AI-TODO end
 */
