@@ -13,7 +13,7 @@ export const <%-command%>Component = () => {
         {errorMode ? <div className={"notification is-danger"}>Error in Command-Processing<br/>{error}</div> :
             <span/>}
 
-        <h3><%-command%> Command</h3>
+        <h3><%-command%></h3>
         <div>
             <JsonForm schema={schema} handleCommand={(command: any) => {
                 setErrorMode(false)

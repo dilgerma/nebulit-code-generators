@@ -3,11 +3,11 @@ body {
   height: 100%;
   background-color: lightgray;
   background: repeating-linear-gradient(
-    45deg,
-    lightgray,
-    white 10px,
-    lightgray 10px,
-    white 20px
+          45deg,
+          lightgray,
+          white 10px,
+          lightgray 10px,
+          white 20px
   );
 }
 
@@ -26,6 +26,10 @@ a {
 
 .tabs li.is-active a {
   color: white !important;
+}
+
+.cell {
+  max-height: 250px;
 }
 
 img {
@@ -92,6 +96,7 @@ img {
   text-align: center;
   background-color: lightblue;
   max-width: 250px;
+  margin-top: 15px;
   padding: 10px;
   color:white;
   border-radius: 15px;
@@ -118,6 +123,15 @@ img {
   cursor: pointer;
   color: black;
 
+}
+
+input.input {
+  background-color: white!important;
+  color: darkgray;
+}
+
+.label {
+  color: darkgray !important;
 }
 
 .view.is-active {

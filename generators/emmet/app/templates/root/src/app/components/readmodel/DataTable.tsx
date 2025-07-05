@@ -6,77 +6,89 @@ const DataTable = (props: any) => {
     const [headers, setHeaders] = useState<string[]>([])
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [errorMode, setErrorMode] = useState(false)
-           const [error, setError] = useState("")
+    const [error, setError] = useState("")
+    const [refresh, setRefresh] = useState(false)
 
     useEffect(() => {
         if (!data) {
             return
         }
         if (Array.isArray(data)) {
-            setHeaders(Object.keys(data[selectedIndex]??{}));
+            setHeaders(Object.keys(data[selectedIndex] ?? {}));
         } else {
-            setHeaders(Object.keys(data??{}));
+            setHeaders(Object.keys(data ?? {}));
         }
     }, [selectedIndex]);
 
 
     useEffect(() => {
-        fetchData(parseEndpoint(props.endpoint + "/" + props.aggregateId, {aggregateId: props.aggregateId})).then((data) => {
+        try {
+            if (refresh) {
+                fetchData(parseEndpoint(props.endpoint + "/" + props.aggregateId, {aggregateId: props.aggregateId})).then((data) => {
+                    if (!data) {
+                        setErrorMode(true)
+                        return
+                    }
+                    if (Array.isArray(data.data) && !data.data[0])
+                        return
+                    if (Array.isArray(data.data)) {
+                        setData(data.data)
+                        setHeaders(Object.keys(data.data[0]))
+                    } else {
+                        setData([data])
+                        setHeaders(Object.keys(data))
+                    }
 
-            if(!data) {
-                setErrorMode(true)
-                return
+                    setRefresh(false)
+                }).catch((error) => {
+                    setErrorMode(true)
+                    setError(error)
+                })
             }
-            if(Array.isArray(data.data) && !data.data[0])
-                return
-            if(Array.isArray(data.data)) {
-                setData(data.data)
-                setHeaders(Object.keys(data.data[0]))
-            } else {
-                setData([data])
-                setHeaders(Object.keys(data))
-            }
+        } finally {
+            setRefresh(false)
+        }
+    }, [props.endpoint, refresh]);
 
-        }).catch((error)=>{
-            setErrorMode(true)
-            setError(error)
-        })
-    }, [props.endpoint]);
-
-    const handleSelectionChange = (event:any) => {
-      setSelectedIndex(event.target.value)
+    const handleSelectionChange = (event: any) => {
+        setSelectedIndex(event.target.value)
     };
 
     // @ts-ignore
     return (
         <div>
-            {errorMode ? <div className={"top-margin notification is-danger"}>Fehler in Laden der Daten<br/>{error}</div> : <span/> }
-              <select onChange={handleSelectionChange}>
+            {errorMode ?
+                <div className={"top-margin notification is-danger"}>Fehler in Laden der Daten<br/>{error}</div> :
+                <span/>}
+            <select onChange={handleSelectionChange}>
                 {data.map((_, index) => (
-                  <option key={index} value={index}>{`Item ${index + 1}`}</option>
+                    <option key={index} value={index}>{`Item ${index + 1}`}</option>
                 ))}
-              </select>
-              {data[selectedIndex] && (
+            </select>
+            <button onClick={() => setRefresh(true)} className={"button is-small left-margin"}><i
+                className="fa-solid fa-arrows-rotate"></i></button>
+
+            {data[selectedIndex] && (
                 props.children ?
-                    React.cloneElement(props.children, { data, headers, selectedIndex }) :
-                  <table>
-                  <thead>
-                    <tr>
-                      <th>Attribute</th>
-                      <th>Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {headers.map((header) => (
-                      <tr key={header}>
-                        <td>{header}</td>
-                        <td>{`${data[selectedIndex][header]?.toString()}`}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
+                    React.cloneElement(props.children, {data, headers, selectedIndex}) :
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Attribute</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {headers.map((header) => (
+                            <tr key={header}>
+                                <td>{header}</td>
+                                <td>{`${data[selectedIndex][header]?.toString()}`}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+            )}
+        </div>
     );
 };
 

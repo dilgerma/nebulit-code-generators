@@ -594,19 +594,14 @@ module.exports = class extends Generator {
     _loadScreens() {
 
         var slicesNames = this.answers.slices
-        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+        const slices = config.slices.filter(it => slicesNames.includes(it.title))
 
-        var screens = slices.map(it => it.id)
-            // get all commands and readmodels in the flow
-            .flatMap(commandOrReadModelId => config.slices.flatMap(it => it.commands.concat(it.readmodels))
-                .filter(item => item.id === commandOrReadModelId))
+        return slices.flatMap(it => it.commands.concat(it.readmodels))
             // only take commands and readmodels connected to screens
             .filter(commandOrReadModel => commandOrReadModel.dependencies?.some(it => it.elementType === "SCREEN"))
             // find all screen ids referenced in the model
             .flatMap(commandOrReadModel => commandOrReadModel.dependencies.filter(it => it.elementType === "SCREEN").flatMap(it => it.id))
             .map(screenId => config.slices.flatMap(it => it.screens).find(it => it.id === screenId))
-
-        return screens
     }
 
     _writeScreens() {
@@ -658,6 +653,33 @@ module.exports = class extends Generator {
             let description = config.slices.flatMap(it => it.screens)?.find(it => it.id === screenImage.id)?.description
             descriptionList.push(`"${description}"`)
         }
+
+        const commandImports = uniq(commands.map(it => `import {${commandTitle(it)}CommandComponent} from "@/app/slices/${commandTitle(it)}/ui/${commandTitle(it)}CommandStateChange"`)).join("\n")
+        const readModelImports = uniq(readModels.map(it => `import {${readModelTitle(it)}ReadModelStateView} from "@/app/slices/${readModelTitle(it)}/ui/${readModelTitle(it)}ReadModelStateView"`)).join("\n")
+        const selections = uniqBy(commands.concat(readModels),(item)=>item.id).map(it => `
+                        <div className={"cell ${it.type?.toLowerCase()}"}
+                             onClick={() => setView("${it.title?.replaceAll(" ","")?.toLowerCase()}")}>
+                            <h3>${it.title?.replaceAll(" ","")}</h3>
+                            <div>
+                                ${it.type}
+                            </div>
+                        </div>`)
+
+        let commandComponents = uniqBy(commands,(item)=>item.id).map(it => `{view == "${commandTitle(it)?.toLowerCase()}" ? <${commandTitle(it)}CommandComponent/> : <span/>}`)
+        let readModelComponents = uniqBy(readModels,(item)=>item.id).map(it => `{view == "${readModelTitle(it)?.toLowerCase()}" ? <${readModelTitle(it)}ReadModelStateView/> : <span/>}`)
+
+
+        this.fs.copyTpl(
+            this.templatePath(`ui/page.tsx.tpl`),
+            this.destinationPath(`${this.answers.appName}/src/app/${_screenTitle(screenTitle)?.toLowerCase()}/page.tsx`),
+            {
+                _commandImports: commandImports,
+                _readModelImports:readModelImports,
+                _pageName: capitalizeFirstCharacter(_screenTitle(screenTitle)),
+                _selections: selections.join("\n"),
+                _views: commandComponents.concat(readModelComponents).join("\n"),
+            }
+        )
 
 
     }
