@@ -14,7 +14,13 @@
     "@event-driven-io/emmett-postgresql": "^0.38.3",
     "next": "15.3.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "polyfill-crypto-methods": "^0.2.0",
+    "@rjsf/core": "^5.18.3",
+    "@rjsf/utils": "^5.18.3",
+    "@rjsf/validator-ajv8": "^5.18.3",
+    "rjsf-bulma": "^5.0.0-beta.5",
+    "react-draggable": "^4.4.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

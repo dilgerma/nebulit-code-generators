@@ -36,7 +36,7 @@ export const CommandSelection = (props: { commands: CommandConfig[] }) => {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(command.data)
+                    body: JSON.stringify(command)
                 })
                     .catch((error: any) => {
                         setErrorMode(true);

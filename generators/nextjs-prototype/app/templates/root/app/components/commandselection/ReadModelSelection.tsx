@@ -21,7 +21,7 @@ export const ReadModelSelection = (props:{aggregateId:string, readModels:ReadMod
                  onClick={()=> setSelectedReadModelConfig(props.readModels?.find(it => it.readModel == readmodel.readModel))}>
                      <h3>ReadModel</h3>
                      <div>
-                     {readmodel?.readModel}</div>
+                     {JSON.stringify(readmodel?.readModel)}</div>
                 <div className={"cell"}/>
                  </div></div>
              })}

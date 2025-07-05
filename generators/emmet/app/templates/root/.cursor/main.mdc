@@ -1,0 +1,30 @@
+# Main Entry Point
+
+This is the main entry point for AI-based development when working with this codebase, but also serves as a great reference for developers.
+
+Always follow these rule files very carefully, as they have been crafted to ensure consistency and high-quality code.
+
+When I say "adjust screen", start the process for all slices in app/components/slices.
+
+## High-Level Problem Solving Strategy
+
+1. Investigate the codebase. Explore relevant files, search for key functions, and gather context.
+2. Develop a clear, step-by-step plan. Break down the fix into manageable, incremental steps.
+3. Your working Directory is /app/components/slices/*
+5. if a subfolder in /app/components/slices/* contains a Screen.tsx and one or several .png files, the Styling of the Screen.tsx must be adjusted to match the png file. Before you start, ask for the image to be pasted.
+6. Use the pasted png as guideline for the layout, fields are coming from the provided schema.
+7. if Command Enabled is true, screen should perform a POST request using fetch, if Read Model is enabled, should be a GET request to retrieve the information to display.
+8. parse the Screen.tsx and use the AIHint-Comments as guideline. Replace CommandSelection and ReadModelSelection with custom code to access the APIs.
+9. Before each code change, always consult the relevant rule files in .cursor, and follow the rules very carefully.
+   - Failure to follow the rules is the main reason for making unacceptable changes.
+10. Iterate until you are extremely confident the fix is complete.
+   - When changing code, do not add comments about what you changed.
+
+
+Follow the instructions in @Tools Rules Tools and Rules mentioned here take precedence.
+
+For images, use "/placeholder.png" as a placeholder.
+
+## Rules for implementing changes
+
+Always consult the relevant rule files before each code change.

@@ -30,7 +30,7 @@ function parseSchema(element) {
     schemaElement = schemaElement.title(element.title)
         .description(element.description)
     element.fields?.forEach(field => {
-        if (field.type !== "Custom") {
+        if (field.type !== "Custom" || !field.schema) {
             schemaElement = schemaElement.prop(field.name, fieldType(field.type, field.cardinality));
         } else {
             // Handle custom schema

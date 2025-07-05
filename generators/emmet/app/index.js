@@ -5,13 +5,23 @@
 
 var Generator = require('yeoman-generator');
 var slugify = require('slugify')
-const {buildLink} = require("../../common/util/config");
-const {uniq, uniqBy} = require("../../common/util/util");
-const {_packageFolderName, _processorTitle} = require("../../common/util/naming");
+const {buildLink, findSlice, findSliceByCommandId, findSliceByReadModelId} = require("../../common/util/config");
+const {uniq, uniqBy, capitalizeFirstCharacter, groupBy} = require("../../common/util/util");
+const {
+    _packageFolderName,
+    _processorTitle,
+    _screenTitle,
+    _commandTitle,
+    _readmodelTitle,
+    _sliceTitle,
+    _flowTitle
+} = require("../../common/util/naming");
 const {variableAssignments} = require("./assignments");
 const {analyzeSpecs} = require("../../common/util/specs");
 const ejs = require('ejs')
 const {v4} = require("uuid");
+const {parseSchema} = require("../../common/util/jsonschema");
+const {variables} = require("../../nextjs-prototype/common/domain");
 
 
 function sliceTitle(slice) {
@@ -142,20 +152,63 @@ module.exports = class extends Generator {
     }
 
     writing() {
-        if(this.answers.skeleton) {
+        if (this.answers.skeleton) {
             this._writeApp()
         }
     }
 
+
     _writeApp() {
 
+        /*var sliceViews = this.answers.slices.flatMap((sliceName) => {
+            var slice = config.slices.find(it => it.title === sliceName)
+            var screens = this._findScreensForSlice(slice)
+
+            return screens?.map((screen) => {
+                return `
+                          {
+                              "slice":"${_sliceTitle(slice.title)}",
+                              "viewType":"${_screenTitle(screen.title)}",
+                              "viewName" : "${_sliceTitle(slice.title)}/${_screenTitle(screen.title)}",
+                              "commandView" : ${_sliceTitle(slice.title)}${_screenTitle(screen.title)}
+                          }`
+            })
+
+        }).join(",")
+
+        var componentImports = this.answers.slices.flatMap((sliceName) => {
+            var slice = config.slices.find(it => it.title === sliceName)
+            var screens = this._findScreensForSlice(slice)
+            return screens?.map((screen) => {
+                var sliceName = _sliceTitle(slice.title)
+                return `import ${sliceName}${_screenTitle(screen.title)} from '@/app/components/slices/${sliceName}/${_screenTitle(screen.title)}';
+                      `
+            })
+
+        }).join("\n")*/
+
         this.fs.copyTpl(
-            this.templatePath('root/'),
-            this.destinationPath(`${slugify(this.answers.appName)}/`),
+            this.templatePath('root'),
+            this.destinationPath(slugify(this.answers.appName)),
             {
+                rootPackageName: this.answers.rootPackageName,
                 appName: this.answers.appName,
             }
         )
+
+        this.fs.copyTpl(
+            this.templatePath('root/.cursor'),
+            this.destinationPath(slugify(this.answers.appName) + "/.cursor")
+        )
+
+        this.fs.copyTpl(
+            this.templatePath('git/gitignore'),
+            this.destinationPath(`${slugify(this.answers.appName)}/.gitignore`),
+            {
+                rootPackageName: this.answers.rootPackageName
+            }
+        )
+
     }
 
     /** Build a union type of all events with imports. */
@@ -191,7 +244,6 @@ module.exports = class extends Generator {
 
         return `${imports}\n\n${unionType}`
     }
-
 
 
     writingCommands() {
@@ -230,12 +282,14 @@ module.exports = class extends Generator {
 
                     this.fs.copyTpl(
                         this.templatePath(`commandApi.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/app/api/${slicePath?.toLowerCase()}/route.ts`),
+                        this.destinationPath(`${this.answers.appName}/src/app/api/${slicePath?.toLowerCase()}/[id]/route.ts`),
                         {
                             idAttribute: (command.fields.find(it => it.idAttribute)?.name) ?? "aggregateId",
                             command: commandTitle(command),
                             slice: slicePath,
                         })
+
+
                 });
 
         });
@@ -321,7 +375,7 @@ module.exports = class extends Generator {
                         return {
                             ...document,
                             data: {
-                                ${variableAssignments(readModel.fields.sort((a,b)=>a?.name?.localeCompare(b.name)), "event", it, ",\n", ":")}
+                                ${variableAssignments(readModel.fields.sort((a, b) => a?.name?.localeCompare(b.name)), "event", it, ",\n", ":")}
                             }
                         }`
                         )
@@ -343,12 +397,16 @@ module.exports = class extends Generator {
 
                         })
 
+                    // assume only one id attribute
+                    let idAttribute = readModel.fields.find(field => field.idAttribute)
+
                     this.fs.copyTpl(
                         this.templatePath(`readModelApi.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/app/api/${slicePath?.toLowerCase()}/route.ts`),
+                        this.destinationPath(`${this.answers.appName}/src/app/api/${slicePath?.toLowerCase()}${idAttribute ? `/[${idAttribute.name}]` : ``}/route.ts`),
                         {
                             readModel: readModelTitle(readModel),
                             slice: slicePath,
+                            idAttribute: idAttribute?.name
                         })
                 });
         });
@@ -436,7 +494,7 @@ module.exports = class extends Generator {
                         then: renderThenEvents(spec.then, command),
                     });
                     specs.push(renderedContent)
-                } else if(spec.then.filter(it => it.type === "SPEC_READMODEL")?.length  > 0) {
+                } else if (spec.then.filter(it => it.type === "SPEC_READMODEL")?.length > 0) {
                     // STATE VIEW
 
                     const templatePath = this.templatePath('spec_given_then.ts.tpl');
@@ -445,14 +503,14 @@ module.exports = class extends Generator {
                     const stream = v4()
 
 
-                    let givenFields = uniqBy(spec.given.filter(it => it.type === "SPEC_EVENT").flatMap((it) => it.fields), (it) => it.name).sort((a,b)=>a?.name?.localeCompare(b.name))
-                    let givenFieldNames = givenFields.map(it => it.name).sort((a,b)=>a?.name?.localeCompare(b.name))
+                    let givenFields = uniqBy(spec.given.filter(it => it.type === "SPEC_EVENT").flatMap((it) => it.fields), (it) => it.name).sort((a, b) => a?.name?.localeCompare(b.name))
+                    let givenFieldNames = givenFields.map(it => it.name).sort((a, b) => a?.name?.localeCompare(b.name))
                     let givenFieldInitializations = givenFields.map(it => `const ${it.name} = ${exampleOrRandomValue(it.example, it.type)}`)
 
                     let specReadModel = spec.then[0]
                     let readModel = slice.readmodels.find(it => it.id === specReadModel.linkedId)
                     if (readModel) {
-                        let expectedFields = uniq(specReadModel.fields.map(it => `${(!givenFieldNames.includes(it.name) && !it.example) ? "// " : ""}${it.name}: ${it.example ? it.example : it.name}`)).sort((a,b)=>a?.name?.localeCompare(b.name))
+                        let expectedFields = uniq(specReadModel.fields.map(it => `${(!givenFieldNames.includes(it.name) && !it.example) ? "// " : ""}${it.name}: ${it.example ? it.example : it.name}`)).sort((a, b) => a?.name?.localeCompare(b.name))
                         let expectedProjectionValues = `{
                         data: ${readModel.listElement ? "[" : ""}{
                             ${expectedFields.join(",\n")}
@@ -494,7 +552,7 @@ module.exports = class extends Generator {
                             imports: uniq(globalImports).join("\n")
 
                         });
-                } else if(slice.readmodels.length > 0) {
+                } else if (slice.readmodels.length > 0) {
                     // STATE VIEW
                     // TODO check whether we should support multiple RMs in one slice
                     let readModel = slice.readmodels[0]
@@ -523,6 +581,136 @@ module.exports = class extends Generator {
         });
     }
 
+    /**
+     * UX Component rendering
+     */
+
+    writeUiComponents() {
+        this._writeScreens()
+        this._writeCommandsComponents()
+        this._writeReadModelComponents()
+    }
+
+    _loadScreens() {
+
+        var slicesNames = this.answers.slices
+        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+
+        var screens = slices.map(it => it.id)
+            // get all commands and readmodels in the flow
+            .flatMap(commandOrReadModelId => config.slices.flatMap(it => it.commands.concat(it.readmodels))
+                .filter(item => item.id === commandOrReadModelId))
+            // only take commands and readmodels connected to screens
+            .filter(commandOrReadModel => commandOrReadModel.dependencies?.some(it => it.elementType === "SCREEN"))
+            // find all screen ids referenced in the model
+            .flatMap(commandOrReadModel => commandOrReadModel.dependencies.filter(it => it.elementType === "SCREEN").flatMap(it => it.id))
+            .map(screenId => config.slices.flatMap(it => it.screens).find(it => it.id === screenId))
+
+        return screens
+    }
+
+    _writeScreens() {
+        let screens = this._loadScreens()
+            .sort((a, b) => (a.prototype?.order ?? 99) - (b.prototype?.order ?? 99))
+
+        let groupedScreens = groupBy(screens, (screen) => screen?.title)
+        Object.keys(groupedScreens).filter(it => it).map(title => groupedScreens[title])
+            .filter(it => it.filter(item => item).length > 0).forEach((item) => this._writeScreen(item))
+    }
+
+    _writeBase64Image(base64Data, index) {
+        try {
+            // Remove data URL prefix if present (e.g., "data:image/png;base64,")
+            const base64String = base64Data.replace(/^data:image\/[a-z]+;base64,/, '');
+
+            // Convert base64 to buffer
+            return Buffer.from(base64String, 'base64');
+        } catch (error) {
+            this.log(`✗ Error writing screen image ${index + 1}: ${error.message}`);
+        }
+    }
+
+    _writeScreen(screensWithSameTitle) {
+
+        screensWithSameTitle = screensWithSameTitle || []
+        var commands = screensWithSameTitle.flatMap(it => it.dependencies.filter(dep => dep.type === "OUTBOUND")
+            .filter(dep => dep.elementType === "COMMAND")).map(dep => config.slices.flatMap(it => it.commands).find(it => it.id === dep.id)).filter(it => it)
+
+        var readModels = screensWithSameTitle.flatMap(it => it.dependencies.filter(dep => dep.type === "INBOUND")
+            .filter(dep => dep.elementType === "READMODEL")).map(dep => config.slices.flatMap(it => it.readmodels).find(it => it.id == dep.id)).filter(it => it)
+
+        var screenTitle = screensWithSameTitle[0]?.title
+        var css = screensWithSameTitle.find(it => !!it.prototype?.css)?.prototype?.css
+        var pageTemplate = screensWithSameTitle.find(it => !!it.prototype?.pageTemplate)?.prototype?.pageTemplate?.replaceAll("class=\"", "className=\"")
+
+        let screenImages = config.sliceImages?.filter(it => screensWithSameTitle?.map(item => item.id).includes(it.id))
+
+        let imageList = []
+        let descriptionList = []
+        for (let screenImage of screenImages) {
+            let buffer = this._writeBase64Image(screenImage.base64Image, screenImages.indexOf(screenImage))
+
+            // Write to destination
+            this.fs.write(
+                `./public/screens/${screenImage.title}-${screenImage.id}.png`, buffer
+            );
+            imageList.push(`"${screenImage.title}-${screenImage.id}"`)
+            let description = config.slices.flatMap(it => it.screens)?.find(it => it.id === screenImage.id)?.description
+            descriptionList.push(`"${description}"`)
+        }
+
+
+    }
+
+    _writeCommandsComponents() {
+        var slicesNames = this.answers.slices
+        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+        const commands = slices.flatMap(it => it.commands)
+
+        commands.forEach((command, index) => {
+
+            const idAttribute = command.fields.find(it => it.idAttribute)??"aggregateId"
+
+            this.fs.copyTpl(
+                this.templatePath(`ui/commandUI.tsx.tpl`),
+                this.destinationPath(`${this.answers.appName}/src/app/slices/${_sliceTitle(command.slice)}/ui/${_commandTitle(command.title)}StateChange.tsx`),
+                {
+                    command: _commandTitle(command.title),
+                    endpoint: commandTitle(command)?.toLowerCase(),
+                    idAttribute: idAttribute
+                });
+
+            this.fs.copyTpl(
+                this.templatePath(`ui/schema.json.tpl`),
+                this.destinationPath(`${this.answers.appName}/src/app/slices/${_sliceTitle(command.slice)}/ui/${_commandTitle(command.title)}.json`),
+                {
+                    _schema: JSON.stringify(parseSchema(command), null, 2)
+                }
+            )
+        });
+    }
+
+    _writeReadModelComponents() {
+        var slicesNames = this.answers.slices
+        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+        const readmodels = slices.flatMap(it => it.readmodels)
+
+        readmodels.forEach((readmodel, index) => {
+            this.fs.copyTpl(
+                this.templatePath(`ui/readModelUI.tsx.tpl`),
+                this.destinationPath(`${this.answers.appName}/src/app/slices/${_sliceTitle(readmodel.slice)}/ui/${_readmodelTitle(readmodel.title)}StateView.tsx`),
+                {
+                    endpoint: readmodel.title?.replaceAll(" ","").replaceAll("-","")?.toLowerCase(),
+                    readmodel: _readmodelTitle(readmodel.title),
+                    lowerCaseReadmodel: _readmodelTitle(readmodel.title)?.toLowerCase(),
+                });
+        });
+    }
+
+
+    /**
+     * End UX Component Rendering
+     */
 
     end() {
         this.log(('Jobs is Done!'))
@@ -603,15 +791,15 @@ function toListElement(item, mapping) {
 
 function exampleOrRandomValue(example, type) {
 
-    if (type === "String") return example ? `"${example}"`:`"${v4()}"`;
+    if (type === "String") return example ? `"${example}"` : `"${v4()}"`;
     else if (type === "Decimal") return example ? example : Math.random() * 1000;
     else if (type === "Double") return example ? example : Math.random() * 1000;
     else if (type === "Long") return example ? example : Math.round(Math.random() * 1000);
     else if (type === "Int") return example ? example : Math.round(Math.random() * 1000);
-    else if (type === "Boolean") return example ? `${example}` :Math.random() < 0.5;
-    else if (type === "Date") return example ? `"${example}"` :new Date(Date.now() - Math.random() * 1e12);
+    else if (type === "Boolean") return example ? `${example}` : Math.random() < 0.5;
+    else if (type === "Date") return example ? `"${example}"` : new Date(Date.now() - Math.random() * 1e12);
     else if (type === "DateTime") example ? `"${example}"` : new Date(Date.now() - Math.random() * 1e12);
-    else if (type === "UUID") return example ? `"${example}"`: `"${v4()}"`;
+    else if (type === "UUID") return example ? `"${example}"` : `"${v4()}"`;
     else return "null // todo: handle complex type";
 }
 
