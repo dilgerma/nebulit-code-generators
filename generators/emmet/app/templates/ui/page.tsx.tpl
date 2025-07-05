@@ -43,7 +43,7 @@ export default function <%=_pageName%>(props: any) {
                         </div>
                     </div>
                 </nav>
-                <img className="banner" src={"/assets/banner.jpg"}/>
+                <img className="banner" src={"/assets/banner.png"}/>
 
                 <main>
                     <div className="grid">

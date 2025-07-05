@@ -42,7 +42,7 @@ export default function Home(props: any) {
                             </div>
                         </div>
                     </nav>
-                    <img className="banner" src={"/assets/banner.jpg"}/>
+                    <img className="banner" src={"/assets/banner.png"}/>
 
                     <main>
                     </main>

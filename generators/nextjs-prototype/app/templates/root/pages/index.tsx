@@ -21,7 +21,7 @@ export default function Home(props: any) {
 
         <div>
             <div className="content container">
-                               <img className="banner" src={"/assets/banner.jpg"}/>
+                               <img className="banner" src={"/assets/banner.png"}/>
                 <Head>
                     <title>Prototype</title>
                     <link rel="icon" href="/favicon.ico"/>
