@@ -152,6 +152,7 @@ module.exports = class extends Generator {
     }
 
     writing() {
+        console.log(JSON.stringify(this.answers))
         if (this.answers.skeleton) {
             this._writeApp()
         }
@@ -160,32 +161,6 @@ module.exports = class extends Generator {
 
     _writeApp() {
 
-        /*var sliceViews = this.answers.slices.flatMap((sliceName) => {
-            var slice = config.slices.find(it => it.title === sliceName)
-            var screens = this._findScreensForSlice(slice)
-
-            return screens?.map((screen) => {
-                return `
-                          {
-                              "slice":"${_sliceTitle(slice.title)}",
-                              "viewType":"${_screenTitle(screen.title)}",
-                              "viewName" : "${_sliceTitle(slice.title)}/${_screenTitle(screen.title)}",
-                              "commandView" : ${_sliceTitle(slice.title)}${_screenTitle(screen.title)}
-                          }`
-            })
-
-        }).join(",")
-
-        var componentImports = this.answers.slices.flatMap((sliceName) => {
-            var slice = config.slices.find(it => it.title === sliceName)
-            var screens = this._findScreensForSlice(slice)
-            return screens?.map((screen) => {
-                var sliceName = _sliceTitle(slice.title)
-                return `import ${sliceName}${_screenTitle(screen.title)} from '@/app/components/slices/${sliceName}/${_screenTitle(screen.title)}';
-                      `
-            })
-
-        }).join("\n")*/
 
         this.fs.copyTpl(
             this.templatePath('root'),
@@ -206,6 +181,20 @@ module.exports = class extends Generator {
             this.destinationPath(`${slugify(this.answers.appName)}/.gitignore`),
             {
                 rootPackageName: this.answers.rootPackageName
+            }
+        )
+
+        let screens = this._loadScreens()
+        let navbarItems = uniqBy(screens, (it)=>it.title).map(it => `<Link href="/${_screenTitle(it.title)?.toLowerCase()}" className="navbar-item">
+                                            ${_screenTitle(it.title)}
+                                        </Link>`)
+
+        this.fs.copyTpl(
+            this.templatePath('ui/rootpage.tsx.tpl'),
+            this.destinationPath(`${slugify(this.answers.appName)}/src/app/page.tsx`),
+            {
+                appName: this.answers.appName,
+                navbar_items: navbarItems
             }
         )
 
@@ -610,7 +599,7 @@ module.exports = class extends Generator {
 
         let groupedScreens = groupBy(screens, (screen) => screen?.title)
         Object.keys(groupedScreens).filter(it => it).map(title => groupedScreens[title])
-            .filter(it => it.filter(item => item).length > 0).forEach((item) => this._writeScreen(item))
+            .filter(it => it.filter(item => item).length > 0).forEach((item) => this._writeScreen(item, Object.keys(groupedScreens)))
     }
 
     _writeBase64Image(base64Data, index) {
@@ -625,7 +614,7 @@ module.exports = class extends Generator {
         }
     }
 
-    _writeScreen(screensWithSameTitle) {
+    _writeScreen(screensWithSameTitle, allScreens) {
 
         screensWithSameTitle = screensWithSameTitle || []
         var commands = screensWithSameTitle.flatMap(it => it.dependencies.filter(dep => dep.type === "OUTBOUND")
@@ -667,17 +656,22 @@ module.exports = class extends Generator {
 
         let commandComponents = uniqBy(commands,(item)=>item.id).map(it => `{view == "${commandTitle(it)?.toLowerCase()}" ? <${commandTitle(it)}CommandComponent/> : <span/>}`)
         let readModelComponents = uniqBy(readModels,(item)=>item.id).map(it => `{view == "${readModelTitle(it)?.toLowerCase()}" ? <${readModelTitle(it)}ReadModelStateView/> : <span/>}`)
-
+        let navbarItems = uniqBy(allScreens, (it)=>it).map(it => `<Link href="/${_screenTitle(it)?.toLowerCase()}" className="navbar-item">
+                                            ${_screenTitle(it)}
+                                        </Link>`)
 
         this.fs.copyTpl(
             this.templatePath(`ui/page.tsx.tpl`),
             this.destinationPath(`${this.answers.appName}/src/app/${_screenTitle(screenTitle)?.toLowerCase()}/page.tsx`),
             {
+                appName: this.answers.appName,
                 _commandImports: commandImports,
                 _readModelImports:readModelImports,
                 _pageName: capitalizeFirstCharacter(_screenTitle(screenTitle)),
                 _selections: selections.join("\n"),
                 _views: commandComponents.concat(readModelComponents).join("\n"),
+                navbar_items: navbarItems.join("\n"),
+
             }
         )
 

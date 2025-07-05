@@ -144,3 +144,12 @@ input.input {
 .filter input {
   background-color: lightgray;
 }
+
+.rjsf > .button {
+  margin-top: 15px;
+}
+
+
+nav {
+  background-color: white !important;
+}
