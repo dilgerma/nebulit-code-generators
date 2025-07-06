@@ -2,8 +2,14 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {<%-readModel%>ReadModel} from "@/app/slices/<%-slice%>/<%-readModel%>Projection";
 import {loadPongoClient} from "@/app/common/loadPongoClient";
+import {requireUser} from "@/app/supabase/requireUser";
+
 
 export async function GET(req: NextRequest, { params }: { params: { <%-idAttribute%>: string }}) {
+  const principal = await requireUser(false)
+    if(principal.error) {
+        return principal
+    }
     try {
         //still async
         const parameters = await params

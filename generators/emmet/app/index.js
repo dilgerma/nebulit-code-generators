@@ -161,6 +161,10 @@ module.exports = class extends Generator {
 
     _writeApp() {
 
+        let screens = this._loadScreens()
+        let navbarItems = uniqBy(screens, (it)=>it.title).map(it => `<Link href="/${_screenTitle(it.title)?.toLowerCase()}" className="navbar-item">
+                                            ${_screenTitle(it.title)}
+                                        </Link>`)
 
         this.fs.copyTpl(
             this.templatePath('root'),
@@ -168,6 +172,7 @@ module.exports = class extends Generator {
             {
                 rootPackageName: this.answers.rootPackageName,
                 appName: this.answers.appName,
+                navbar_items: navbarItems
             }
         )
 
@@ -184,19 +189,6 @@ module.exports = class extends Generator {
             }
         )
 
-        let screens = this._loadScreens()
-        let navbarItems = uniqBy(screens, (it)=>it.title).map(it => `<Link href="/${_screenTitle(it.title)?.toLowerCase()}" className="navbar-item">
-                                            ${_screenTitle(it.title)}
-                                        </Link>`)
-
-        this.fs.copyTpl(
-            this.templatePath('ui/rootpage.tsx.tpl'),
-            this.destinationPath(`${slugify(this.answers.appName)}/src/app/page.tsx`),
-            {
-                appName: this.answers.appName,
-                navbar_items: navbarItems
-            }
-        )
 
     }
 
@@ -661,8 +653,8 @@ module.exports = class extends Generator {
                                         </Link>`)
 
         this.fs.copyTpl(
-            this.templatePath(`ui/page.tsx.tpl`),
-            this.destinationPath(`${this.answers.appName}/src/app/${_screenTitle(screenTitle)?.toLowerCase()}/page.tsx`),
+            this.templatePath(`ui/pageComponent.tsx.tpl`),
+            this.destinationPath(`${this.answers.appName}/src/app/${_screenTitle(screenTitle)?.toLowerCase()}/${capitalizeFirstCharacter(_screenTitle(screenTitle))}Component.tsx`),
             {
                 appName: this.answers.appName,
                 _commandImports: commandImports,
@@ -672,6 +664,14 @@ module.exports = class extends Generator {
                 _views: commandComponents.concat(readModelComponents).join("\n"),
                 navbar_items: navbarItems.join("\n"),
 
+            }
+        )
+
+        this.fs.copyTpl(
+            this.templatePath(`ui/page.tsx.tpl`),
+            this.destinationPath(`${this.answers.appName}/src/app/${_screenTitle(screenTitle)?.toLowerCase()}/page.tsx`),
+            {
+                _pageName: `${capitalizeFirstCharacter(_screenTitle(screenTitle))}`
             }
         )
 

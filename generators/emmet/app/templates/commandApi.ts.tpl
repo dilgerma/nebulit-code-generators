@@ -1,8 +1,14 @@
 // app/api/contact/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import {<%-command%>Command, handle<%-command%>} from "@/app/slices/<%-slice%>/<%-command%>Command";
+import {requireUser} from "@/app/supabase/requireUser";
 
 export async function POST(req: NextRequest) {
+    const principal = await requireUser(false)
+    if(principal.error) {
+        return principal
+    }
+
     try {
         const command = (await req.json()) as <%-command%>Command;
         await handle<%-command%>(command.data.<%-idAttribute%>, command)
