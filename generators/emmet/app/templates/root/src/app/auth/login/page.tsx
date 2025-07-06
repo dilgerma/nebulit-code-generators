@@ -6,7 +6,7 @@ export default function LoginPage() {
             <div className="hero-body">
                 <div className="container">
                     <div className="columns is-centered">
-                        <div className="column is-6-tablet is-6-desktop">
+                        <div className="column">
                             <div className="box">
                                 <h1 className="title has-text-centered">Welcome</h1>
                                 <form>
@@ -39,7 +39,7 @@ export default function LoginPage() {
                                                 required
                                             />
                                             <span className="icon is-small is-left">
-                        <i className="fas fa-lock"></i>
+                        <i className="fas fa-lock" aria-hidden="true"></i>
                       </span>
                                         </div>
                                     </div>
