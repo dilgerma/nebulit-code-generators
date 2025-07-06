@@ -20,7 +20,7 @@ export async function requireUser(redirectOnFailedLogin: boolean = true): Promis
     } = await supabase.auth.getUser();
     if (!user) {
         if (redirectOnFailedLogin) {
-            redirect('/login');
+            redirect('/auth/login');
         } else {
             return {
                 user: null,

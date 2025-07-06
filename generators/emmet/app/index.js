@@ -152,7 +152,6 @@ module.exports = class extends Generator {
     }
 
     writing() {
-        console.log(JSON.stringify(this.answers))
         if (this.answers.skeleton) {
             this._writeApp()
         }
@@ -202,7 +201,7 @@ module.exports = class extends Generator {
                 .filter((ev) => ev.title && ev.context !== 'EXTERNAL') // skip externally managed events
                 .forEach((ev) => {
                     const typeName = pascalCase(ev.title);
-                    const fileName = slugify(ev.title?.replaceAll(" ", "").replaceAll("-", ""));
+                    const fileName = slugify(eventTitle(ev));
                     eventData.push({
                         typeName,
                         fileName
@@ -290,7 +289,7 @@ module.exports = class extends Generator {
                     const tsCode = renderEvent(ev);
                     this.fs.copyTpl(
                         this.templatePath(`events.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/app/events/${slugify(ev.title?.replaceAll(" ", "").replaceAll("-", ""))}.ts`),
+                        this.destinationPath(`${this.answers.appName}/src/app/events/${eventTitle(ev)}.ts`),
                         {
                             event: tsCode
                         })
@@ -361,7 +360,6 @@ module.exports = class extends Generator {
                         }`
                         )
                     }
-
 
                     this.fs.copyTpl(
                         this.templatePath(`readmodel.ts.tpl`),
@@ -685,7 +683,7 @@ module.exports = class extends Generator {
 
         commands.forEach((command, index) => {
 
-            const idAttribute = command.fields.find(it => it.idAttribute)??"aggregateId"
+            const idAttribute = command.fields.find(it => it.idAttribute)?.name??"aggregateId"
 
             this.fs.copyTpl(
                 this.templatePath(`ui/commandUI.tsx.tpl`),

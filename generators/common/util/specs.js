@@ -30,13 +30,24 @@ Title: ${spec?.title}${comments}${given}${when}${then}
 function _elementAnalyze(element) {
     if (!element) return '';
 
-    const fieldsWithExamples = element?.fields?.filter(field => field.example) || [];
+    const fieldsWithExamples = element?.fields??[]
 
-    const fieldsSection = fieldsWithExamples.length > 0
-        ? `\n  Fields:\n${fieldsWithExamples.map(field => ` - ${field.name}: ${field.example}`).join('\n')}`
-        : '';
+    let fieldsSection
 
-    return `  * ${element?.title}${fieldsSection}`;
+    if (element.examples.length > 0) {
+        //render example entries
+        fieldsSection = `
+Expected Items in List:
+        ${element.examples.map((item, cnt) =>
+            ` 
+** Item ${cnt+1}\n${Object.entries(item).map(entry => ` - ${entry[0]}: ${(entry[1]??"(not specified)")}`).join('\n')}`).join('\n')}`;
+    } else {
+        fieldsSection = fieldsWithExamples.length > 0
+            ? `\n  Fields:\n${fieldsWithExamples.map(field => ` - ${field.name}: ${field.example}`).join('\n')}`
+            : '';
+    }
+
+    return `  * '${element?.title}' (${element?.type})${fieldsSection}`;
 }
 
 module.exports = {

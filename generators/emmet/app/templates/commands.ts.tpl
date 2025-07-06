@@ -28,6 +28,7 @@ export const evolve = (
 
 /*
 AI-TODO start: implement according to the specifications provided.
+Stick to the specification, don´t add new fields, which are not specified.
 
 in case an error is expected - throw an error
 
