@@ -161,7 +161,7 @@ module.exports = class extends Generator {
     _writeApp() {
 
         let screens = this._loadScreens()
-        let navbarItems = uniqBy(screens, (it)=>it.title).map(it => `<Link href="/${_screenTitle(it.title)?.toLowerCase()}" className="navbar-item">
+        let navbarItems = uniqBy(screens, (it) => it.title).map(it => `<Link href="/${_screenTitle(it.title)?.toLowerCase()}" className="navbar-item">
                                             ${_screenTitle(it.title)}
                                         </Link>`)
 
@@ -200,7 +200,7 @@ module.exports = class extends Generator {
             events
                 .filter((ev) => ev.title && ev.context !== 'EXTERNAL') // skip externally managed events
                 .forEach((ev) => {
-                    const typeName = pascalCase(ev.title);
+                    const typeName = eventTitle(ev);
                     const fileName = slugify(eventTitle(ev));
                     eventData.push({
                         typeName,
@@ -276,9 +276,7 @@ module.exports = class extends Generator {
     }
 
     writingEvents() {
-        var slicesNames = this.answers.slices
-
-        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+        const slices = config.slices || [];
 
         slices.forEach((slice) => {
             const events = slice.events || [];
@@ -331,10 +329,11 @@ module.exports = class extends Generator {
 
                     if (readModel.listElement) {
                         let idFields = readModel.fields.filter(field => field.idAttribute)
+                        console.log(JSON.stringify(readModel))
                         caseStatements = inboundDeps.map(event => {
                             let query = idFields.map(field => `item.${field.name} === event.${findTargetField(field.name, event) ?? `noFieldMatch`}`).join(" && ")
-
-                            return `case "${eventTitle(event)}": {
+                            if (query) {
+                                return `case "${eventTitle(event)}": {
                                 const existing = state.data?.find(item => ${query})
                                 
                                 if(existing) {
@@ -348,6 +347,14 @@ module.exports = class extends Generator {
                                 }
                                 return {...state};
                         }`
+                            } else {
+                                return `case "${eventTitle(event)}": {
+                                    state?.data?.push({
+                                        ${variableAssignments(readModel.fields, "event", event, ",\n", ":")}
+                                    })
+                                    return {...state};
+                        }`
+                            }
                         });
 
                     } else {
@@ -372,7 +379,8 @@ module.exports = class extends Generator {
                             eventsList: inboundDeps.map(it => `"${eventTitle(it)}"`).join(` , `),
                             caseStatements: caseStatements.join("\n"),
                             eventImports: imports,
-                            aiComment: aiComment
+                            aiComment: aiComment,
+                            stateAssignment: `const state: ${readModelTitle(readModel)}ReadModel = {...document, data: ${readModel?.listElement ? "[...document?.data??[]]" : "{...{...document?.data}}"}};`
 
                         })
 
@@ -390,13 +398,6 @@ module.exports = class extends Generator {
                 });
         });
 
-        let unionType = this._renderEventUnion(slices)
-        this.fs.copyTpl(
-            this.templatePath(`eventunion.ts.tpl`),
-            this.destinationPath(`${this.answers.appName}/src/app/events/${slugify(this.answers.appName?.replaceAll(" ", "").replaceAll("-", ""))}Events.ts`),
-            {
-                union: unionType
-            })
     }
 
     renderEventstore() {
@@ -491,9 +492,9 @@ module.exports = class extends Generator {
                     if (readModel) {
                         let expectedFields = uniq(specReadModel.fields.map(it => `${(!givenFieldNames.includes(it.name) && !it.example) ? "// " : ""}${it.name}: ${it.example ? it.example : it.name}`)).sort((a, b) => a?.name?.localeCompare(b.name))
                         let expectedProjectionValues = `{
-                        data: ${readModel.listElement ? "[" : ""}{
+                        data: ${readModel.listElement ? "[" : ""}${specReadModel.expectEmptyList ? "" : `{
                             ${expectedFields.join(",\n")}
-                            }${readModel.listElement ? "]" : ""}
+                            }`}${readModel.listElement ? "]" : ""}
                     }`
 
                         // Render template to string
@@ -635,18 +636,18 @@ module.exports = class extends Generator {
 
         const commandImports = uniq(commands.map(it => `import {${commandTitle(it)}CommandComponent} from "@/app/slices/${commandTitle(it)}/ui/${commandTitle(it)}CommandStateChange"`)).join("\n")
         const readModelImports = uniq(readModels.map(it => `import {${readModelTitle(it)}ReadModelStateView} from "@/app/slices/${readModelTitle(it)}/ui/${readModelTitle(it)}ReadModelStateView"`)).join("\n")
-        const selections = uniqBy(commands.concat(readModels),(item)=>item.id).map(it => `
+        const selections = uniqBy(commands.concat(readModels), (item) => item.id).map(it => `
                         <div className={"cell ${it.type?.toLowerCase()}"}
-                             onClick={() => setView("${it.title?.replaceAll(" ","")?.toLowerCase()}")}>
-                            <h3>${it.title?.replaceAll(" ","")}</h3>
+                             onClick={() => setView("${it.title?.replaceAll(" ", "")?.toLowerCase()}")}>
+                            <h3>${it.title?.replaceAll(" ", "")}</h3>
                             <div>
                                 ${it.type}
                             </div>
                         </div>`)
 
-        let commandComponents = uniqBy(commands,(item)=>item.id).map(it => `{view == "${commandTitle(it)?.toLowerCase()}" ? <${commandTitle(it)}CommandComponent/> : <span/>}`)
-        let readModelComponents = uniqBy(readModels,(item)=>item.id).map(it => `{view == "${readModelTitle(it)?.toLowerCase()}" ? <${readModelTitle(it)}ReadModelStateView/> : <span/>}`)
-        let navbarItems = uniqBy(allScreens, (it)=>it).map(it => `<Link href="/${_screenTitle(it)?.toLowerCase()}" className="navbar-item">
+        let commandComponents = uniqBy(commands, (item) => item.id).map(it => `{view == "${commandTitle(it)?.toLowerCase()}" ? <${commandTitle(it)}CommandComponent/> : <span/>}`)
+        let readModelComponents = uniqBy(readModels, (item) => item.id).map(it => `{view == "${readModelTitle(it)?.toLowerCase()}" ? <${readModelTitle(it)}ReadModelStateView/> : <span/>}`)
+        let navbarItems = uniqBy(allScreens, (it) => it).map(it => `<Link href="/${_screenTitle(it)?.toLowerCase()}" className="navbar-item">
                                             ${_screenTitle(it)}
                                         </Link>`)
 
@@ -656,7 +657,7 @@ module.exports = class extends Generator {
             {
                 appName: this.answers.appName,
                 _commandImports: commandImports,
-                _readModelImports:readModelImports,
+                _readModelImports: readModelImports,
                 _pageName: capitalizeFirstCharacter(_screenTitle(screenTitle)),
                 _selections: selections.join("\n"),
                 _views: commandComponents.concat(readModelComponents).join("\n"),
@@ -683,7 +684,7 @@ module.exports = class extends Generator {
 
         commands.forEach((command, index) => {
 
-            const idAttribute = command.fields.find(it => it.idAttribute)?.name??"aggregateId"
+            const idAttribute = command.fields.find(it => it.idAttribute)?.name ?? "aggregateId"
 
             this.fs.copyTpl(
                 this.templatePath(`ui/commandUI.tsx.tpl`),
@@ -714,7 +715,7 @@ module.exports = class extends Generator {
                 this.templatePath(`ui/readModelUI.tsx.tpl`),
                 this.destinationPath(`${this.answers.appName}/src/app/slices/${_sliceTitle(readmodel.slice)}/ui/${_readmodelTitle(readmodel.title)}StateView.tsx`),
                 {
-                    endpoint: readmodel.title?.replaceAll(" ","").replaceAll("-","")?.toLowerCase(),
+                    endpoint: readmodel.title?.replaceAll(" ", "").replaceAll("-", "")?.toLowerCase(),
                     readmodel: _readmodelTitle(readmodel.title),
                     lowerCaseReadmodel: _readmodelTitle(readmodel.title)?.toLowerCase(),
                 });

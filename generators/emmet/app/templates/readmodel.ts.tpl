@@ -7,7 +7,7 @@ const evolve = (
   document: <%-readModel%>ReadModel | null,
   { type, data: event }: <%-eventsUnion%>
 ): <%-readModel%>ReadModel | null => {
-  const state: <%-readModel%>ReadModel = {...document, data: [...document?.data??[]]};
+  <%-stateAssignment%>
   switch (type) {
     /*
     AI-TODO start: implement according to the specifications provided.

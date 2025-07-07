@@ -34,7 +34,7 @@ function _elementAnalyze(element) {
 
     let fieldsSection
 
-    if (element.examples.length > 0) {
+    if (element?.examples?.length > 0) {
         //render example entries
         fieldsSection = `
 Expected Items in List:
@@ -43,7 +43,7 @@ Expected Items in List:
 ** Item ${cnt+1}\n${Object.entries(item).map(entry => ` - ${entry[0]}: ${(entry[1]??"(not specified)")}`).join('\n')}`).join('\n')}`;
     } else {
         fieldsSection = fieldsWithExamples.length > 0
-            ? `\n  Fields:\n${fieldsWithExamples.map(field => ` - ${field.name}: ${field.example}`).join('\n')}`
+            ? (element.expectEmptyList ? `\nExpects List to be empty`:(`\nFields:\n${fieldsWithExamples.map(field => ` - ${field.name}: ${field.example}`).join('\n')}`))
             : '';
     }
 
