@@ -461,8 +461,7 @@ module.exports = class extends Generator {
                     globalImports = globalImports.concat(imports)
 
 
-                    let commandFields = command.fields?.map(it => `${it.name}: ${exampleOrRandomValue(it.example, it.type)}`).join(",\n");
-
+                    let commandFields = spec.when[0]?.fields?.map(it => `${it.name}: ${exampleOrRandomValue(it.example, it.type)}`).join(",\n");
                     // Render template to string
                     const renderedContent = ejs.render(templateContent, {
                         spec: spec,
@@ -732,6 +731,7 @@ module.exports = class extends Generator {
     }
 };
 
+
 /**
  *
  * @param specEvents
@@ -746,7 +746,7 @@ function renderGivenEvents(specEvents, stream, useInitializedVars) {
         return `{
                         type: '${eventTitle(event)}',
                         data: {
-                            ${event.fields?.map(it => `${it.name}: ${useInitializedVars ? it.name : exampleOrRandomValue(it.example, it.type)}`).join(",\n")}
+                            ${event.fields?.map(it => `${it.name}: ${useInitializedVars ? it.name : exampleOrRandomValue(then.fields.find(thenField => it.name === thenField.name)?.example, it.type)}`).join(",\n")}
                         },
                         ${stream ? `metadata: {streamName: '${stream}'}` : ""}
                     }`
