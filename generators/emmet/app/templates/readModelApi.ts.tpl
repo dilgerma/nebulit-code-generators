@@ -4,7 +4,9 @@ import {<%-readModel%>ReadModel} from "@/app/slices/<%-slice%>/<%-readModel%>Pro
 import {loadPongoClient} from "@/app/common/loadPongoClient";
 import {requireUser} from "@/app/supabase/requireUser";
 
-
+/*
+example: http://localhost:54321/rest/v1/CartsWithProducts-collection?select=data:data->data->0&_id=eq.16
+*/
 export async function GET(req: NextRequest, { params }: { params: { <%-idAttribute%>: string }}) {
   const principal = await requireUser(false)
     if(principal.error) {

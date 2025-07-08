@@ -384,6 +384,7 @@ module.exports = class extends Generator {
 
                         })
 
+                    /*
                     // assume only one id attribute
                     let idAttribute = readModel.fields.find(field => field.idAttribute)
 
@@ -395,6 +396,8 @@ module.exports = class extends Generator {
                             slice: slicePath,
                             idAttribute: idAttribute?.name
                         })
+
+                     */
                 });
         });
 
