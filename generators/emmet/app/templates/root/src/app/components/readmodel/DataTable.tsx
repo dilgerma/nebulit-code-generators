@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {parseEndpoint} from '@/app/components/util/parseEndpoint';
+import {parseQueryEndpoint} from '@/app/components/util/parseEndpoint';
 
 const DataTable = (props: { endpoint:string, queries: Record<string,string> } ) => {
     const [data, setData] = useState<string[]>([]);
@@ -25,7 +25,7 @@ const DataTable = (props: { endpoint:string, queries: Record<string,string> } ) 
     useEffect(() => {
         try {
             if (refresh) {
-                fetchData(parseEndpoint(props.endpoint, {...props.queries})).then((data) => {
+                fetchData(parseQueryEndpoint(props.endpoint, {...props.queries})).then((data) => {
                     if (!data) {
                         setErrorMode(true)
                         return
