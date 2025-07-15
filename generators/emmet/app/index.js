@@ -329,7 +329,6 @@ module.exports = class extends Generator {
 
                     if (readModel.listElement) {
                         let idFields = readModel.fields.filter(field => field.idAttribute)
-                        console.log(JSON.stringify(readModel))
                         caseStatements = inboundDeps.map(event => {
                             let query = idFields.map(field => `item.${field.name} === event.${findTargetField(field.name, event) ?? `noFieldMatch`}`).join(" && ")
                             if (query) {
@@ -384,10 +383,8 @@ module.exports = class extends Generator {
 
                         })
 
-                    /*
                     // assume only one id attribute
                     let idAttribute = readModel.fields.find(field => field.idAttribute)
-
                     this.fs.copyTpl(
                         this.templatePath(`readModelApi.ts.tpl`),
                         this.destinationPath(`${this.answers.appName}/src/app/api/${slicePath?.toLowerCase()}${idAttribute ? `/[${idAttribute.name}]` : ``}/route.ts`),
@@ -397,7 +394,6 @@ module.exports = class extends Generator {
                             idAttribute: idAttribute?.name
                         })
 
-                     */
                 });
         });
 
@@ -717,7 +713,7 @@ module.exports = class extends Generator {
                 this.templatePath(`ui/readModelUI.tsx.tpl`),
                 this.destinationPath(`${this.answers.appName}/src/app/slices/${_sliceTitle(readmodel.slice)}/ui/${_readmodelTitle(readmodel.title)}StateView.tsx`),
                 {
-                    endpoint: readmodel.title?.replaceAll(" ", "").replaceAll("-", "")?.toLowerCase(),
+                    endpoint: readModelTitle(readmodel),
                     readmodel: _readmodelTitle(readmodel.title),
                     lowerCaseReadmodel: _readmodelTitle(readmodel.title)?.toLowerCase(),
                 });

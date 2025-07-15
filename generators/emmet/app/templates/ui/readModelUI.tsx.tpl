@@ -2,7 +2,7 @@ import {useState} from "react"
 import DataTable from "@/app/components/readmodel/DataTable";
 
 export const <%-readmodel%>StateView = () => {
-    const endpoint = "/api/<%-endpoint%>"
+    const endpoint = "<%-endpoint%>-collection"
     const [errorMode, setErrorMode] = useState(false)
     const [error, setError] = useState("")
 
@@ -17,7 +17,7 @@ export const <%-readmodel%>StateView = () => {
         <div className={"top-margin"}/>
 
         <div>
-            <DataTable endpoint={endpoint} aggregateId={id}/>
+            <DataTable endpoint={endpoint} queries={{_id: id}}/>
         </div>
     </div>
 }

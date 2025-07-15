@@ -17,6 +17,7 @@ export const <%-command%>Component = () => {
         <div>
             <JsonForm schema={schema} handleCommand={(command: any) => {
                 setErrorMode(false)
+                // ${idAttribute}
                 fetch(parseEndpoint(`${endpoint}/${command?.data[idAttribute]}`, command.data), {
                     method: 'POST',
                     headers: {

@@ -1,13 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {parseEndpoint} from '@/app/components/util/parseEndpoint';
 
-const DataTable = (props: any) => {
+const DataTable = (props: { endpoint:string, queries: Record<string,string> } ) => {
     const [data, setData] = useState<string[]>([]);
     const [headers, setHeaders] = useState<string[]>([])
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [errorMode, setErrorMode] = useState(false)
     const [error, setError] = useState("")
     const [refresh, setRefresh] = useState(false)
+    const [arraySelection, setArraySelection] = useState(false)
 
     useEffect(() => {
         if (!data) {
@@ -24,25 +25,32 @@ const DataTable = (props: any) => {
     useEffect(() => {
         try {
             if (refresh) {
-                fetchData(parseEndpoint(props.endpoint + "/" + props.aggregateId, {aggregateId: props.aggregateId})).then((data) => {
+                fetchData(parseEndpoint(props.endpoint, {...props.queries})).then((data) => {
                     if (!data) {
                         setErrorMode(true)
                         return
                     }
+                    setArraySelection(Array.isArray(data.data))
                     if (Array.isArray(data.data) && !data.data[0])
                         return
                     if (Array.isArray(data.data)) {
                         setData(data.data)
                         setHeaders(Object.keys(data.data[0]))
+                        if(data.data.length > 1) {
+                            setSelectedIndex(0)
+                        }
                     } else {
-                        setData([data])
-                        setHeaders(Object.keys(data))
+                        setSelectedIndex(0)
+                        setData([data.data])
+                        setHeaders(Object.keys(data.data))
                     }
 
                     setRefresh(false)
+                    setErrorMode(false)
                 }).catch((error) => {
                     setErrorMode(true)
                     setError(error)
+                    setData([])
                 })
             }
         } finally {
@@ -60,33 +68,31 @@ const DataTable = (props: any) => {
             {errorMode ?
                 <div className={"top-margin notification is-danger"}>Fehler in Laden der Daten<br/>{error}</div> :
                 <span/>}
-            <select onChange={handleSelectionChange}>
+            {arraySelection ? <select onChange={handleSelectionChange}>
                 {data.map((_, index) => (
                     <option key={index} value={index}>{`Item ${index + 1}`}</option>
                 ))}
-            </select>
+            </select> : <span/>}
             <button onClick={() => setRefresh(true)} className={"button is-small left-margin"}><i
                 className="fa-solid fa-arrows-rotate"></i></button>
 
             {data[selectedIndex] && (
-                props.children ?
-                    React.cloneElement(props.children, {data, headers, selectedIndex}) :
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Attribute</th>
-                            <th>Value</th>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {headers.map((header) => (
+                        <tr key={header}>
+                            <td>{header}</td>
+                            <td>{`${data[selectedIndex][header]?.toString()}`}</td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        {headers.map((header) => (
-                            <tr key={header}>
-                                <td>{header}</td>
-                                <td>{`${data[selectedIndex][header]?.toString()}`}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                    ))}
+                    </tbody>
+                </table>
             )}
         </div>
     );
