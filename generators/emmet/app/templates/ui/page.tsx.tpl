@@ -1,7 +1,12 @@
-import <%=_pageName%>Component from './<%=_pageName%>Component';
-import {requireUser} from "@/app/supabase/requireUser";
+import <%=_pageName%>Component from '../screens/<%=_lowercasePageName%>/<%=_pageName%>Component';
+import {Navigation} from "../components/navigation/Navigation";
+import {commonGetServerSideProps} from "../supabase/ProtectedPageProps";
+import {GetServerSidePropsContext} from "next";
+
 
 export default async function <%=_pageName%>(props: any) {
-        let principal = await requireUser()
         return <<%=_pageName%>Component/>
 }
+
+export const getServerSideProps = async (context: GetServerSidePropsContext):Promise<any> => {
+    return commonGetServerSideProps(context)}

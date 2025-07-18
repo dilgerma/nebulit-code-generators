@@ -1,8 +1,7 @@
 import type { Command } from '@event-driven-io/emmett'
-import {<%-appName%>Events} from "@/app/events/<%-appName%>Events";
 import { CommandHandler } from '@event-driven-io/emmett';
-import {findEventstore} from "@/app/common/loadPostgresEventstore";
-
+import {<%-appName%>Events} from "../../events/<%-appName%>Events";
+import {findEventstore} from "../../common/loadPostgresEventstore";
 
 <%-command%>
 

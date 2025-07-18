@@ -1,7 +1,5 @@
-"use client"
 import React, {useState} from 'react';
-import Link from "next/link";
-import {Navigation} from "@/app/components/navigation/Navigation";
+import {Navigation} from "../../components/navigation/Navigation";
 
 
 <%-_commandImports%>

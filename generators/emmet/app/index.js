@@ -250,7 +250,7 @@ module.exports = class extends Generator {
 
                     this.fs.copyTpl(
                         this.templatePath(`commands.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/app/slices/${slicePath}/${commandTitle(command)}Command.ts`),
+                        this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/${commandTitle(command)}Command.ts`),
                         {
                             command: tsCode,
                             slice: slicePath,
@@ -369,7 +369,7 @@ module.exports = class extends Generator {
 
                     this.fs.copyTpl(
                         this.templatePath(`readmodel.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/app/slices/${slicePath}/${readModelTitle(readModel)}Projection.ts`),
+                        this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/${readModelTitle(readModel)}Projection.ts`),
                         {
                             slice: slicePath,
                             readModelType: tsCode,
@@ -413,7 +413,7 @@ module.exports = class extends Generator {
             readModels
                 .forEach((readModel) => {
                     const slicePath = sliceTitle(slice)
-                    projectionsImports.push(`import {${readModelTitle(readModel)}Projection} from "@/app/slices/${slicePath}/${readModelTitle(readModel)}Projection"`)
+                    projectionsImports.push(`import {${readModelTitle(readModel)}Projection} from "@/slices/${slicePath}/${readModelTitle(readModel)}Projection"`)
                     projections.push(`${readModelTitle(readModel)}Projection`)
                 });
         })
@@ -523,7 +523,7 @@ module.exports = class extends Generator {
                     // STATE CHANGE
                     this.fs.copyTpl(
                         this.templatePath(`spec_state_change.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/app/slices/${slicePath}/${sliceTitle(slice)}.test.ts`),
+                        this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/${sliceTitle(slice)}.test.ts`),
                         {
                             slice: slicePath,
                             scenarios: specs.filter(it => it).join("\n"),
@@ -544,7 +544,7 @@ module.exports = class extends Generator {
                     // STATE VIEW
                     this.fs.copyTpl(
                         this.templatePath(`spec_state_view.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/app/slices/${slicePath}/${sliceTitle(slice)}Projection.test.ts`),
+                        this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/${sliceTitle(slice)}Projection.test.ts`),
                         {
                             eventsUnion: eventsUnion,
                             readModel: readModelTitle(readModel),
@@ -632,8 +632,8 @@ module.exports = class extends Generator {
             descriptionList.push(`"${description}"`)
         }
 
-        const commandImports = uniq(commands.map(it => `import {${commandTitle(it)}CommandComponent} from "@/app/slices/${commandTitle(it)}/ui/${commandTitle(it)}CommandStateChange"`)).join("\n")
-        const readModelImports = uniq(readModels.map(it => `import {${readModelTitle(it)}ReadModelStateView} from "@/app/slices/${readModelTitle(it)}/ui/${readModelTitle(it)}ReadModelStateView"`)).join("\n")
+        const commandImports = uniq(commands.map(it => `import {${commandTitle(it)}CommandComponent} from "../../slices/${commandTitle(it)}/ui/${commandTitle(it)}CommandStateChange"`)).join("\n")
+        const readModelImports = uniq(readModels.map(it => `import {${readModelTitle(it)}ReadModelStateView} from "../../slices/${readModelTitle(it)}/ui/${readModelTitle(it)}ReadModelStateView"`)).join("\n")
         const selections = uniqBy(commands.concat(readModels), (item) => item.id).map(it => `
                         <div className={"cell ${it.type?.toLowerCase()}"}
                              onClick={() => setView("${it.title?.replaceAll(" ", "")?.toLowerCase()}")}>
@@ -651,7 +651,7 @@ module.exports = class extends Generator {
 
         this.fs.copyTpl(
             this.templatePath(`ui/pageComponent.tsx.tpl`),
-            this.destinationPath(`${this.answers.appName}/src/app/${_screenTitle(screenTitle)?.toLowerCase()}/${capitalizeFirstCharacter(_screenTitle(screenTitle))}Component.tsx`),
+            this.destinationPath(`${this.answers.appName}/src/screens/${_screenTitle(screenTitle)?.toLowerCase()}/${capitalizeFirstCharacter(_screenTitle(screenTitle))}Component.tsx`),
             {
                 appName: this.answers.appName,
                 _commandImports: commandImports,
@@ -666,9 +666,10 @@ module.exports = class extends Generator {
 
         this.fs.copyTpl(
             this.templatePath(`ui/page.tsx.tpl`),
-            this.destinationPath(`${this.answers.appName}/src/app/${_screenTitle(screenTitle)?.toLowerCase()}/page.tsx`),
+            this.destinationPath(`${this.answers.appName}/src/pages/${_screenTitle(screenTitle)?.toLowerCase()}.tsx`),
             {
-                _pageName: `${capitalizeFirstCharacter(_screenTitle(screenTitle))}`
+                _pageName: `${capitalizeFirstCharacter(_screenTitle(screenTitle))}`,
+                _lowercasePageName: `${_screenTitle(screenTitle)?.toLowerCase()}`
             }
         )
 
@@ -686,7 +687,7 @@ module.exports = class extends Generator {
 
             this.fs.copyTpl(
                 this.templatePath(`ui/commandUI.tsx.tpl`),
-                this.destinationPath(`${this.answers.appName}/src/app/slices/${_sliceTitle(command.slice)}/ui/${_commandTitle(command.title)}StateChange.tsx`),
+                this.destinationPath(`${this.answers.appName}/src/slices/${_sliceTitle(command.slice)}/ui/${_commandTitle(command.title)}StateChange.tsx`),
                 {
                     command: _commandTitle(command.title),
                     endpoint: commandTitle(command)?.toLowerCase(),
@@ -695,7 +696,7 @@ module.exports = class extends Generator {
 
             this.fs.copyTpl(
                 this.templatePath(`ui/schema.json.tpl`),
-                this.destinationPath(`${this.answers.appName}/src/app/slices/${_sliceTitle(command.slice)}/ui/${_commandTitle(command.title)}.json`),
+                this.destinationPath(`${this.answers.appName}/src/slices/${_sliceTitle(command.slice)}/ui/${_commandTitle(command.title)}.json`),
                 {
                     _schema: JSON.stringify(parseSchema(command), null, 2)
                 }
@@ -711,7 +712,7 @@ module.exports = class extends Generator {
         readmodels.forEach((readmodel, index) => {
             this.fs.copyTpl(
                 this.templatePath(`ui/readModelUI.tsx.tpl`),
-                this.destinationPath(`${this.answers.appName}/src/app/slices/${_sliceTitle(readmodel.slice)}/ui/${_readmodelTitle(readmodel.title)}StateView.tsx`),
+                this.destinationPath(`${this.answers.appName}/src/slices/${_sliceTitle(readmodel.slice)}/ui/${_readmodelTitle(readmodel.title)}StateView.tsx`),
                 {
                     endpoint: readModelTitle(readmodel),
                     readmodel: _readmodelTitle(readmodel.title),

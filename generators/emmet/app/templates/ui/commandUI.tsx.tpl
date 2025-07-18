@@ -1,7 +1,7 @@
 import {useState} from "react"
-import {JsonForm} from "@/app/components/commandselection/JsonForm";
+import {JsonForm} from "../../../components/commandselection/JsonForm";
 import schema from './<%-command%>.json'
-import {parseEndpoint} from "@/app/components/util/parseEndpoint";
+import {parseEndpoint} from "../../../components/util/parseEndpoint";
 
 export const <%-command%>Component = () => {
     const endpoint = "/api/<%-endpoint%>"
