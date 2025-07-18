@@ -1,7 +1,6 @@
-"use client";
 
 import { useState } from 'react';
-import { supabase } from "@/app/supabase/supabaseClient";
+import {createClient} from "@/supabase/component";
 
 export default function App() {
   const [email, setEmail] = useState('');
@@ -14,7 +13,8 @@ export default function App() {
     setMessage(null);
     setErrorMsg(null);
     setLoading(true);
-    const { data, error } = await supabase.auth.signInWithOtp({ email });
+    const client = createClient()
+    const { data, error } = await client.auth.signInWithOtp({ email });
     setLoading(false);
     if (error) {
       setErrorMsg(error.message);

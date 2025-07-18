@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {parseQueryEndpoint} from '@/app/components/util/parseEndpoint';
+import {parseQueryEndpoint} from "../util/parseEndpoint";
 
 const DataTable = (props: { endpoint:string, queries: Record<string,string> } ) => {
     const [data, setData] = useState<string[]>([]);

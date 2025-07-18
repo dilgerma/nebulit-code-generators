@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from 'react';
-import { supabase } from "@/app/supabase/supabaseClient";
+import {createClient} from "@/supabase/component";
 
 export default function ResetPassword() {
   const [email, setEmail] = useState('');
@@ -14,7 +12,8 @@ export default function ResetPassword() {
     setMessage(null);
     setErrorMsg(null);
     setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const client = createClient()
+    const { error } = await client.auth.resetPasswordForEmail(email);
     setLoading(false);
     if (error) {
       setErrorMsg(error.message);
