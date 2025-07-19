@@ -98,8 +98,17 @@ function renderReadModel(readmodel) {
         `
 }
 
-function findTargetField(fieldName, target) {
-    return target.fields.find(it => it.name === fieldName || it.mapping === fieldName)?.name
+function findTargetField(fieldName, source, target) {
+    const name = target.fields.find(it => it.name === fieldName)?.name;
+    let targetFieldMapping = target.fields.find(it => it.name === fieldName)?.mapping;
+    if (targetFieldMapping) {
+        const sourceField = source.fields.find(it => it.name === targetFieldMapping);
+        if (sourceField) {
+            return sourceField?.name
+        }
+    }
+    // could not match fields
+    return fieldName
 }
 
 function renderEventAssignment(command, event) {
@@ -331,7 +340,7 @@ module.exports = class extends Generator {
                     if (readModel.listElement) {
                         let idFields = readModel.fields.filter(field => field.idAttribute)
                         caseStatements = inboundDeps.map(event => {
-                            let query = idFields.map(field => `item.${field.name} === event.${findTargetField(field.name, event) ?? `noFieldMatch`}`).join(" && ")
+                            let query = idFields.map(field => `item.${field.name} === event.${findTargetField(field.name, event, readModel) ?? `noFieldMatch`}`).join(" && ")
                             if (query) {
                                 return `case "${eventTitle(event)}": {
                                 const existing = state.data?.find(item => ${query})

@@ -4,7 +4,7 @@ import {commonGetServerSideProps} from "../supabase/ProtectedPageProps";
 import {GetServerSidePropsContext} from "next";
 
 
-export default async function <%=_pageName%>(props: any) {
+export default function <%=_pageName%>(props: any) {
         return <<%=_pageName%>Component/>
 }
 
