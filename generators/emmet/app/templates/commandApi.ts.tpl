@@ -1,23 +1,23 @@
-// app/api/contact/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import {<%-command%>Command, handle<%-command%>} from "@/app/slices/<%-slice%>/<%-command%>Command";
-import {requireUser} from "@/app/supabase/requireUser";
+import { Router, Request, Response } from 'express';
+import { <%-command%>Command, handle<%-command%> } from './<%-command%>Command';
+import {requireUser} from "../../supabase/requireUser";
 
-export async function POST(req: NextRequest) {
-    const principal = await requireUser(false)
-    if(principal.error) {
-        return principal
+const router = Router();
+
+router.post('/<%-path%>/:id', async (req: Request, res: Response) => {
+    const principal = await requireUser(req, res, false);
+    if (principal.error) {
+        return res.status(401).json(principal); // Adjust status code as needed
     }
 
     try {
-        const command = (await req.json()) as <%-command%>Command;
-        await handle<%-command%>(command.data.<%-idAttribute%>, command)
-        return NextResponse.json({ ok: true }, { status: 200 });
+        const command = req.body as <%-command%>Command;
+        await handle<%-command%>(req.params.id, command);
+        return res.status(200).json({ ok: true });
     } catch (err) {
         console.error(err);
-        return NextResponse.json(
-            { ok: false, error: 'Server error' },
-            { status: 500 }
-        );
+        return res.status(500).json({ ok: false, error: 'Server error' });
     }
-}
+});
+
+export default router;

@@ -1,5 +1,5 @@
 import {useState} from "react"
-import DataTable from "@/app/components/readmodel/DataTable";
+import DataTable from "../../../components/readmodel/DataTable";
 
 export const <%-readmodel%>StateView = () => {
     const endpoint = "<%-endpoint%>-collection"

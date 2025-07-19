@@ -1,37 +1,32 @@
-// app/api/contact/route.ts
-import {NextRequest, NextResponse} from 'next/server';
-import {<%-readModel%>ReadModel} from "@/app/slices/<%-slice%>/<%-readModel%>Projection";
-import {loadPongoClient} from "@/app/common/loadPongoClient";
-import {requireUser} from "@/app/supabase/requireUser";
+import { Router, Request, Response } from 'express';
+import {loadPongoClient} from "../../common/loadPongoClient";
+import {<%-readmodel%>ReadModel} from "./<%-readmodel%>Projection";
 
-/*
-example: http://localhost:54321/rest/v1/CartsWithProducts-collection?select=data:data->data->0&_id=eq.16
-*/
-export async function GET(req: NextRequest, { params }: { params: { <%-idAttribute%>: string }}) {
-  const principal = await requireUser(false)
-    if(principal.error) {
-        return principal
-    }
+const router = Router();
+
+router.get('/query/<%-readmodel%>-collection', async (req: Request, res: Response) => {
+    // requireUser in your original code seems to expect some kind of context,
+    // adapt it to Express req if needed, or pass false as in your original code.
     try {
-        //still async
-        const parameters = await params
-        const client = loadPongoClient()
+        const account = req.query._id;
+        const client = loadPongoClient();
         const db = client.db();
-        const collection = db.collection<<%-readModel%>ReadModel>("<%-readModel%>-collection")
-         const projection = await collection.findOne({
-                    _id: parameters.<%-idAttribute%>,
-                });
-        // make sure not to serialize big ints
-         const sanitized = JSON.parse(JSON.stringify(projection, (key, value) =>
-               typeof value === 'bigint' ? value.toString() : value
-          ));
+        const collection = db.collection<<%-readmodel%>ReadModel>('<%-readmodel%>-collection');
 
-        return NextResponse.json(sanitized, {status: 200});
+        const projection = await collection.findOne({ _id: account });
+
+        // Serialize, handling bigint properly
+        const sanitized = JSON.parse(
+            JSON.stringify(projection, (key, value) =>
+                typeof value === 'bigint' ? value.toString() : value
+            )
+        );
+
+        return res.status(200).json(sanitized);
     } catch (err) {
         console.error(err);
-        return NextResponse.json(
-            {ok: false, error: 'Server error'},
-            {status: 500}
-        );
+        return res.status(500).json({ ok: false, error: 'Server error' });
     }
-}
+});
+
+export default router;

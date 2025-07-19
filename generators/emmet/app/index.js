@@ -262,10 +262,11 @@ module.exports = class extends Generator {
 
                     this.fs.copyTpl(
                         this.templatePath(`commandApi.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/app/api/${slicePath?.toLowerCase()}/[id]/route.ts`),
+                        this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/routes.ts`),
                         {
                             idAttribute: (command.fields.find(it => it.idAttribute)?.name) ?? "aggregateId",
                             command: commandTitle(command),
+                            path: commandTitle(command)?.toLowerCase(),
                             slice: slicePath,
                         })
 
@@ -287,7 +288,7 @@ module.exports = class extends Generator {
                     const tsCode = renderEvent(ev);
                     this.fs.copyTpl(
                         this.templatePath(`events.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/app/events/${eventTitle(ev)}.ts`),
+                        this.destinationPath(`${this.answers.appName}/src/events/${eventTitle(ev)}.ts`),
                         {
                             event: tsCode
                         })
@@ -297,7 +298,7 @@ module.exports = class extends Generator {
         let unionType = this._renderEventUnion(slices)
         this.fs.copyTpl(
             this.templatePath(`eventunion.ts.tpl`),
-            this.destinationPath(`${this.answers.appName}/src/app/events/${slugify(this.answers.appName?.replaceAll(" ", "").replaceAll("-", ""))}Events.ts`),
+            this.destinationPath(`${this.answers.appName}/src/events/${slugify(this.answers.appName?.replaceAll(" ", "").replaceAll("-", ""))}Events.ts`),
             {
                 union: unionType
             })
@@ -318,7 +319,7 @@ module.exports = class extends Generator {
                     let inboundDeps = readModel.dependencies.filter(it => it.type === "INBOUND" && it.elementType === "EVENT")
                         .map(event => config.slices.flatMap(it => it.events).find(it => it.id === event.id))
 
-                    let imports = inboundDeps.map(it => `import { ${eventTitle(it)} } from '@/app/events/${eventTitle(it)}';`).join("\n")
+                    let imports = inboundDeps.map(it => `import { ${eventTitle(it)} } from '../../events/${eventTitle(it)}';`).join("\n")
 
                     const tsCode = renderReadModel(readModel);
                     const slicePath = sliceTitle(slice)
@@ -387,9 +388,9 @@ module.exports = class extends Generator {
                     let idAttribute = readModel.fields.find(field => field.idAttribute)
                     this.fs.copyTpl(
                         this.templatePath(`readModelApi.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/app/api/${slicePath?.toLowerCase()}${idAttribute ? `/[${idAttribute.name}]` : ``}/route.ts`),
+                        this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/routes.ts`),
                         {
-                            readModel: readModelTitle(readModel),
+                            readmodel: readModelTitle(readModel),
                             slice: slicePath,
                             idAttribute: idAttribute?.name
                         })
@@ -413,14 +414,14 @@ module.exports = class extends Generator {
             readModels
                 .forEach((readModel) => {
                     const slicePath = sliceTitle(slice)
-                    projectionsImports.push(`import {${readModelTitle(readModel)}Projection} from "@/slices/${slicePath}/${readModelTitle(readModel)}Projection"`)
+                    projectionsImports.push(`import {${readModelTitle(readModel)}Projection} from "../slices/${slicePath}/${readModelTitle(readModel)}Projection"`)
                     projections.push(`${readModelTitle(readModel)}Projection`)
                 });
         })
 
         this.fs.copyTpl(
             this.templatePath(`loadEventStore.ts.tpl`),
-            this.destinationPath(`${this.answers.appName}/src/app/common/loadPostgresEventstore.ts`),
+            this.destinationPath(`${this.answers.appName}/src/common/loadPostgresEventstore.ts`),
             {
                 imports: projectionsImports.join("\n"),
                 projections: projections.join(",\n"),
