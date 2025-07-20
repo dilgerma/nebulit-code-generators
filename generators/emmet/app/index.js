@@ -257,6 +257,8 @@ module.exports = class extends Generator {
 
                     const aiComment = slice.specifications?.map(spec => analyzeSpecs(spec)).join("\n")
 
+                    const idAttribute = command.fields.find(it => it.idAttribute)?.name??"aggregateId"
+
                     this.fs.copyTpl(
                         this.templatePath(`commands.ts.tpl`),
                         this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/${commandTitle(command)}Command.ts`),
@@ -269,11 +271,24 @@ module.exports = class extends Generator {
                             aiComment: aiComment
                         })
 
+                    const payloadVars = command.fields.map(it => `${it.name}:${tsType(it)}`).join(",\n")
+                    const assignments = variableAssignments(command.fields, "req.body", command, ",\n",":", (field, renderedItem)=>{
+                        if (!field.optional) {
+                            return `assertNotEmpty(${renderedItem})`
+                        } else {
+                            return renderedItem
+                        }
+                    })
+
                     this.fs.copyTpl(
-                        this.templatePath(`commandApi.ts.tpl`),
+                        this.templatePath(`commandApi2.ts.tpl`),
                         this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/routes.ts`),
                         {
-                            idAttribute: (command.fields.find(it => it.idAttribute)?.name) ?? "aggregateId",
+                            assignments: assignments,
+                            //hardcode id for path /.../:id
+                            paramVars: "id:string",
+                            payloadVars: payloadVars,
+                            idAttribute: idAttribute,
                             command: commandTitle(command),
                             path: commandTitle(command)?.toLowerCase(),
                             slice: slicePath,
