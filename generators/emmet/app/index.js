@@ -590,6 +590,7 @@ module.exports = class extends Generator {
 
     writeUiComponents() {
         this._writeScreens()
+
         this._writeCommandsComponents()
         this._writeReadModelComponents()
     }
