@@ -1,4 +1,6 @@
 import React, {useState} from "react";
+import Link from "next/link";
+
 
 export const Navigation = () => {
 
@@ -13,8 +15,7 @@ export const Navigation = () => {
             <div className="navbar-brand">
                 <a className="navbar-item">
                     <strong>
-                        <
-                        %-appName%>
+                        <%-appName%>
                     </strong>
                 </a>
 
@@ -33,8 +34,7 @@ export const Navigation = () => {
 
             <div className={`navbar-menu ${isMenuActive ? 'is-active' : ''}`}>
                 <div className="navbar-start">
-                    <
-                    %- navbar_items %>
+                    <%- navbar_items %>
                 </div>
             </div>
         </nav>

@@ -419,6 +419,16 @@ module.exports = class extends Generator {
                             idAttribute: idAttribute?.name
                         })
 
+                    if (readModel.todoList) {
+                        console.log("###  " + readModel.title + " " + readModel.todoList)
+                        this.fs.copyTpl(
+                            this.templatePath(`db_migration.ts.tpl`),
+                            this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase())}`),
+                            {
+                                readmodel: readModelTitle(readModel)
+                            })
+                    }
+
                 });
         });
 
@@ -844,3 +854,17 @@ function exampleOrRandomValue(example, type) {
     else return "null // todo: handle complex type";
 }
 
+const generateMigrationFilename = (name) => {
+    const now = new Date();
+
+    const pad = (n) => n.toString().padStart(2, '0');
+
+    const year = now.getFullYear();
+    const month = pad(now.getMonth() + 1);
+    const day = pad(now.getDate());
+    const hour = pad(now.getHours());
+    const minute = pad(now.getMinutes());
+    const second = pad(now.getSeconds());
+
+    return `${year}${month}${day}${hour}${minute}${second}_${name}.sql`;
+};
