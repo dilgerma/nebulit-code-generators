@@ -399,6 +399,7 @@ module.exports = class extends Generator {
                             slice: slicePath,
                             readModelType: tsCode,
                             readModel: readModelTitle(readModel),
+                            readModelLowerCase: readModelTitle(readModel)?.toLowerCase(),
                             eventsUnion: inboundDeps.map(it => eventTitle(it)).join(` | `),
                             eventsList: inboundDeps.map(it => `"${eventTitle(it)}"`).join(` , `),
                             caseStatements: caseStatements.join("\n"),
@@ -415,6 +416,7 @@ module.exports = class extends Generator {
                         this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/routes.ts`),
                         {
                             readmodel: readModelTitle(readModel),
+                            readModelLowerCase: readModelTitle(readModel)?.toLowerCase(),
                             slice: slicePath,
                             idAttribute: idAttribute?.name
                         })
@@ -425,7 +427,7 @@ module.exports = class extends Generator {
                             this.templatePath(`db_migration.ts.tpl`),
                             this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase())}`),
                             {
-                                readmodel: readModelTitle(readModel)
+                                readmodel: readModelTitle(readModel)?.toLowerCase()
                             })
                     }
 

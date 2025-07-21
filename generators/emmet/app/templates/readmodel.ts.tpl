@@ -21,7 +21,7 @@ const evolve = (
   }
 };
 
-const collectionName = '<%-readModel%>-collection';
+const collectionName = '<%-readModelLowerCase%>-collection';
 
 export const <%-readModel%>Projection = pongoSingleStreamProjection({
   canHandle: [<%-eventsList%>],

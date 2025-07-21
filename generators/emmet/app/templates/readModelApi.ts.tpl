@@ -10,14 +10,14 @@ export const api =
         // external dependencies
     ): WebApiSetup =>
         (router: Router): void => {
-            router.get('/api/query/<%-readmodel%>-collection', async (req: Request, res: Response) => {
+            router.get('/api/query/<%-readModelLowerCase%>-collection', async (req: Request, res: Response) => {
                 // requireUser in your original code seems to expect some kind of context,
                 // adapt it to Express req if needed, or pass false as in your original code.
                 try {
                     const account = req.query._id;
                     const client = loadPongoClient();
                     const db = client.db();
-                    const collection = db.collection<<%-readmodel%>ReadModel>('<%-readmodel%>-collection');
+                    const collection = db.collection<<%-readmodel%>ReadModel>('<%-readModelLowerCase%>-collection');
 
                     const projection = await collection.findOne({ _id: account });
 
