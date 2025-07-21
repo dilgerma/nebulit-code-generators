@@ -29,7 +29,8 @@ export const <%-command%>Component = () => {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(command)
+                    credentials: 'include',
+                    body: JSON.stringify(command.data)
                 })
                   .then((response)=>{
                         if (response.status === 200) {

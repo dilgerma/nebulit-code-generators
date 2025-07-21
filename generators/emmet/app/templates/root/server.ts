@@ -1,11 +1,11 @@
-import express, { Request, Response } from 'express';
+import express, {Application, Request, Response} from 'express';
 import next from 'next';
-import {NextFunction} from "connect";
 import { parse } from 'url';
 import LoginHandler from "./src/supabase/LoginHandler";
 import { join } from 'path';
-import { readdirSync } from 'fs';
+import { getApplication, startAPI, WebApiSetup } from '@event-driven-io/emmett-expressjs';
 import {glob} from "glob";
+import {NextResponse} from "next/dist/server/web/spec-extension/response";
 var cookieParser = require('cookie-parser')
 
 const dev = process.env.NODE_ENV !== 'production';
@@ -13,50 +13,56 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 app.prepare().then(async () => {
-    const server = express();
 
     const routesPattern = join(__dirname, 'src/slices/**/routes.@(ts|js)');
     const routeFiles = await glob(routesPattern, { nodir: true });
-
-    console.log("Applying Cookie Middleware")
-    server.use(cookieParser());
-    server.use(express.json());
-
-
     console.log('Found route files:', routeFiles);
 
+    const webApis: WebApiSetup[] = [];
+
     for (const file of routeFiles) {
-        const routeModule = require(file);
-        const router = routeModule.default || routeModule;
-        if (typeof router === 'function') {
-            console.log(`Loading route from ${file}`);
-            server.use('/api', router);
+        const webApiModule:{ api : ()=>WebApiSetup } = await import(file);
+        if(typeof webApiModule.api == 'function') {
+            var module = webApiModule.api()
+            webApis.push(module);
+        } else {
+            console.error(`Expected api function to be defined in ${file}`);
         }
     }
 
 
-    server.all('/', (req, res) => {
+    const express = require('express');
+    const app = express();
+
+    app.use(cookieParser());
+
+    const application: Application = getApplication({
+        apis: webApis,
+        disableJsonMiddleware:false,
+        enableDefaultExpressEtag: true,
+    });
+
+    app.use(application);
+
+    app.all('/', (req:Request, res:Response) => {
         console.log("handling /")
         const parsedUrl = parse(req.url!, true)
         return handle(req, res, parsedUrl);
     });
 
-    server.get("/api/auth/confirm", (req, resp)=>{
+    application.get("/api/auth/confirm", (req, resp)=>{
         return LoginHandler(req, resp)
     })
 
     // Let Next.js handle all other routes
-    server.all('/*path', (req, res) => {
+    application.all('*', async (req, res) => {
         //@ts-ignore
-        console.log("handling /*path")
         const parsedUrl = parse(req.url!, true)
-        return handle(req, res, parsedUrl);
+        return await handle(req, res, parsedUrl);
     });
-
-
 
     const port = parseInt(process.env.PORT || '3000', 10);
-    server.listen(port, () => {
-        console.log(`> Ready on http://localhost:${port}`);
-    });
+    console.log(`> Ready on port ${port}`);
+    startAPI(app, {port:port});
+
 });

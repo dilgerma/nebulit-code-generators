@@ -281,7 +281,7 @@ module.exports = class extends Generator {
                     })
 
                     this.fs.copyTpl(
-                        this.templatePath(`commandApi2.ts.tpl`),
+                        this.templatePath(`commandApi.ts.tpl`),
                         this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/routes.ts`),
                         {
                             assignments: assignments,
