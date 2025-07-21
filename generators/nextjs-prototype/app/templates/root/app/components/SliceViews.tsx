@@ -1,9 +1,8 @@
 "use client"
-import React from 'react';
-import {useEffect, useState} from "react"
+import React, {useState} from 'react';
 import {ViewSelection} from '@/app/core/types';
 
-function shorten(text:string, length = 15)  {
+function shorten(text: string, length = 15) {
     if (!text || text.length <= length) {
         return text;
     }
@@ -62,7 +61,7 @@ export default function SliceViews(props: { aggregateId: string | undefined, vie
                             <div className={"has-text-centered"}>
                                 <img className={"shadow"} src={"https://i.ibb.co/87MRc1f/image.png"}/>
                                 <h3>{viewSelection.viewType}</h3>
-                                <div title={viewSelection.slice}>{shorten(viewSelection.slice,20)}</div>
+                                <div title={viewSelection.slice}>{shorten(viewSelection.slice, 20)}</div>
                             </div>
                         </a>
                     </li>)}

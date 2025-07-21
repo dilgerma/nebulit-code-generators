@@ -1,8 +1,7 @@
-
-const variableAssignments = (elementFields, sourceName, source, separator, assignmentOperator, wrapper = (field, renderedItem)=>renderedItem) => {
+const variableAssignments = (elementFields, sourceName, source, separator, assignmentOperator, wrapper = (field, renderedItem) => renderedItem) => {
 
     var fields = elementFields?.map(field => {
-        var sourceMapping = processSourceMapping(field, sourceName, source, assignmentOperator,wrapper)
+        var sourceMapping = processSourceMapping(field, sourceName, source, assignmentOperator, wrapper)
         if (sourceMapping) {
             return `\t\t\t${sourceMapping}`
         }
@@ -14,7 +13,7 @@ const renderAssignmenet = (field, sourceName, fieldName, wrapper) => {
     return wrapper(field, `${sourceName}.${fieldName}`)
 }
 
-const processSourceMapping = (targetField, sourceName, source, assigmentOperator = "=",wrapper = (field, renderedItem)=>renderedItem) => {
+const processSourceMapping = (targetField, sourceName, source, assigmentOperator = "=", wrapper = (field, renderedItem) => renderedItem) => {
     var name = targetField.name
     var field = source.fields?.find((field) => field.name === name)
     if (field) {

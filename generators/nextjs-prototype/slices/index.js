@@ -51,7 +51,7 @@ module.exports = class extends Generator {
         }
     }
 
-    _idAttribute(element){
+    _idAttribute(element) {
         return element.fields?.find(it => it.idAttribute)?.name ?? "aggregateId"
     }
 
@@ -116,7 +116,7 @@ module.exports = class extends Generator {
             `
             )}`
 
-              const ai_command_comment = `
+            const ai_command_comment = `
             Command enabled: ${commands.length > 0}
             ${commands?.map(command => `
             ## start command
@@ -132,7 +132,7 @@ module.exports = class extends Generator {
 
             let screenImages = config.sliceImages?.filter(it => it.slice === sliceName)
 
-            for(let screenImage of screenImages) {
+            for (let screenImage of screenImages) {
                 let buffer = this._writeBase64Image(screenImage.base64Image, screenImages.indexOf(screenImage))
 
                 // Write to destination

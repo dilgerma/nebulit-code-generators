@@ -9,8 +9,8 @@
     "baseUrl": ".",
     "paths": {
       "*": [
-        "node_modules/*",
-      ],
+        "node_modules/*"
+      ]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

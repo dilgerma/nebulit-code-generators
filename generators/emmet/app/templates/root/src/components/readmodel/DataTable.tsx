@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {parseQueryEndpoint} from "../util/parseEndpoint";
 
-const DataTable = (props: { endpoint:string, queries: Record<string,string> } ) => {
+const DataTable = (props: { endpoint: string, queries: Record<string, string> }) => {
     const [data, setData] = useState<string[]>([]);
     const [headers, setHeaders] = useState<string[]>([])
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -36,7 +36,7 @@ const DataTable = (props: { endpoint:string, queries: Record<string,string> } ) 
                     if (Array.isArray(data.data)) {
                         setData(data.data)
                         setHeaders(Object.keys(data.data[0]))
-                        if(data.data.length > 1) {
+                        if (data.data.length > 1) {
                             setSelectedIndex(0)
                         }
                     } else {

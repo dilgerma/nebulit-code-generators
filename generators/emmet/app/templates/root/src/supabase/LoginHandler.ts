@@ -1,4 +1,4 @@
-import { type EmailOtpType } from '@supabase/supabase-js'
+import {type EmailOtpType} from '@supabase/supabase-js'
 import {Request, Response} from "express";
 
 import createClient from './api'
@@ -21,7 +21,7 @@ export default async function LoginHandler(req: Request, res: Response) {
 
     if (token_hash && type) {
         const supabase = createClient(req, res)
-        const { error } = await supabase.auth.verifyOtp({
+        const {error} = await supabase.auth.verifyOtp({
             type: type as EmailOtpType,
             token_hash,
         })

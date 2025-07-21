@@ -1,4 +1,6 @@
-package <%= rootPackageName%>
+package <
+
+%= rootPackageName%>
 
 import org.axonframework.commandhandling.CommandBus
 import org.axonframework.commandhandling.CommandMessage
@@ -75,8 +77,8 @@ class AxonConfig {
         "org.springframework.modulith.events.jpa",
         "org.axonframework.eventhandling.tokenstore",
         "org.axonframework.eventsourcing.eventstore.jpa",
-    "org.axonframework.modelling.saga.repository.jpa",
-    "org.axonframework.eventhandling.deadletter.jpa"]
+        "org.axonframework.modelling.saga.repository.jpa",
+        "org.axonframework.eventhandling.deadletter.jpa"]
 )
 class SpringApp {
     companion object {

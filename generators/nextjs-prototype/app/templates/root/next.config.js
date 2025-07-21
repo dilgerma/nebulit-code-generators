@@ -52,12 +52,12 @@ module.exports = {
                 "assert": false,
                 "test": false,
                 "fs": false,
-                 "node:crypto": require.resolve('polyfill-crypto-methods')
+                "node:crypto": require.resolve('polyfill-crypto-methods')
             };
 
             config.resolve.alias = {
-                  ...config.resolve.alias,
-                  crypto: 'polyfill-crypto-methodsd'
+                ...config.resolve.alias,
+                crypto: 'polyfill-crypto-methodsd'
             };
 
         }

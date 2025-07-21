@@ -25,7 +25,7 @@ module.exports = class extends Generator {
             this.templatePath('open-api/template.yml'),
             this.destinationPath("open-api.yml"),
             {
-                spec: JSON.stringify(spec,null,2)
+                spec: JSON.stringify(spec, null, 2)
             }
         )
     }
@@ -44,9 +44,9 @@ module.exports = class extends Generator {
             const required = [];
 
             fields.forEach((f) => {
-                let prop = { type: typeMap[f.type] || 'string' };
+                let prop = {type: typeMap[f.type] || 'string'};
                 if (f.cardinality === 'List') {
-                    prop = { type: 'array', items: prop };
+                    prop = {type: 'array', items: prop};
                 }
                 properties[f.name] = prop;
                 if (!f.optional) required.push(f.name);
@@ -55,7 +55,7 @@ module.exports = class extends Generator {
             return {
                 type: 'object',
                 properties,
-                ...(required.length ? { required } : {})
+                ...(required.length ? {required} : {})
             };
         };
 
@@ -66,14 +66,14 @@ module.exports = class extends Generator {
                 version: '1.0.0'
             },
             paths: {},
-            components: { schemas: {} }
+            components: {schemas: {}}
         };
 
         config.slices.forEach((slice) => {
             (slice.commands || []).forEach((cmd) => {
-                const id = (cmd.fields?.find(field => field.idAttribute)?.name??"aggregateId").toLowerCase();
+                const id = (cmd.fields?.find(field => field.idAttribute)?.name ?? "aggregateId").toLowerCase();
                 const schemaName = cmd.title.replace(/\s+/g, '');
-                const endpoint = `/${cmd?.endpoint??(_sliceTitle(slice.title))}/{${id}}`
+                const endpoint = `/${cmd?.endpoint ?? (_sliceTitle(slice.title))}/{${id}}`
 
                 openapi.paths[`${endpoint}`] = {
                     post: {
@@ -93,19 +93,19 @@ module.exports = class extends Generator {
                             required: true,
                             content: {
                                 'application/json': {
-                                    schema: { $ref: `#/components/schemas/${schemaName}` }
+                                    schema: {$ref: `#/components/schemas/${schemaName}`}
                                 }
                             }
                         },
-                        responses: { 200: { description: 'OK' } }
+                        responses: {200: {description: 'OK'}}
                     }
                 };
                 openapi.components.schemas[schemaName] = makeSchema(cmd.fields);
             });
 
             (slice.readmodels || []).forEach((rm) => {
-                const id = (rm.fields?.find(field => field.idAttribute)?.name??"aggregateId")
-                const endpoint = `/${rm?.endpoint??(_sliceTitle(slice.title))}/{${id}}`
+                const id = (rm.fields?.find(field => field.idAttribute)?.name ?? "aggregateId")
+                const endpoint = `/${rm?.endpoint ?? (_sliceTitle(slice.title))}/{${id}}`
                 const schemaName = rm.title.replace(/\s+/g, '');
                 openapi.paths[`${endpoint}`] = {
                     get: {
@@ -126,7 +126,7 @@ module.exports = class extends Generator {
                                 description: 'OK',
                                 content: {
                                     'application/json': {
-                                        schema: { $ref: `#/components/schemas/${schemaName}` }
+                                        schema: {$ref: `#/components/schemas/${schemaName}`}
                                     }
                                 }
                             }

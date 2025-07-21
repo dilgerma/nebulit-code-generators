@@ -1,7 +1,6 @@
-import Link from "next/link";
 import React, {useState} from "react";
 
-export const Navigation = ()=>{
+export const Navigation = () => {
 
     const [isMenuActive, setIsMenuActive] = useState<boolean>(false)
 
@@ -14,7 +13,8 @@ export const Navigation = ()=>{
             <div className="navbar-brand">
                 <a className="navbar-item">
                     <strong>
-                        <%-appName%>
+                        <
+                        %-appName%>
                     </strong>
                 </a>
 
@@ -33,7 +33,8 @@ export const Navigation = ()=>{
 
             <div className={`navbar-menu ${isMenuActive ? 'is-active' : ''}`}>
                 <div className="navbar-start">
-                    <%- navbar_items %>
+                    <
+                    %- navbar_items %>
                 </div>
             </div>
         </nav>

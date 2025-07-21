@@ -1,10 +1,13 @@
 # Nebulit Code Generators
 
-**Nebulit Code Generators** is a modular toolkit designed to automate code scaffolding, streamline development workflows, and enhance developer productivity. Built with flexibility in mind, it supports multiple programming languages and integrates seamlessly with modern development environments.
+**Nebulit Code Generators** is a modular toolkit designed to automate code scaffolding, streamline development
+workflows, and enhance developer productivity. Built with flexibility in mind, it supports multiple programming
+languages and integrates seamlessly with modern development environments.
 
 Seamlessly combine Software Modelling with Code Generation.
 
-There is an [8-Day E-Mail Course (free)](https://newsletter.nebulit.de/generator), that guides you through the process to build your own code generator.
+There is an [8-Day E-Mail Course (free)](https://newsletter.nebulit.de/generator), that guides you through the process
+to build your own code generator.
 
 
 ---
@@ -39,6 +42,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](./LICENSE)
 Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
 
 ---
+
 ## How to use the Generators
 
 The Generators use a json representation of an Event Model to generate Code or Documentation.

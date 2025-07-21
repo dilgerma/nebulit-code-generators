@@ -18,9 +18,9 @@ export type ReadModelConfig = {
 }
 
 export type ViewSelection = {
-    "slice" : string,
+    "slice": string,
     "viewType": string,
-    "commandView" : React.FC<any>,
-    "viewName":string
+    "commandView": React.FC<any>,
+    "viewName": string
 }
 

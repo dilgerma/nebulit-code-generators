@@ -12,7 +12,7 @@ spring:
     password: postgres
     driver-class-name: org.postgresql.Driver
 
-# Flyway Configuration
+  # Flyway Configuration
   flyway:
     url: jdbc:postgresql://localhost:5432/postgres
     locations: classpath:db/migration

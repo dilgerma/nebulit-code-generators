@@ -1,12 +1,13 @@
 "use client"
 import Head from 'next/head';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
 // @ts-ignore
 import {DebugEvents} from '@/app/components/debug/eventsdebug';
 import SliceViews from '@/app/components/SliceViews';
 import {ViewSelection} from '@/app/core/types';
-<%-_imports%>
+
+<%-_imports % >
 
 
 export default function Home(props: any) {
@@ -16,12 +17,13 @@ export default function Home(props: any) {
     /*
     * JSON View Definitions per Slice.
     * */
-    var sliceViews:ViewSelection[] = [<%-_views%>]
+    var sliceViews: ViewSelection[] = [<%-_views % >
+]
     return (
 
         <div>
             <div className="content container">
-                               <img className="banner" src={"/assets/banner.png"}/>
+                <img className="banner" src={"/assets/banner.png"}/>
                 <Head>
                     <title>Prototype</title>
                     <link rel="icon" href="/favicon.ico"/>

@@ -257,7 +257,7 @@ module.exports = class extends Generator {
 
                     const aiComment = slice.specifications?.map(spec => analyzeSpecs(spec)).join("\n")
 
-                    const idAttribute = command.fields.find(it => it.idAttribute)?.name??"aggregateId"
+                    const idAttribute = command.fields.find(it => it.idAttribute)?.name ?? "aggregateId"
 
                     this.fs.copyTpl(
                         this.templatePath(`commands.ts.tpl`),
@@ -272,7 +272,7 @@ module.exports = class extends Generator {
                         })
 
                     const payloadVars = command.fields.map(it => `${it.name}:${tsType(it)}`).join(",\n")
-                    const assignments = variableAssignments(command.fields, "req.body", command, ",\n",":", (field, renderedItem)=>{
+                    const assignments = variableAssignments(command.fields, "req.body", command, ",\n", ":", (field, renderedItem) => {
                         if (!field.optional) {
                             return `assertNotEmpty(${renderedItem})`
                         } else {

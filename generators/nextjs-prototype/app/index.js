@@ -91,7 +91,7 @@ module.exports = class extends Generator {
 
         this.fs.copyTpl(
             this.templatePath('root/.cursor'),
-            this.destinationPath(slugify(this.answers.appName)+"/.cursor")
+            this.destinationPath(slugify(this.answers.appName) + "/.cursor")
         )
 
         this.fs.copyTpl(

@@ -343,7 +343,7 @@ module.exports = class extends Generator {
     _writeQueryableMultiKeyReportReadModel(sliceTitle, readModel, inboundEvents, slice) {
 
         var specs = slice?.specifications?.map(spec => analyzeSpecs(spec))
-        var aiComment =  specs?.length  >0 ? `/*
+        var aiComment = specs?.length > 0 ? `/*
          // AI-TODO:
          ${specs.join(`\n`)} */` : ""
 
@@ -450,7 +450,7 @@ module.exports = class extends Generator {
     _writeQueryableReportReadModel(sliceTitle, readModel, inboundEvents, slice) {
 
         var specs = slice?.specifications?.map(spec => analyzeSpecs(spec))
-        var aiComment =  specs?.length  >0 ? `/* 
+        var aiComment = specs?.length > 0 ? `/* 
         // AI-TODO:
         ${specs.join(`\n`)} */` : ""
 

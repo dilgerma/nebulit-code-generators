@@ -1,3 +1,5 @@
-package <%= rootPackageName%>.common
+package <
 
-class CommandException(override var message: String): Exception()
+%= rootPackageName%>.common
+
+class CommandException(override var message: String) : Exception()

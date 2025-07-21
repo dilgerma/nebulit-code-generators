@@ -1,4 +1,6 @@
-package <%= rootPackageName%>.common
+package <
+
+%= rootPackageName%>.common
 
 import java.util.*
 

@@ -1,3 +1,5 @@
-package <%= rootPackageName%>.common
+package <
+
+%= rootPackageName%>.common
 
 interface Processor

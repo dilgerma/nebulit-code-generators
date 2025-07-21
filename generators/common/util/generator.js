@@ -17,9 +17,9 @@ class ClassesGenerator {
             if (variable.cardinality?.toLowerCase() === "list") {
                 return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality, variable.optional)}`;
             } else {
-                if(variable.type?.toLowerCase() === "date") {
+                if (variable.type?.toLowerCase() === "date") {
                     return `\t@JsonFormat(pattern = "dd.MM.yyyy") var ${variable.name}:${typeMapping(variable.type, variable.cardinality, variable.optional)}`;
-                } else if(variable.type?.toLowerCase() === "datetime") {
+                } else if (variable.type?.toLowerCase() === "datetime") {
                     return `\t@JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss") var ${variable.name}:${typeMapping(variable.type, variable.cardinality, variable.optional)}`;
                 } else {
                     return `\tvar ${variable.name}:${typeMapping(variable.type, variable.cardinality, variable.optional)}`;

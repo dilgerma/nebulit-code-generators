@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import {useEffect, useState} from "react";
 
 const renderObject = (object) => {
     return typeof object == "object" ? JSON.stringify(object, null, 2) : object;

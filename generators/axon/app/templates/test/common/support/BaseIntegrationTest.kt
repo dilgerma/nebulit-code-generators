@@ -1,4 +1,6 @@
-package <%= rootPackageName%>.common.support
+package <
+
+%= rootPackageName%>.common.support
 
 import com.ninjasquad.springmockk.MockkBean
 import org.awaitility.Awaitility
@@ -37,9 +39,9 @@ abstract class BaseIntegrationTest {
 }
 
 fun awaitUntilAssserted(fn: () -> Unit) {
-       Awaitility.await().pollInSameThread()
-           .atMost(Duration.ofSeconds(15))
-           .untilAsserted {
-               fn()
-           }
-   }
+    Awaitility.await().pollInSameThread()
+        .atMost(Duration.ofSeconds(15))
+        .untilAsserted {
+            fn()
+        }
+}

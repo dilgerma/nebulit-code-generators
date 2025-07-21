@@ -1,5 +1,5 @@
 "use client"
-import {useState, useEffect} from "react";
+import {useEffect, useState} from "react";
 import Draggable from "react-draggable";
 import {v4} from "uuid"
 
@@ -45,60 +45,60 @@ export function DebugEvents(props: any) {
     }
 
     return <Draggable>
-            <div className={"debug padding"}>
-                <label>
-                    <div>
-                        <input checked={showEvents} className={"checkbox"} type={"checkbox"}
-                               onChange={() => setShowEvents(!showEvents)}/>
-                        <span className={"left-margin"}>Events anzeigen</span>
-                    </div>
-                </label>
-                    <div id={"uuid"}>{currentUUID}</div>
-                    <button onClick={() => setCurrentUUID(v4())} className={"button"}>UUID</button>
-                    <div onClick={() => CopyToClipboard("uuid")} className={"button"}><i
-                        className="fa-regular fa-copy"></i>
-                    </div>
-
-                <hr/>
-                <div className={"control"}>
-                    <label>
-                        <span>AggregateId:</span>
-                        <input value={aggregateId} onChange={(evt) => applyAggregateId(evt.target.value)} type={"text"}
-                               className={"input"}/>
-                    </label>
+        <div className={"debug padding"}>
+            <label>
+                <div>
+                    <input checked={showEvents} className={"checkbox"} type={"checkbox"}
+                           onChange={() => setShowEvents(!showEvents)}/>
+                    <span className={"left-margin"}>Events anzeigen</span>
                 </div>
+            </label>
+            <div id={"uuid"}>{currentUUID}</div>
+            <button onClick={() => setCurrentUUID(v4())} className={"button"}>UUID</button>
+            <div onClick={() => CopyToClipboard("uuid")} className={"button"}><i
+                className="fa-regular fa-copy"></i>
+            </div>
 
-                {showEvents ?
+            <hr/>
+            <div className={"control"}>
+                <label>
+                    <span>AggregateId:</span>
+                    <input value={aggregateId} onChange={(evt) => applyAggregateId(evt.target.value)} type={"text"}
+                           className={"input"}/>
+                </label>
+            </div>
 
-                    <div>
-                        {events?.map((item) => {
-                            <h3 className={"has-text-centered padding"}>{item.type}</h3>
-                            return <div>
-                                <div>
-                                    <b>Sequence:</b><span>{item.sequenceNumber}</span></div>
-                                <div><b>Type:</b><span>{item.payloadType}</span></div>
-                                <pre>
+            {showEvents ?
+
+                <div>
+                    {events?.map((item) => {
+                        <h3 className={"has-text-centered padding"}>{item.type}</h3>
+                        return <div>
+                            <div>
+                                <b>Sequence:</b><span>{item.sequenceNumber}</span></div>
+                            <div><b>Type:</b><span>{item.payloadType}</span></div>
+                            <pre>
                                                                                {JSON.stringify(item.payload, (key, value) =>
                                                                                        typeof value === 'bigint'
                                                                                            ? value.toString()
                                                                                            : value
                                                                                    , 2)}
-                                    <details>
+                                <details>
                                     <summary>Metadaten</summary>
-                                        {JSON.stringify(item.metaData, (key, value) =>
-                                                typeof value === 'bigint'
-                                                    ? value.toString()
-                                                    : value
-                                            , 2)}
+                                    {JSON.stringify(item.metaData, (key, value) =>
+                                            typeof value === 'bigint'
+                                                ? value.toString()
+                                                : value
+                                        , 2)}
                                 </details>
 
                         </pre>
-                            </div>
-                        })}
+                        </div>
+                    })}
 
 
-                    </div> : <span/>}
-            </div>
+                </div> : <span/>}
+        </div>
     </Draggable>
 
 

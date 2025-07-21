@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react"
+import {useState} from "react"
 import {JsonForm} from '@/app/components/commandselection/JsonForm';
 import {CommandConfig} from '@/app/core/types'
 import {parseEndpoint} from '@/app/components/util/parseEndpoint';
@@ -19,7 +19,7 @@ export const CommandSelection = (props: { commands: CommandConfig[] }) => {
                              onClick={() => setSelectedCommand(props.commands?.find(it => it.command == command.command))}>
                             <h3>Command</h3>
                             <div title={command?.command}>
-                                {shorten(command?.command,20)}</div>
+                                {shorten(command?.command, 20)}</div>
                             <div className={"cell"}/>
                         </div>
                         <div className={"top-margin"}/>
@@ -47,7 +47,7 @@ export const CommandSelection = (props: { commands: CommandConfig[] }) => {
     </div>
 }
 
-function shorten(text, length = 15)  {
+function shorten(text, length = 15) {
     if (!text || text.length <= length) {
         return text;
     }

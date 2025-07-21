@@ -1,7 +1,6 @@
 import {Navigation} from "../components/navigation/Navigation";
 
 
-
 export default function IndexPage() {
     return (
         <div className="content container">

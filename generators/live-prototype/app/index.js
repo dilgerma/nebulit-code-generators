@@ -215,7 +215,7 @@ module.exports = class extends Generator {
 
         let imageList = []
         let descriptionList = []
-        for(let screenImage of screenImages) {
+        for (let screenImage of screenImages) {
             let buffer = this._writeBase64Image(screenImage.base64Image, screenImages.indexOf(screenImage))
 
             // Write to destination

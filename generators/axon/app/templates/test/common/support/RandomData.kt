@@ -1,4 +1,6 @@
-package <%= rootPackageName%>.common.support
+package <
+
+%= rootPackageName%>.common.support
 
 import org.jeasy.random.EasyRandom
 import org.jeasy.random.EasyRandomParameters
