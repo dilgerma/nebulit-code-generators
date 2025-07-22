@@ -73,7 +73,7 @@ const DataTable = (props: { endpoint: string, queries: Record<string, string> })
                     <option key={index} value={index}>{`Item ${index + 1}`}</option>
                 ))}
             </select> : <span/>}
-            {props.queries && Object.keys(props.queries)?.length > 0 ? <button onClick={() => setRefresh(true)} className={"button is-small left-margin"}><i
+            {props.queries && Object.values(props.queries)?.length > 0 ? <button onClick={() => setRefresh(true)} className={"button is-small left-margin"}><i
                 className="fa-solid fa-arrows-rotate"></i></button> : <span/>}
 
             {data[selectedIndex] && (

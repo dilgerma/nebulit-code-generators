@@ -422,17 +422,25 @@ module.exports = class extends Generator {
                             idAttribute: idAttribute?.name
                         })
 
-                    if (readModel.todoList) {
-                        if (!fileExistsByGlob(`${this.answers.appName}/supabase/migrations`, _readmodelTitle(readModel.title).toLowerCase())) {
+                    if (!fileExistsByGlob(`${this.answers.appName}/supabase/migrations`, _readmodelTitle(readModel.title).toLowerCase())) {
+                        if (readModel.todoList) {
+                            this.fs.copyTpl(
+                                this.templatePath(`db_migration_todolist.ts.tpl`),
+                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase())}`),
+                                {
+                                    readmodel: readModelTitle(readModel)?.toLowerCase()
+                                })
+
+                        } else {
                             this.fs.copyTpl(
                                 this.templatePath(`db_migration.ts.tpl`),
                                 this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase())}`),
                                 {
                                     readmodel: readModelTitle(readModel)?.toLowerCase()
                                 })
-                        } else {
-                            console.log(`Migration ${_readmodelTitle(readModel.title).toLowerCase()} exists. Skipping.`)
                         }
+                    } else {
+                        console.log(`Migration ${_readmodelTitle(readModel.title).toLowerCase()} exists. Skipping.`)
                     }
 
                 });
