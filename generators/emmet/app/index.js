@@ -22,6 +22,7 @@ const ejs = require('ejs')
 const {v4} = require("uuid");
 const {parseSchema} = require("../../common/util/jsonschema");
 const {variables} = require("../../nextjs-prototype/common/domain");
+const {fileExistsByGlob} = require("../../common/util/files");
 
 
 function sliceTitle(slice) {
@@ -422,13 +423,16 @@ module.exports = class extends Generator {
                         })
 
                     if (readModel.todoList) {
-                        console.log("###  " + readModel.title + " " + readModel.todoList)
-                        this.fs.copyTpl(
-                            this.templatePath(`db_migration.ts.tpl`),
-                            this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase())}`),
-                            {
-                                readmodel: readModelTitle(readModel)?.toLowerCase()
-                            })
+                        if (!fileExistsByGlob(`${this.answers.appName}/supabase/migrations`, _readmodelTitle(readModel.title).toLowerCase())) {
+                            this.fs.copyTpl(
+                                this.templatePath(`db_migration.ts.tpl`),
+                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase())}`),
+                                {
+                                    readmodel: readModelTitle(readModel)?.toLowerCase()
+                                })
+                        } else {
+                            console.log(`Migration ${_readmodelTitle(readModel.title).toLowerCase()} exists. Skipping.`)
+                        }
                     }
 
                 });

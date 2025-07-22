@@ -11,9 +11,10 @@
   ],
   "dependencies": {
     "fluent-json-schema": "^4.2.1",
+    "glob": "^11.0.3",
+    "slugify": "^1.6.6",
     "uuid": "^9.0.1",
-    "yeoman-generator": "^3.2.0",
-    "slugify": "^1.6.6"
+    "yeoman-generator": "^3.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
