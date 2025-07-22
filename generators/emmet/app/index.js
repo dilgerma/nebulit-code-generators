@@ -606,7 +606,6 @@ module.exports = class extends Generator {
 
     writeUiComponents() {
         this._writeScreens()
-
         this._writeCommandsComponents()
         this._writeReadModelComponents()
     }
@@ -756,7 +755,7 @@ module.exports = class extends Generator {
                 this.templatePath(`ui/readModelUI.tsx.tpl`),
                 this.destinationPath(`${this.answers.appName}/src/slices/${_sliceTitle(readmodel.slice)}/ui/${_readmodelTitle(readmodel.title)}StateView.tsx`),
                 {
-                    endpoint: readModelTitle(readmodel),
+                    endpoint: readModelTitle(readmodel)?.toLowerCase(),
                     readmodel: _readmodelTitle(readmodel.title),
                     lowerCaseReadmodel: _readmodelTitle(readmodel.title)?.toLowerCase(),
                 });
