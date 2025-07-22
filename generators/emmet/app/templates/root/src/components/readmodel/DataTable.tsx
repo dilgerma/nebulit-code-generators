@@ -24,7 +24,7 @@ const DataTable = (props: { endpoint: string, queries: Record<string, string> })
 
     useEffect(() => {
         try {
-            if (refresh) {
+            if (refresh && Object.keys(props.queries).length > 0) {
                 fetchData(parseQueryEndpoint(props.endpoint, {...props.queries})).then((data) => {
                     if (!data) {
                         setErrorMode(true)
@@ -73,8 +73,8 @@ const DataTable = (props: { endpoint: string, queries: Record<string, string> })
                     <option key={index} value={index}>{`Item ${index + 1}`}</option>
                 ))}
             </select> : <span/>}
-            <button onClick={() => setRefresh(true)} className={"button is-small left-margin"}><i
-                className="fa-solid fa-arrows-rotate"></i></button>
+            {props.queries && Object.keys(props.queries)?.length > 0 ? <button onClick={() => setRefresh(true)} className={"button is-small left-margin"}><i
+                className="fa-solid fa-arrows-rotate"></i></button> : <span/>}
 
             {data[selectedIndex] && (
                 <table>
