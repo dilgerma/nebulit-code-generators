@@ -14,12 +14,12 @@ export const api =
                 // requireUser in your original code seems to expect some kind of context,
                 // adapt it to Express req if needed, or pass false as in your original code.
                 try {
-                    const account = req.query._id;
+                    <%- statusOrIdQuery %>;
                     const client = loadPongoClient();
                     const db = client.db();
                     const collection = db.collection<<%-readmodel%>ReadModel>('<%-readModelLowerCase%>-collection');
 
-                    const projection = await collection.findOne({ _id: account });
+                    const projection = await <%-statusOrIdQueryResult%>;
 
                     // Serialize, handling bigint properly
                     const sanitized = JSON.parse(

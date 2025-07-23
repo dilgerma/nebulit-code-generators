@@ -30,9 +30,19 @@ const DataTable = (props: { endpoint: string, queries: Record<string, string> })
                         setErrorMode(true)
                         return
                     }
-                    setArraySelection(Array.isArray(data.data))
+                    setArraySelection(Array.isArray(data.data) || Array.isArray(data))
+                    if(Array.isArray(data) && !data[0])
+                        return
                     if (Array.isArray(data.data) && !data.data[0])
                         return
+                    if (Array.isArray(data)) {
+                        setData(data)
+                        setHeaders(Object.keys(data[0]))
+                        if (data.length > 1) {
+                            setSelectedIndex(0)
+                        }
+                        return
+                    }
                     if (Array.isArray(data.data)) {
                         setData(data.data)
                         setHeaders(Object.keys(data.data[0]))
@@ -88,7 +98,7 @@ const DataTable = (props: { endpoint: string, queries: Record<string, string> })
                     {headers.map((header) => (
                         <tr key={header}>
                             <td>{header}</td>
-                            <td>{`${data[selectedIndex][header]?.toString()}`}</td>
+                            <td>{`${renderAttribute(data[selectedIndex][header])}`}</td>
                         </tr>
                     ))}
                     </tbody>
@@ -115,6 +125,25 @@ async function fetchData(endpoint: string) {
     } catch (error) {
         console.error('Error fetching data:', error);
         return Promise.reject(`Error fetching data ${error}`);
+    }
+}
+
+
+function renderAttribute(attr: unknown): string {
+    if (attr === null || attr === undefined) {
+        return '';
+    }
+
+    // Check for primitive types (string, number, boolean, bigint, symbol)
+    if (typeof attr === 'string' || typeof attr === 'number' || typeof attr === 'boolean' || typeof attr === 'bigint' || typeof attr === 'symbol') {
+        return attr.toString();
+    }
+
+    // For all other types (objects, arrays, functions), render as JSON
+    try {
+        return JSON.stringify(attr);
+    } catch {
+        return '[Unserializable]';
     }
 }
 

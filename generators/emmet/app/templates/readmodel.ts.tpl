@@ -1,5 +1,7 @@
 import { pongoSingleStreamProjection } from '@event-driven-io/emmett-postgresql';
 <%- eventImports %>
+import {ProcessorTodoItem} from "../../process/process";
+
 
 <%-readModelType%>
 

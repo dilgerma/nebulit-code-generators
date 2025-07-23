@@ -87,15 +87,26 @@ function renderCommand(command) {
         }>;`
 }
 
-function renderReadModel(readmodel) {
+function renderReadModel(readmodel, todoList) {
     const typeName = pascalCase(readmodel.title);
+    /*
+    * TODO Lists are rendered as single items but queried as a list.
+    *  Lists are rendered as list items but queried as single item.
+    *
+    * Example:
+    *
+    * List Item => queryByCustomerId => {data: Items[]}
+    *
+    * Todo List => queryAll => [{data: Item}]
+    * */
     return `export type ${typeName}ReadModelItem = {
         ${readmodel.fields.map((f) => `  ${f.name}?: ${tsType(f)}`).join(',\n')},
-        };
+        }
         
         export type ${typeName}ReadModel = {
-            data: ${readmodel.listElement ? `${typeName}ReadModelItem[]` : `${typeName}ReadModelItem`}
-            }
+            data: ${readmodel.listElement && !todoList ? `${typeName}ReadModelItem[]` : `${typeName}ReadModelItem`},
+            ${todoList ? `status?:string`:``}
+        }${todoList ? '&Partial<ProcessorTodoItem>' : ''}
         `
 }
 
@@ -346,14 +357,14 @@ module.exports = class extends Generator {
 
                     let imports = inboundDeps.map(it => `import { ${eventTitle(it)} } from '../../events/${eventTitle(it)}';`).join("\n")
 
-                    const tsCode = renderReadModel(readModel);
+                    const tsCode = renderReadModel(readModel, readModel.todoList);
                     const slicePath = sliceTitle(slice)
 
                     const aiComment = slice.specifications?.map(spec => analyzeSpecs(spec)).join("\n")
 
                     let caseStatements;
 
-                    if (readModel.listElement) {
+                    if (readModel.listElement && !readModel.todoList) {
                         let idFields = readModel.fields.filter(field => field.idAttribute)
                         caseStatements = inboundDeps.map(event => {
                             let query = idFields.map(field => `item.${field.name} === event.${findTargetField(field.name, event, readModel) ?? `noFieldMatch`}`).join(" && ")
@@ -387,7 +398,8 @@ module.exports = class extends Generator {
                         return {
                             ...document,
                             data: {
-                                ${variableAssignments(readModel.fields.sort((a, b) => a?.name?.localeCompare(b.name)), "event", it, ",\n", ":")}
+                                ${variableAssignments(readModel.fields.sort((a, b) => a?.name?.localeCompare(b.name)), "event", it, ",\n", ":")},
+                                ${readModel.todoList ? `status: "OPEN"`: ""}
                             }
                         }`
                         )
@@ -406,7 +418,7 @@ module.exports = class extends Generator {
                             caseStatements: caseStatements.join("\n"),
                             eventImports: imports,
                             aiComment: aiComment,
-                            stateAssignment: `const state: ${readModelTitle(readModel)}ReadModel = {...document, data: ${readModel?.listElement ? "[...document?.data??[]]" : "{...{...document?.data}}"}};`
+                            stateAssignment: `const state: ${readModelTitle(readModel)}ReadModel = {...document, data: ${readModel?.listElement && !readModel.todoList ? "[...document?.data??[]]" : "{...document?.data}"}};`
 
                         })
 
@@ -419,6 +431,8 @@ module.exports = class extends Generator {
                             readmodel: readModelTitle(readModel),
                             readModelLowerCase: readModelTitle(readModel)?.toLowerCase(),
                             slice: slicePath,
+                            statusOrIdQuery: readModel.todoList ? `const status = req.query.status` : `const id = req.query._id`,
+                            statusOrIdQueryResult: readModel.todoList ? `collection.find({ "status": status })` :`collection.findOne({ _id: id })`,
                             idAttribute: idAttribute?.name
                         })
 
@@ -766,6 +780,8 @@ module.exports = class extends Generator {
                     endpoint: readModelTitle(readmodel)?.toLowerCase(),
                     readmodel: _readmodelTitle(readmodel.title),
                     lowerCaseReadmodel: _readmodelTitle(readmodel.title)?.toLowerCase(),
+                    showFilter: !readmodel.todoList,
+                    query: readmodel.todoList ? `{status: "OPEN"}` : "{_id: id}"
                 });
         });
     }

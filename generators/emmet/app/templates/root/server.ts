@@ -14,7 +14,7 @@ const handle = app.getRequestHandler();
 
 app.prepare().then(async () => {
 
-    const routesPattern = join(__dirname, 'src/slices/**/routes.@(ts|js)');
+    const routesPattern = join(__dirname, 'src/slices/**/routes{,-*}.@(ts|js)');
     const routeFiles = await glob(routesPattern, {nodir: true});
     console.log('Found route files:', routeFiles);
 
