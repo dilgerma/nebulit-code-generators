@@ -339,7 +339,7 @@ module.exports = class extends Generator {
 
 
             readModels
-                .forEach((readModel) => {
+                .forEach((readModel, idx) => {
 
                     let inboundDeps = readModel.dependencies.filter(it => it.type === "INBOUND" && it.elementType === "EVENT")
                         .map(event => config.slices.flatMap(it => it.events).find(it => it.id === event.id))
@@ -426,7 +426,7 @@ module.exports = class extends Generator {
                         if (readModel.todoList) {
                             this.fs.copyTpl(
                                 this.templatePath(`db_migration_todolist.ts.tpl`),
-                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase())}`),
+                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase()), idx}`),
                                 {
                                     readmodel: readModelTitle(readModel)?.toLowerCase()
                                 })
@@ -434,7 +434,7 @@ module.exports = class extends Generator {
                         } else {
                             this.fs.copyTpl(
                                 this.templatePath(`db_migration.ts.tpl`),
-                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase())}`),
+                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx)}`),
                                 {
                                     readmodel: readModelTitle(readModel)?.toLowerCase()
                                 })
@@ -867,7 +867,7 @@ function exampleOrRandomValue(example, type) {
     else return "null // todo: handle complex type";
 }
 
-const generateMigrationFilename = (name) => {
+const generateMigrationFilename = (name, idx) => {
     const now = new Date();
 
     const pad = (n) => n.toString().padStart(2, '0');
@@ -877,7 +877,7 @@ const generateMigrationFilename = (name) => {
     const day = pad(now.getDate());
     const hour = pad(now.getHours());
     const minute = pad(now.getMinutes());
-    const second = pad(now.getSeconds());
+    const second = pad(now.getSeconds()+idx);
 
     return `${year}${month}${day}${hour}${minute}${second}_${name}.sql`;
 };
