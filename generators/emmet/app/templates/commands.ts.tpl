@@ -6,16 +6,16 @@ import {findEventstore} from "../../common/loadPostgresEventstore";
 <%-command%>
 
 // TODO-AI keep attributes in state optional
-export type <%-slice%>State = {
+export type <%-commandType%>State = {
 }
 
-export const <%-slice%>InitialState = (): <%-slice%>State => ({
+export const <%-commandType%>InitialState = (): <%-commandType%>State => ({
 });
 
 export const evolve = (
-    state: <%-slice%>State,
+    state: <%-commandType%>State,
     event: <%-appName%>Events,
-): <%-slice%>State => {
+): <%-commandType%>State => {
     const { type, data } = event;
 
     switch (type) {
@@ -38,17 +38,17 @@ AI-TODO end
 */
     export const decide = (
     command: <%-commandType%>Command,
-    state: <%-slice%>State,
+    state: <%-commandType%>State,
 ): <%-appName%>Events[] => {
     return [<%-resultingEvents%>]
 };
 
 
-const <%-slice%>CommandHandler = CommandHandler<<%-slice%>State, <%-appName%>Events>({evolve,initialState:<%-slice%>InitialState});
+const <%-commandType%>CommandHandler = CommandHandler<<%-commandType%>State, <%-appName%>Events>({evolve,initialState:<%-commandType%>InitialState});
 
-export const handle<%-slice%> = async (id:string,command:<%-slice%>Command) => {
+export const handle<%-commandType%> = async (id:string,command:<%-commandType%>Command) => {
     const eventStore = await findEventstore()
-    await <%-slice%>CommandHandler(eventStore, id, (state:<%-slice%>State)=>decide(command,state))
+    await <%-commandType%>CommandHandler(eventStore, id, (state:<%-commandType%>State)=>decide(command,state))
 
 }
 

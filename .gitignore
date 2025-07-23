@@ -35,3 +35,6 @@ node_modules
 .next
 node
 generators/booster
+
+.env.local
+.env.*

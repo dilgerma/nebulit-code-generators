@@ -16,7 +16,7 @@ export type ProcessorConfig = {
 export const startProcessor = <T>(config:ProcessorConfig, handler: (item:T&ProcessorTodoItem)=>void) =>{
     cron.schedule(config.schedule,async () => {
         const data = await fetchData(parseQueryEndpoint(config.endpoint, config.query ? config.query : {"status": "OPEN"}))
-        if (data.length > 0) {
+        if (data?.length > 0) {
             handler(data[0]);
         } else {
             //console.log("No item to process")

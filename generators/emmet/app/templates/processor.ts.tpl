@@ -3,7 +3,7 @@ import {<%-readmodel%>ReadModel} from "../<%-readmodel%>/<%-readmodel%>Projectio
 import {handle<%-command%>, <%-command%>Command} from "./<%-command%>Command";
 
 const config: ProcessorConfig = {
-    schedule: '* * * * * *',
+    schedule: '*/30 * * * * *',
     endpoint: "<%-readmodel%>-collection"
 }
 
@@ -13,7 +13,7 @@ const idAttribute = "<%-idAttribute%>"
 export const processor = {
     start: () => {
         startProcessor(config, async (item: <%-readmodel%>ReadModel) => {
-            console.log(`Processing ${JSON.stringify(item)}`);
+            console.log(`Processing ${JSON.stringify(item)} from List ${config.endpoint}`);
             const command: <%-command%>Command = {
                 type: "<%-command%>",
                 data: {

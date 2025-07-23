@@ -25,6 +25,9 @@ const {variables} = require("../../nextjs-prototype/common/domain");
 const {fileExistsByGlob} = require("../../common/util/files");
 
 
+function sliceTitleFromString(slice) {
+    return slugify(pascalCase(slice.replace("slice:", "")), "").replaceAll("-", "")
+}
 function sliceTitle(slice) {
     return slugify(pascalCase(slice.title.replace("slice:", "")), "").replaceAll("-", "")
 }
@@ -58,6 +61,7 @@ function tsType(field) {
         uuid: 'string',
         string: 'string',
         double: 'number',
+        decimal: 'number',
         int: 'number',
         integer: 'number',
         boolean: 'boolean',
@@ -207,6 +211,15 @@ module.exports = class extends Generator {
                 rootPackageName: this.answers.rootPackageName
             }
         )
+        if(!fileExistsByGlob(slugify(this.answers.appName),".env.local")) {
+            this.fs.copyTpl(
+                this.templatePath('root/.env.local'),
+                this.destinationPath(`${slugify(this.answers.appName)}/.env.local`),
+                {
+                    rootPackageName: this.answers.rootPackageName
+                }
+            )
+        }
 
 
     }
@@ -276,7 +289,7 @@ module.exports = class extends Generator {
                         {
                             command: tsCode,
                             slice: slicePath,
-                            commandType: commandTitle(command),
+                                commandType: commandTitle(command),
                             resultingEvents: resultingEvents,
                             appName: this.answers.appName,
                             aiComment: aiComment
@@ -486,7 +499,7 @@ module.exports = class extends Generator {
                         if (readModel.todoList) {
                             this.fs.copyTpl(
                                 this.templatePath(`db_migration_todolist.ts.tpl`),
-                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase()), idx}`),
+                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx)}`),
                                 {
                                     readmodel: readModelTitle(readModel)?.toLowerCase()
                                 })
@@ -741,8 +754,8 @@ module.exports = class extends Generator {
             descriptionList.push(`"${description}"`)
         }
 
-        const commandImports = uniq(commands.map(it => `import {${commandTitle(it)}CommandComponent} from "../../slices/${commandTitle(it)}/ui/${commandTitle(it)}CommandStateChange"`)).join("\n")
-        const readModelImports = uniq(readModels.map(it => `import {${readModelTitle(it)}ReadModelStateView} from "../../slices/${readModelTitle(it)}/ui/${readModelTitle(it)}ReadModelStateView"`)).join("\n")
+        const commandImports = uniq(commands.map(it => `import {${commandTitle(it)}CommandComponent} from "../../slices/${sliceTitleFromString(it.slice)}/ui/${commandTitle(it)}CommandStateChange"`)).join("\n")
+        const readModelImports = uniq(readModels.map(it => `import {${readModelTitle(it)}ReadModelStateView} from "../../slices/${sliceTitleFromString(it.slice)}/ui/${readModelTitle(it)}ReadModelStateView"`)).join("\n")
         const selections = uniqBy(commands.concat(readModels), (item) => item.id).map(it => `
                         <div className={"cell ${it.type?.toLowerCase()}"}
                              onClick={() => setView("${it.title?.replaceAll(" ", "")?.toLowerCase()}")}>
@@ -929,7 +942,7 @@ function exampleOrRandomValue(example, type) {
     else return "null // todo: handle complex type";
 }
 
-const generateMigrationFilename = (name, idx) => {
+const generateMigrationFilename = (name, idx, skipDate) => {
     const now = new Date();
 
     const pad = (n) => n.toString().padStart(2, '0');
@@ -941,5 +954,5 @@ const generateMigrationFilename = (name, idx) => {
     const minute = pad(now.getMinutes());
     const second = pad(now.getSeconds() + idx);
 
-    return `${year}${month}${day}${hour}${minute}${second}_${name}.sql`;
+    return skipDate ? `${name}` : `${year}${month}${day}${hour}${minute}${second}_${name}.sql`;
 };
