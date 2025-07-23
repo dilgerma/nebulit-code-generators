@@ -105,13 +105,12 @@ function renderReadModel(readmodel, todoList) {
         
         export type ${typeName}ReadModel = {
             data: ${readmodel.listElement && !todoList ? `${typeName}ReadModelItem[]` : `${typeName}ReadModelItem`},
-            ${todoList ? `status?:string`:``}
+            ${todoList ? `status?:string` : ``}
         }${todoList ? '&Partial<ProcessorTodoItem>' : ''}
         `
 }
 
 function findTargetField(fieldName, source, target) {
-    const name = target.fields.find(it => it.name === fieldName)?.name;
     let targetFieldMapping = target.fields.find(it => it.name === fieldName)?.mapping;
     if (targetFieldMapping) {
         const sourceField = source.fields.find(it => it.name === targetFieldMapping);
@@ -283,7 +282,7 @@ module.exports = class extends Generator {
                             aiComment: aiComment
                         })
 
-                    const payloadVars = command.fields.map(it => `${it.name}:${tsType(it)}`).join(",\n")
+                    const payloadVars = command.fields.map(it => `${it.name}?:${tsType(it)}`).join(",\n")
                     const assignments = variableAssignments(command.fields, "req.body", command, ",\n", ":", (field, renderedItem) => {
                         if (!field.optional) {
                             return `assertNotEmpty(${renderedItem})`
@@ -338,6 +337,53 @@ module.exports = class extends Generator {
             {
                 union: unionType
             })
+    }
+
+    writingProcessors() {
+        var slicesNames = this.answers.slices
+
+        const slices = config.slices.filter(it => slicesNames.includes(it.title)).filter(it => it.processors?.length > 0) || [];
+
+        slices.forEach((slice) => {
+            const processor = slice.processors[0];
+            if (!processor) {
+                return
+            }
+            const slicePath = sliceTitle(slice);
+
+
+            let readModels = processor.dependencies.filter(it => it.type === "INBOUND" && it.elementType === "READMODEL")
+                .map(readmodel => config.slices.flatMap(it => it.readmodels).find(it => it.id === readmodel.id))
+            let todoList = readModels.length == 1 ? readModels[0] : readModels.find(it => it.todoList)
+
+            if (!todoList) {
+                console.log("No TODO List defined for slice ${slicePath")
+                return
+            }
+
+            let command = processor.dependencies.filter(it => it.type === "OUTBOUND" && it.elementType === "COMMAND")
+                .map(commandDep => config.slices.flatMap(it => it.commands).find(it => it.id === commandDep.id))[0]
+            const idAttribute = command.fields.find(it => it.idAttribute)?.name ?? "aggregateId"
+            if (!command) {
+                console.log(`No Command Defined for slice ${slicePath}`)
+            }
+
+            const assignments = variableAssignments(command.fields, "item.data", processor, ",\n", ":", (field,renderedItem)=>{
+                return renderedItem+"!"
+            })
+
+            this.fs.copyTpl(
+                this.templatePath(`processor.ts.tpl`),
+                this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/processor.ts`),
+                {
+                    slice: slicePath,
+                    readmodel: readModelTitle(todoList),
+                    command: commandTitle(command),
+                    endpoint: `/api/${commandTitle(command)?.toLowerCase()}`,
+                    idAttribute: idAttribute,
+                    assignments: assignments
+                });
+        })
     }
 
     writingReadModels() {
@@ -399,8 +445,8 @@ module.exports = class extends Generator {
                             ...document,
                             data: {
                                 ${variableAssignments(readModel.fields.sort((a, b) => a?.name?.localeCompare(b.name)), "event", it, ",\n", ":")},
-                                ${readModel.todoList ? `status: "OPEN"`: ""}
-                            }
+                            },
+                            ${readModel.todoList ? `status: "OPEN"` : ""}
                         }`
                         )
                     }
@@ -432,7 +478,7 @@ module.exports = class extends Generator {
                             readModelLowerCase: readModelTitle(readModel)?.toLowerCase(),
                             slice: slicePath,
                             statusOrIdQuery: readModel.todoList ? `const status = req.query.status` : `const id = req.query._id`,
-                            statusOrIdQueryResult: readModel.todoList ? `collection.find({ "status": status })` :`collection.findOne({ _id: id })`,
+                            statusOrIdQueryResult: readModel.todoList ? `collection.find({ "status": status })` : `collection.findOne({ _id: id })`,
                             idAttribute: idAttribute?.name
                         })
 
@@ -893,7 +939,7 @@ const generateMigrationFilename = (name, idx) => {
     const day = pad(now.getDate());
     const hour = pad(now.getHours());
     const minute = pad(now.getMinutes());
-    const second = pad(now.getSeconds()+idx);
+    const second = pad(now.getSeconds() + idx);
 
     return `${year}${month}${day}${hour}${minute}${second}_${name}.sql`;
 };

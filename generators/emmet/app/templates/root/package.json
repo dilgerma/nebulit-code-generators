@@ -18,6 +18,7 @@
     "@rjsf/validator-ajv8": "^5.18.3",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.0",
+    "node-cron": "^4.2.1",
     "cookie-parser": "^1.4.7",
     "glob": "^11.0.3",
     "next": "15.3.4",

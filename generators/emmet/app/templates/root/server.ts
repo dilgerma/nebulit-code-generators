@@ -18,6 +18,10 @@ app.prepare().then(async () => {
     const routeFiles = await glob(routesPattern, {nodir: true});
     console.log('Found route files:', routeFiles);
 
+    const processorPattern = join(__dirname, 'src/slices/**/processor{,-*}.@(ts|js)');
+    const processorFiles = await glob(processorPattern, {nodir: true});
+    console.log('Found processor files:', processorFiles);
+
     const webApis: WebApiSetup[] = [];
 
     for (const file of routeFiles) {
@@ -30,6 +34,13 @@ app.prepare().then(async () => {
         }
     }
 
+    for(const processorFile of processorFiles) {
+        const processor: { processor: {start: () => {}} } = await import(processorFile);
+        if (typeof processor.processor.start == "function") {
+            console.log(`starting processor ${processorFile}`)
+            processor.processor.start()
+        }
+    }
 
     const express = require('express');
     const app = express();

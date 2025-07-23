@@ -5,11 +5,14 @@ import {on, WebApiSetup} from "@event-driven-io/emmett-expressjs";
 import {assertNotEmptyString} from "@event-driven-io/emmett";
 import {assertNotEmpty} from "../../components/util/assertions";
 
+export type <%-command%>RequestPayload = {
+    <%-payloadVars%>
+}
 
-type <%-command%>Request = Request<
+export type <%-command%>Request = Request<
     Partial<{ <%-paramVars%> }>,
     unknown,
-    Partial<{ <%-payloadVars%> }>
+    Partial<<%-command%>RequestPayload>
 >;
 
 export const api =
