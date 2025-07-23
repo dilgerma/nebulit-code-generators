@@ -499,7 +499,7 @@ module.exports = class extends Generator {
                         if (readModel.todoList) {
                             this.fs.copyTpl(
                                 this.templatePath(`db_migration_todolist.ts.tpl`),
-                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx)}`),
+                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx*5)}`),
                                 {
                                     readmodel: readModelTitle(readModel)?.toLowerCase()
                                 })
@@ -507,7 +507,7 @@ module.exports = class extends Generator {
                         } else {
                             this.fs.copyTpl(
                                 this.templatePath(`db_migration.ts.tpl`),
-                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx)}`),
+                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx*5)}`),
                                 {
                                     readmodel: readModelTitle(readModel)?.toLowerCase()
                                 })
