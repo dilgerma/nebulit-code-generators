@@ -5,6 +5,8 @@ import LoginHandler from "./src/supabase/LoginHandler";
 import {join} from 'path';
 import {getApplication, startAPI, WebApiSetup} from '@event-driven-io/emmett-expressjs';
 import {glob} from "glob";
+import {replayProjection} from "./src/common/replay";
+
 
 var cookieParser = require('cookie-parser')
 
@@ -45,6 +47,12 @@ app.prepare().then(async () => {
     const express = require('express');
     const app = express();
 
+    app.post("/internal/replay/:slice/:projectionName", async (req:Request, resp:Response)=>{
+        const {slice, projectionName} = req.params
+        await replayProjection(slice, projectionName);
+        return resp.status(200).json({ status: 'ok' });
+    })
+
     app.use(cookieParser());
 
     const application: Application = getApplication({
@@ -61,12 +69,12 @@ app.prepare().then(async () => {
         return handle(req, res, parsedUrl);
     });
 
-    application.get("/api/auth/confirm", (req, resp) => {
+    application.get("/api/auth/confirm", (req:Request, resp:Response) => {
         return LoginHandler(req, resp)
     })
 
     // Let Next.js handle all other routes
-    application.all('*', async (req, res) => {
+    application.all('*', async (req: Request, res:Response) => {
         //@ts-ignore
         const parsedUrl = parse(req.url!, true)
         return await handle(req, res, parsedUrl);

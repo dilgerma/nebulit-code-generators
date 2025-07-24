@@ -258,6 +258,22 @@ module.exports = class extends Generator {
         return `${imports}\n\n${unionType}`
     }
 
+    writeSliceJson() {
+        var slicesNames = this.answers.slices
+
+        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+
+        for (const slice of slices) {
+            const slicePath = sliceTitle(slice)
+
+            this.fs.copyTpl(
+                this.templatePath(`slice.json.tpl`),
+                this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/slice.json`),
+                {
+                    json: JSON.stringify(slice, null, 2)
+                })
+        }
+    }
 
     writingCommands() {
 

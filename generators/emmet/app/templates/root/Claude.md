@@ -1,30 +1,25 @@
 # Project Configuration
 
+Read Events in src/events to understand the global structure.
+
+
 ## Framework & Styling
 - **CSS Framework**: Use Bulma CSS exclusively for all styling
 - **Assumption**: Bulma CSS is already available and imported in the project
 - **Styling Guidelines**:
-    - Use Bulma's utility classes and components
-    - Follow Bulma's naming conventions and class structure
-    - Leverage Bulma's responsive design features
-    - Prefer Bulma components over custom CSS
+  - Use Bulma's utility classes and components
+  - Follow Bulma's naming conventions and class structure
+  - Leverage Bulma's responsive design features
+  - Prefer Bulma components over custom CSS
 
 ## File Structure Constraints
-- **Strict Path Limitation**: All TypeScript files must be created within `src/slices/{slicename}/*.ts`
+- **Strict Path Limitation**: if not instructed otherwise, only check `src/slices/{slicename}/*.ts`
 - **Slice Organization**: Each feature/domain should be organized as a separate slice
-- **File Types**: Only `.ts` files are allowed within slice directories
-- **No Nested Directories**: Keep flat structure within each slice folder
 
 ## Code Standards
 - **Language**: TypeScript only
 - **Module System**: Use ES modules (import/export)
 - **Type Safety**: Ensure all code is properly typed
-- **File Naming**: Use kebab-case for file names (e.g., `user-service.ts`, `payment-handler.ts`)
-
-## Slice Naming Convention
-- Use descriptive, domain-focused slice names
-- Examples: `user-management`, `payment-processing`, `event-modeling`, `workshop-booking`
-- Keep slice names lowercase with hyphens
 
 ## Development Guidelines
 1. Each slice should be self-contained and focused on a specific domain
@@ -32,21 +27,22 @@
 3. Maintain clear separation of concerns within each slice
 4. Follow TypeScript best practices for type definitions and interfaces
 
+Only check src/slices/{slice}/*.ts, do not check subfolders, if not explicitely tasked to build the UI.
+If not tasked explicitely to change routes, ignore routes*.ts
+
+Ignore case for files and slices in prompts. "CartItems" slice is the same as "cartitemsrun t"
+
+Do not change files with tests unless explicitely instructed: *.test.ts
+
+After you are done, automatically run the tests for the slice that was edited.
+
 ## Example Slice Structure
 ```
 src/slices/
-├── user-management/
-│   ├── user-service.ts
-│   ├── user-types.ts
-│   └── user-handlers.ts
-├── workshop-booking/
-│   ├── booking-service.ts
-│   ├── booking-types.ts
-│   └── booking-handlers.ts
-└── event-modeling/
-    ├── model-service.ts
-    ├── model-types.ts
-    └── model-handlers.ts
+├── {slice-name}/
+│   ├── CommandHandler.ts
+│   ├── ui/
+│   └── routes.ts
 ```
 
 ## Bulma Integration Notes
