@@ -6,7 +6,6 @@ import {join} from 'path';
 import {getApplication, startAPI, WebApiSetup} from '@event-driven-io/emmett-expressjs';
 import {glob} from "glob";
 import {replayProjection} from "./src/common/replay";
-import {correlationCausationMiddleware} from "./src/common/correlationCausationMiddleware";
 
 var cookieParser = require('cookie-parser')
 
@@ -55,7 +54,6 @@ app.prepare().then(async () => {
 
 
     app.use(cookieParser());
-    app.use(correlationCausationMiddleware())
 
     const application: Application = getApplication({
         apis: webApis,

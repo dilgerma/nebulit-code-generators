@@ -1,6 +1,6 @@
 import {before, describe, it} from "node:test";
 import {expectPongoDocuments, PostgreSQLProjectionSpec} from "@event-driven-io/emmett-postgresql";
-import {<%- readModel %>Projection, <%- readModel %>ReadModel} from "@/app/slices/<%-slice%>/<%- readModel %>Projection";
+import {<%- readModel %>Projection, <%- readModel %>ReadModel} from "./<%- readModel %>Projection";
 import {PostgreSqlContainer, StartedPostgreSqlContainer} from "@testcontainers/postgresql";
 <%-imports%>
 

@@ -1,6 +1,6 @@
 "use client"
 // @ts-ignore
-import DataTable from '@/app/components/commandselection/DataTable';
+import DataTable from '../components/commandselection/DataTable';
 
 
 export default function <%-_readModelName%>(props: any) {

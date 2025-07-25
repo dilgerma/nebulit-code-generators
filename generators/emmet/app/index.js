@@ -24,6 +24,7 @@ const {parseSchema} = require("../../common/util/jsonschema");
 const {variables} = require("../../nextjs-prototype/common/domain");
 const {fileExistsByGlob} = require("../../common/util/files");
 const {appName} = require("../../app");
+const path = require("path");
 
 
 function sliceTitleFromString(slice) {
@@ -78,18 +79,25 @@ function tsType(field) {
 }
 
 /** Build the TypeScript source for a single event. */
-function renderEvent(event) {
+function renderEvent(event, additionalMetaDataAttributes) {
+
     const typeName = pascalCase(event.title);
     return `export type ${typeName} = Event<'${typeName}', {
         ${event.fields.map((f) => `  ${f.name}: ${tsType(f)}`).join(',\n')},
+        }, {
+            ${additionalMetaDataAttributes.map(it => `${it.name}?:${it.type}`).join(",\n")},
         }>;`
 }
 
 /** Build the TypeScript source for a single event. */
-function renderCommand(command) {
+function renderCommand(command, additionalMetaDataAttributes) {
+
     const typeName = pascalCase(command.title);
     return `export type ${typeName}Command = Command<'${typeName}', {
-        ${command.fields.map((f) => `  ${f.name}: ${tsType(f)}`).join(',\n')},
+        ${command.fields.map((f) => `  ${f.name}: ${tsType(f)}`).join(',\n')}
+        },
+        {
+            ${additionalMetaDataAttributes.map(it => `${it.name}?:${it.type}`).join(",\n")},
         }>;`
 }
 
@@ -133,6 +141,9 @@ function renderEventAssignment(command, event) {
         type: "${eventTitle(event)}",
             data: {
         ${variableAssignments(event.fields, "command.data", command, ",\n", ":")}
+    }, metadata: {
+        correlation_id: command.metadata?.correlation_id,
+        causation_id: command.metadata?.causation_id
     }}`
 
 }
@@ -203,18 +214,32 @@ module.exports = class extends Generator {
             }
         )
 
-        this.fs.copyTpl(
-            this.templatePath('root/.cursor'),
-            this.destinationPath(slugify(this.answers.appName) + "/.cursor")
-        )
+        if (!fileExistsByGlob(slugify(this.answers.appName), ".cursor")) {
 
-        this.fs.copyTpl(
-            this.templatePath('git/gitignore'),
-            this.destinationPath(`${slugify(this.answers.appName)}/.gitignore`),
-            {
-                rootPackageName: this.answers.rootPackageName
-            }
-        )
+            this.fs.copyTpl(
+                this.templatePath('root/.cursor'),
+                this.destinationPath(slugify(this.answers.appName) + "/.cursor")
+            )
+        }
+        if (!fileExistsByGlob(slugify(this.answers.appName), ".gitignore")) {
+
+            this.fs.copyTpl(
+                this.templatePath('git/gitignore'),
+                this.destinationPath(`${slugify(this.answers.appName)}/.gitignore`),
+                {
+                    rootPackageName: this.answers.rootPackageName
+                }
+            )
+        }
+        if (!fileExistsByGlob(slugify(this.answers.appName), ".generator")) {
+            this.fs.copyTpl(
+                this.templatePath('root/.generator'),
+                this.destinationPath(`${slugify(this.answers.appName)}/.generator`),
+                {
+                    rootPackageName: this.answers.rootPackageName
+                }
+            )
+        }
         if (!fileExistsByGlob(slugify(this.answers.appName), ".env.local")) {
             this.fs.copyTpl(
                 this.templatePath('root/.env.local'),
@@ -248,18 +273,18 @@ module.exports = class extends Generator {
                     });
             });
 
-            if (eventData.length === 0) {
+            if (uniqBy(eventData, it=>it.fileName).length === 0) {
                 return {
                     imports: '',
                     unionType: `export type ${this.answers.appName}Events = never;`
                 };
             }
 
-            const imports = eventData
+            const imports = uniqBy(eventData, it=>it.fileName)
                 .map(event => `import { ${event.typeName} } from './${event.fileName}';`)
                 .join('\n');
 
-            const unionType = `export type ${this.answers.appName}Events = ${eventData.map(event => event.typeName).join(' | ')};`;
+            const unionType = `export type ${this.answers.appName}Events = ${uniqBy(eventData, it=>it.fileName).map(event => event.typeName).join(' | ')};`;
 
             return `${imports}\n\n${unionType}`
         }
@@ -296,7 +321,9 @@ module.exports = class extends Generator {
 
                 commands
                     .forEach((command) => {
-                        const tsCode = renderCommand(command);
+
+
+                        const tsCode = renderCommand(command, this._parseAdditionalAttributes());
 
                         let resultingEvents = command.dependencies
                             .filter(it => it.type === "OUTBOUND" && it.elementType === "EVENT")
@@ -357,10 +384,11 @@ module.exports = class extends Generator {
             slices.forEach((slice) => {
                 const events = slice.events || [];
 
+
                 events
                     .filter((ev) => ev.title && ev.context !== 'EXTERNAL') // skip externally managed events
                     .forEach((ev) => {
-                        const tsCode = renderEvent(ev);
+                        const tsCode = renderEvent(ev, this._parseAdditionalAttributes());
                         this.fs.copyTpl(
                             this.templatePath(`events.ts.tpl`),
                             this.destinationPath(`${this.answers.appName}/src/events/${eventTitle(ev)}.ts`),
@@ -875,6 +903,15 @@ module.exports = class extends Generator {
         });
     }
 
+    _parseAdditionalAttributes(){
+        const configPath = path.resolve(`${this.answers.appName}/.generator/generator-config.json`);
+        const additionalConfigs = fileExistsByGlob(`${this.answers.appName}/.generator`, `generator-config.json`) ? require(`${configPath}`) : {};
+        const additionalMetaDataAttributes = (additionalConfigs?.events?.additional_meta_data_fields ?? []).concat(["correlation_id", "causation_id", "now:Date", "streamName"])
+        return additionalMetaDataAttributes.map(it => {
+            return it.indexOf(":")!== -1 ? {name: it.split(":")[0], type: it.split(":")[1].trim()} : {name: it, type: "string"}
+        })
+    }
+
 
     /**
      * End UX Component Rendering
@@ -902,7 +939,7 @@ function renderGivenEvents(specEvents, stream, useInitializedVars) {
                         data: {
                             ${event.fields?.map(it => `${it.name}: ${useInitializedVars ? it.name : exampleOrRandomValue(then.fields.find(thenField => it.name === thenField.name)?.example, it.type)}`).join(",\n")}
                         },
-                        ${stream ? `metadata: {streamName: '${stream}'}` : ""}
+                        ${stream ? `metadata: {streamName: '${stream}'}` : "metadata: {}"}
                     }`
     })
     return `[${givenEvents.join(",\n")}]`
@@ -921,6 +958,7 @@ function renderThenEvents(specEvents, command) {
                         data: {
                             ${variableAssignments(event.fields, "command.data", command, ",\n", ":")}
                         },
+                        metadata: {}
                     }`
         }).join(",\n");
         return `.then([${events}])`

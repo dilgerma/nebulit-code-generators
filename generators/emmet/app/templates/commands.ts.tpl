@@ -48,7 +48,7 @@ const <%-commandType%>CommandHandler = CommandHandler<<%-commandType%>State, <%-
 
 export const handle<%-commandType%> = async (id:string,command:<%-commandType%>Command) => {
     const eventStore = await findEventstore()
-    await <%-commandType%>CommandHandler(eventStore, id, (state:<%-commandType%>State)=>decide(command,state))
-
+    const result = await <%-commandType%>CommandHandler(eventStore, id, (state:<%-commandType%>State)=>decide(command,state))
+    return {nextExpectedStreamVersion: result.nextExpectedStreamVersion, lastEventGlobalPosition: result.lastEventGlobalPosition}
 }
 

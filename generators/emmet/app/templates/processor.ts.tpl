@@ -18,7 +18,7 @@ export const processor = {
                 type: "<%-command%>",
                 data: {
                    <%-assignments%>
-                }
+                },metadata: {}
             }
             await handle<%-command%>(command.data[idAttribute], command)
         })
