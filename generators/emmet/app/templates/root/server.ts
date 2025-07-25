@@ -5,8 +5,11 @@ import LoginHandler from "./src/supabase/LoginHandler";
 import {join} from 'path';
 import {getApplication, startAPI, WebApiSetup} from '@event-driven-io/emmett-expressjs';
 import {glob} from "glob";
+import {PostgreSQLProjectionDefinition, rebuildPostgreSQLProjections} from "@event-driven-io/emmett-postgresql";
+import {findEventstore} from "./src/common/loadPostgresEventstore";
+import {postgresUrl} from "./src/common/db";
 import {replayProjection} from "./src/common/replay";
-
+import {correlationCausationMiddleware} from "./src/common/correlationCausationMiddleware";
 
 var cookieParser = require('cookie-parser')
 
@@ -36,24 +39,26 @@ app.prepare().then(async () => {
         }
     }
 
-    for(const processorFile of processorFiles) {
-        const processor: { processor: {start: () => {}} } = await import(processorFile);
+    for (const processorFile of processorFiles) {
+        const processor: { processor: { start: () => {} } } = await import(processorFile);
         if (typeof processor.processor.start == "function") {
             console.log(`starting processor ${processorFile}`)
             processor.processor.start()
         }
     }
 
+
     const express = require('express');
     const app = express();
-
     app.post("/internal/replay/:slice/:projectionName", async (req:Request, resp:Response)=>{
         const {slice, projectionName} = req.params
         await replayProjection(slice, projectionName);
         return resp.status(200).json({ status: 'ok' });
     })
 
+
     app.use(cookieParser());
+    app.use(correlationCausationMiddleware())
 
     const application: Application = getApplication({
         apis: webApis,
@@ -69,12 +74,12 @@ app.prepare().then(async () => {
         return handle(req, res, parsedUrl);
     });
 
-    application.get("/api/auth/confirm", (req:Request, resp:Response) => {
+    application.get("/api/auth/confirm", (req, resp) => {
         return LoginHandler(req, resp)
     })
 
     // Let Next.js handle all other routes
-    application.all('*', async (req: Request, res:Response) => {
+    application.all('*', async (req, res) => {
         //@ts-ignore
         const parsedUrl = parse(req.url!, true)
         return await handle(req, res, parsedUrl);
