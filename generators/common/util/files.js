@@ -2,7 +2,7 @@ const path = require("path");
 const glob = require("glob");
 
 function fileExistsByGlob(folder, pattern) {
-    const fullPattern = path.join(folder, `*${pattern}*.sql`);
+    const fullPattern = path.join(folder, `*${pattern}*`);
     const files = glob.sync(fullPattern);
     return files.length > 0;
 }

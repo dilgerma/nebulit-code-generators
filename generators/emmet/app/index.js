@@ -23,11 +23,13 @@ const {v4} = require("uuid");
 const {parseSchema} = require("../../common/util/jsonschema");
 const {variables} = require("../../nextjs-prototype/common/domain");
 const {fileExistsByGlob} = require("../../common/util/files");
+const {appName} = require("../../app");
 
 
 function sliceTitleFromString(slice) {
     return slugify(pascalCase(slice.replace("slice:", "")), "").replaceAll("-", "")
 }
+
 function sliceTitle(slice) {
     return slugify(pascalCase(slice.title.replace("slice:", "")), "").replaceAll("-", "")
 }
@@ -154,16 +156,19 @@ module.exports = class extends Generator {
             when: () => !config?.codeGen?.application,
         },
             {
-                type: 'confirm',
-                name: 'skeleton',
-                message: 'Generate skeleton ( say yes, if you run this the first time )'
+                type: 'checkbox',
+                name: 'generate',
+                choices: ['skeleton', 'events', 'slices', 'pages']
             },
             {
                 type: 'checkbox',
                 name: 'slices',
                 choices: config.slices.map(it => it.title),
                 loop: false,
-                message: 'Which Slice should be generated?'
+                message: 'Which Slice should be generated?',
+                when: (givenAnswers) => {
+                    return givenAnswers.generate?.includes("slices")
+                },
             }]);
 
     }
@@ -176,14 +181,13 @@ module.exports = class extends Generator {
     }
 
     writing() {
-        if (this.answers.skeleton) {
+        if (this.answers.generate?.includes("skeleton")) {
             this._writeApp()
         }
     }
 
 
     _writeApp() {
-
         let screens = this._loadScreens()
         let navbarItems = uniqBy(screens, (it) => it.title).map(it => `<Link href="/${_screenTitle(it.title)?.toLowerCase()}" className="navbar-item">
                                             ${_screenTitle(it.title)}
@@ -211,7 +215,7 @@ module.exports = class extends Generator {
                 rootPackageName: this.answers.rootPackageName
             }
         )
-        if(!fileExistsByGlob(slugify(this.answers.appName),".env.local")) {
+        if (!fileExistsByGlob(slugify(this.answers.appName), ".env.local")) {
             this.fs.copyTpl(
                 this.templatePath('root/.env.local'),
                 this.destinationPath(`${slugify(this.answers.appName)}/.env.local`),
@@ -226,42 +230,44 @@ module.exports = class extends Generator {
 
     /** Build a union type of all events with imports. */
     _renderEventUnion(slices) {
-        const eventData = [];
+        if (this.answers.generate?.includes("events")) {
 
-        slices.forEach((slice) => {
-            const events = slice.events || [];
-            events
-                .filter((ev) => ev.title && ev.context !== 'EXTERNAL') // skip externally managed events
-                .forEach((ev) => {
-                    const typeName = eventTitle(ev);
-                    const fileName = slugify(eventTitle(ev));
-                    eventData.push({
-                        typeName,
-                        fileName
+            const eventData = [];
+
+            slices.forEach((slice) => {
+                const events = slice.events || [];
+                events
+                    .filter((ev) => ev.title && ev.context !== 'EXTERNAL') // skip externally managed events
+                    .forEach((ev) => {
+                        const typeName = eventTitle(ev);
+                        const fileName = slugify(eventTitle(ev));
+                        eventData.push({
+                            typeName,
+                            fileName
+                        });
                     });
-                });
-        });
+            });
 
-        if (eventData.length === 0) {
-            return {
-                imports: '',
-                unionType: `export type ${this.answers.appName}Events = never;`
-            };
+            if (eventData.length === 0) {
+                return {
+                    imports: '',
+                    unionType: `export type ${this.answers.appName}Events = never;`
+                };
+            }
+
+            const imports = eventData
+                .map(event => `import { ${event.typeName} } from './${event.fileName}';`)
+                .join('\n');
+
+            const unionType = `export type ${this.answers.appName}Events = ${eventData.map(event => event.typeName).join(' | ')};`;
+
+            return `${imports}\n\n${unionType}`
         }
-
-        const imports = eventData
-            .map(event => `import { ${event.typeName} } from './${event.fileName}';`)
-            .join('\n');
-
-        const unionType = `export type ${this.answers.appName}Events = ${eventData.map(event => event.typeName).join(' | ')};`;
-
-        return `${imports}\n\n${unionType}`
     }
 
     writeSliceJson() {
-        var slicesNames = this.answers.slices
 
-        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+        const slices = config.slices.filter(it => this.answers?.slices?.includes(it.title)) || [];
 
         for (const slice of slices) {
             const slicePath = sliceTitle(slice)
@@ -277,174 +283,185 @@ module.exports = class extends Generator {
 
     writingCommands() {
 
-        var slicesNames = this.answers.slices
+        if (this.answers.generate?.includes("slices")) {
 
-        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+            var slicesNames = this.answers.slices
 
-        slices.forEach((slice) => {
-            const commands = slice.commands || [];
-            const slicePath = sliceTitle(slice)
+            const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+
+            slices.forEach((slice) => {
+                const commands = slice.commands || [];
+                const slicePath = sliceTitle(slice)
 
 
-            commands
-                .forEach((command) => {
-                    const tsCode = renderCommand(command);
+                commands
+                    .forEach((command) => {
+                        const tsCode = renderCommand(command);
 
-                    let resultingEvents = command.dependencies
-                        .filter(it => it.type === "OUTBOUND" && it.elementType === "EVENT")
-                        .map(item => config.slices.flatMap(it => it.events).find(it => it.id === item.id))
-                        .map(event => renderEventAssignment(command, event));
+                        let resultingEvents = command.dependencies
+                            .filter(it => it.type === "OUTBOUND" && it.elementType === "EVENT")
+                            .map(item => config.slices.flatMap(it => it.events).find(it => it.id === item.id))
+                            .map(event => renderEventAssignment(command, event));
 
-                    const aiComment = slice.specifications?.map(spec => analyzeSpecs(spec)).join("\n")
+                        const aiComment = slice.specifications?.map(spec => analyzeSpecs(spec)).join("\n")
 
-                    const idAttribute = command.fields.find(it => it.idAttribute)?.name ?? "aggregateId"
+                        const idAttribute = command.fields.find(it => it.idAttribute)?.name ?? "aggregateId"
 
-                    this.fs.copyTpl(
-                        this.templatePath(`commands.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/${commandTitle(command)}Command.ts`),
-                        {
-                            command: tsCode,
-                            slice: slicePath,
+                        this.fs.copyTpl(
+                            this.templatePath(`commands.ts.tpl`),
+                            this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/${commandTitle(command)}Command.ts`),
+                            {
+                                command: tsCode,
+                                slice: slicePath,
                                 commandType: commandTitle(command),
-                            resultingEvents: resultingEvents,
-                            appName: this.answers.appName,
-                            aiComment: aiComment
+                                resultingEvents: resultingEvents,
+                                appName: this.answers.appName,
+                                aiComment: aiComment
+                            })
+
+                        const payloadVars = command.fields.map(it => `${it.name}?:${tsType(it)}`).join(",\n")
+                        const assignments = variableAssignments(command.fields, "req.body", command, ",\n", ":", (field, renderedItem) => {
+                            if (!field.optional) {
+                                return `assertNotEmpty(${renderedItem})`
+                            } else {
+                                return renderedItem
+                            }
                         })
 
-                    const payloadVars = command.fields.map(it => `${it.name}?:${tsType(it)}`).join(",\n")
-                    const assignments = variableAssignments(command.fields, "req.body", command, ",\n", ":", (field, renderedItem) => {
-                        if (!field.optional) {
-                            return `assertNotEmpty(${renderedItem})`
-                        } else {
-                            return renderedItem
-                        }
-                    })
-
-                    this.fs.copyTpl(
-                        this.templatePath(`commandApi.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/routes.ts`),
-                        {
-                            assignments: assignments,
-                            //hardcode id for path /.../:id
-                            paramVars: "id:string",
-                            payloadVars: payloadVars,
-                            idAttribute: idAttribute,
-                            command: commandTitle(command),
-                            path: commandTitle(command)?.toLowerCase(),
-                            slice: slicePath,
-                        })
+                        this.fs.copyTpl(
+                            this.templatePath(`commandApi.ts.tpl`),
+                            this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/routes.ts`),
+                            {
+                                assignments: assignments,
+                                //hardcode id for path /.../:id
+                                paramVars: "id:string",
+                                payloadVars: payloadVars,
+                                idAttribute: idAttribute,
+                                command: commandTitle(command),
+                                path: commandTitle(command)?.toLowerCase(),
+                                slice: slicePath,
+                            })
 
 
-                });
+                    });
 
-        });
+            });
+        }
     }
 
     writingEvents() {
-        const slices = config.slices || [];
+        if (this.answers.generate?.includes("events")) {
 
-        slices.forEach((slice) => {
-            const events = slice.events || [];
+            const slices = config.slices || [];
 
-            events
-                .filter((ev) => ev.title && ev.context !== 'EXTERNAL') // skip externally managed events
-                .forEach((ev) => {
-                    const tsCode = renderEvent(ev);
-                    this.fs.copyTpl(
-                        this.templatePath(`events.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/events/${eventTitle(ev)}.ts`),
-                        {
-                            event: tsCode
-                        })
-                });
-        });
+            slices.forEach((slice) => {
+                const events = slice.events || [];
 
-        let unionType = this._renderEventUnion(slices)
-        this.fs.copyTpl(
-            this.templatePath(`eventunion.ts.tpl`),
-            this.destinationPath(`${this.answers.appName}/src/events/${slugify(this.answers.appName?.replaceAll(" ", "").replaceAll("-", ""))}Events.ts`),
-            {
-                union: unionType
-            })
+                events
+                    .filter((ev) => ev.title && ev.context !== 'EXTERNAL') // skip externally managed events
+                    .forEach((ev) => {
+                        const tsCode = renderEvent(ev);
+                        this.fs.copyTpl(
+                            this.templatePath(`events.ts.tpl`),
+                            this.destinationPath(`${this.answers.appName}/src/events/${eventTitle(ev)}.ts`),
+                            {
+                                event: tsCode
+                            })
+                    });
+            });
+
+            let unionType = this._renderEventUnion(slices)
+            this.fs.copyTpl(
+                this.templatePath(`eventunion.ts.tpl`),
+                this.destinationPath(`${this.answers.appName}/src/events/${slugify(this.answers.appName?.replaceAll(" ", "").replaceAll("-", ""))}Events.ts`),
+                {
+                    union: unionType
+                })
+        }
     }
 
     writingProcessors() {
-        var slicesNames = this.answers.slices
+        if (this.answers.generate?.includes("slices")) {
 
-        const slices = config.slices.filter(it => slicesNames.includes(it.title)).filter(it => it.processors?.length > 0) || [];
+            var slicesNames = this.answers.slices
 
-        slices.forEach((slice) => {
-            const processor = slice.processors[0];
-            if (!processor) {
-                return
-            }
-            const slicePath = sliceTitle(slice);
+            const slices = config.slices.filter(it => slicesNames.includes(it.title)).filter(it => it.processors?.length > 0) || [];
+
+            slices.forEach((slice) => {
+                const processor = slice.processors[0];
+                if (!processor) {
+                    return
+                }
+                const slicePath = sliceTitle(slice);
 
 
-            let readModels = processor.dependencies.filter(it => it.type === "INBOUND" && it.elementType === "READMODEL")
-                .map(readmodel => config.slices.flatMap(it => it.readmodels).find(it => it.id === readmodel.id))
-            let todoList = readModels.length == 1 ? readModels[0] : readModels.find(it => it.todoList)
+                let readModels = processor.dependencies.filter(it => it.type === "INBOUND" && it.elementType === "READMODEL")
+                    .map(readmodel => config.slices.flatMap(it => it.readmodels).find(it => it.id === readmodel.id))
+                let todoList = readModels.length == 1 ? readModels[0] : readModels.find(it => it.todoList)
 
-            if (!todoList) {
-                console.log("No TODO List defined for slice ${slicePath")
-                return
-            }
+                if (!todoList) {
+                    console.log("No TODO List defined for slice ${slicePath")
+                    return
+                }
 
-            let command = processor.dependencies.filter(it => it.type === "OUTBOUND" && it.elementType === "COMMAND")
-                .map(commandDep => config.slices.flatMap(it => it.commands).find(it => it.id === commandDep.id))[0]
-            const idAttribute = command.fields.find(it => it.idAttribute)?.name ?? "aggregateId"
-            if (!command) {
-                console.log(`No Command Defined for slice ${slicePath}`)
-            }
+                let command = processor.dependencies.filter(it => it.type === "OUTBOUND" && it.elementType === "COMMAND")
+                    .map(commandDep => config.slices.flatMap(it => it.commands).find(it => it.id === commandDep.id))[0]
+                const idAttribute = command.fields.find(it => it.idAttribute)?.name ?? "aggregateId"
+                if (!command) {
+                    console.log(`No Command Defined for slice ${slicePath}`)
+                }
 
-            const assignments = variableAssignments(command.fields, "item.data", processor, ",\n", ":", (field,renderedItem)=>{
-                return renderedItem+"!"
+                const assignments = variableAssignments(command.fields, "item.data", processor, ",\n", ":", (field, renderedItem) => {
+                    return renderedItem + "!"
+                })
+
+                this.fs.copyTpl(
+                    this.templatePath(`processor.ts.tpl`),
+                    this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/processor.ts`),
+                    {
+                        slice: slicePath,
+                        readmodel: readModelTitle(todoList),
+                        command: commandTitle(command),
+                        endpoint: `/api/${commandTitle(command)?.toLowerCase()}`,
+                        idAttribute: idAttribute,
+                        assignments: assignments
+                    });
             })
-
-            this.fs.copyTpl(
-                this.templatePath(`processor.ts.tpl`),
-                this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/processor.ts`),
-                {
-                    slice: slicePath,
-                    readmodel: readModelTitle(todoList),
-                    command: commandTitle(command),
-                    endpoint: `/api/${commandTitle(command)?.toLowerCase()}`,
-                    idAttribute: idAttribute,
-                    assignments: assignments
-                });
-        })
+        }
     }
 
     writingReadModels() {
-        var slicesNames = this.answers.slices
+        if (this.answers.generate?.includes("slices")) {
 
-        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+            var slicesNames = this.answers.slices
 
-        slices.forEach((slice) => {
-            const readModels = slice.readmodels || [];
+            const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+
+            slices.forEach((slice) => {
+                const readModels = slice.readmodels || [];
 
 
-            readModels
-                .forEach((readModel, idx) => {
+                readModels
+                    .forEach((readModel, idx) => {
 
-                    let inboundDeps = readModel.dependencies.filter(it => it.type === "INBOUND" && it.elementType === "EVENT")
-                        .map(event => config.slices.flatMap(it => it.events).find(it => it.id === event.id))
+                        let inboundDeps = readModel.dependencies.filter(it => it.type === "INBOUND" && it.elementType === "EVENT")
+                            .map(event => config.slices.flatMap(it => it.events).find(it => it.id === event.id))
 
-                    let imports = inboundDeps.map(it => `import { ${eventTitle(it)} } from '../../events/${eventTitle(it)}';`).join("\n")
+                        let imports = inboundDeps.map(it => `import { ${eventTitle(it)} } from '../../events/${eventTitle(it)}';`).join("\n")
 
-                    const tsCode = renderReadModel(readModel, readModel.todoList);
-                    const slicePath = sliceTitle(slice)
+                        const tsCode = renderReadModel(readModel, readModel.todoList);
+                        const slicePath = sliceTitle(slice)
 
-                    const aiComment = slice.specifications?.map(spec => analyzeSpecs(spec)).join("\n")
+                        const aiComment = slice.specifications?.map(spec => analyzeSpecs(spec)).join("\n")
 
-                    let caseStatements;
+                        let caseStatements;
 
-                    if (readModel.listElement && !readModel.todoList) {
-                        let idFields = readModel.fields.filter(field => field.idAttribute)
-                        caseStatements = inboundDeps.map(event => {
-                            let query = idFields.map(field => `item.${field.name} === event.${findTargetField(field.name, event, readModel) ?? `noFieldMatch`}`).join(" && ")
-                            if (query) {
-                                return `case "${eventTitle(event)}": {
+                        if (readModel.listElement && !readModel.todoList) {
+                            let idFields = readModel.fields.filter(field => field.idAttribute)
+                            caseStatements = inboundDeps.map(event => {
+                                let query = idFields.map(field => `item.${field.name} === event.${findTargetField(field.name, event, readModel) ?? `noFieldMatch`}`).join(" && ")
+                                if (query) {
+                                    return `case "${eventTitle(event)}": {
                                 const existing = state.data?.find(item => ${query})
                                 
                                 if(existing) {
@@ -458,18 +475,18 @@ module.exports = class extends Generator {
                                 }
                                 return {...state};
                         }`
-                            } else {
-                                return `case "${eventTitle(event)}": {
+                                } else {
+                                    return `case "${eventTitle(event)}": {
                                     state?.data?.push({
                                         ${variableAssignments(readModel.fields, "event", event, ",\n", ":")}
                                     })
                                     return {...state};
                         }`
-                            }
-                        });
+                                }
+                            });
 
-                    } else {
-                        caseStatements = inboundDeps.map(it => `case "${eventTitle(it)}": 
+                        } else {
+                            caseStatements = inboundDeps.map(it => `case "${eventTitle(it)}": 
                         return {
                             ...document,
                             data: {
@@ -477,83 +494,83 @@ module.exports = class extends Generator {
                             },
                             ${readModel.todoList ? `status: "OPEN"` : ""}
                         }`
-                        )
-                    }
-
-                    this.fs.copyTpl(
-                        this.templatePath(`readmodel.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/${readModelTitle(readModel)}Projection.ts`),
-                        {
-                            slice: slicePath,
-                            readModelType: tsCode,
-                            readModel: readModelTitle(readModel),
-                            readModelLowerCase: readModelTitle(readModel)?.toLowerCase(),
-                            eventsUnion: inboundDeps.map(it => eventTitle(it)).join(` | `),
-                            eventsList: inboundDeps.map(it => `"${eventTitle(it)}"`).join(` , `),
-                            caseStatements: caseStatements.join("\n"),
-                            eventImports: imports,
-                            aiComment: aiComment,
-                            stateAssignment: `const state: ${readModelTitle(readModel)}ReadModel = {...document, data: ${readModel?.listElement && !readModel.todoList ? "[...document?.data??[]]" : "{...document?.data}"}};`
-
-                        })
-
-                    // assume only one id attribute
-                    let idAttribute = readModel.fields.find(field => field.idAttribute)
-                    this.fs.copyTpl(
-                        this.templatePath(`readModelApi.ts.tpl`),
-                        this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/routes.ts`),
-                        {
-                            readmodel: readModelTitle(readModel),
-                            readModelLowerCase: readModelTitle(readModel)?.toLowerCase(),
-                            slice: slicePath,
-                            statusOrIdQuery: readModel.todoList ? `const status = req.query.status` : `const id = req.query._id`,
-                            statusOrIdQueryResult: readModel.todoList ? `collection.find({ "status": status })` : `collection.findOne({ _id: id })`,
-                            idAttribute: idAttribute?.name
-                        })
-
-                    if (!fileExistsByGlob(`${this.answers.appName}/supabase/migrations`, _readmodelTitle(readModel.title).toLowerCase())) {
-                        if (readModel.todoList) {
-                            this.fs.copyTpl(
-                                this.templatePath(`db_migration_todolist.ts.tpl`),
-                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx*5)}`),
-                                {
-                                    readmodel: readModelTitle(readModel)?.toLowerCase()
-                                })
-
-                        } else {
-                            this.fs.copyTpl(
-                                this.templatePath(`db_migration.ts.tpl`),
-                                this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx*5)}`),
-                                {
-                                    readmodel: readModelTitle(readModel)?.toLowerCase()
-                                })
+                            )
                         }
-                    } else {
-                        console.log(`Migration ${_readmodelTitle(readModel.title).toLowerCase()} exists. Skipping.`)
-                    }
 
-                });
-        });
+                        this.fs.copyTpl(
+                            this.templatePath(`readmodel.ts.tpl`),
+                            this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/${readModelTitle(readModel)}Projection.ts`),
+                            {
+                                slice: slicePath,
+                                readModelType: tsCode,
+                                readModel: readModelTitle(readModel),
+                                readModelLowerCase: readModelTitle(readModel)?.toLowerCase(),
+                                eventsUnion: inboundDeps.map(it => eventTitle(it)).join(` | `),
+                                eventsList: inboundDeps.map(it => `"${eventTitle(it)}"`).join(` , `),
+                                caseStatements: caseStatements.join("\n"),
+                                eventImports: imports,
+                                aiComment: aiComment,
+                                stateAssignment: `const state: ${readModelTitle(readModel)}ReadModel = {...document, data: ${readModel?.listElement && !readModel.todoList ? "[...document?.data??[]]" : "{...document?.data}"}};`
 
+                            })
+
+                        // assume only one id attribute
+                        let idAttribute = readModel.fields.find(field => field.idAttribute)
+                        this.fs.copyTpl(
+                            this.templatePath(`readModelApi.ts.tpl`),
+                            this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/routes.ts`),
+                            {
+                                readmodel: readModelTitle(readModel),
+                                readModelLowerCase: readModelTitle(readModel)?.toLowerCase(),
+                                slice: slicePath,
+                                statusOrIdQuery: readModel.todoList ? `const status = req.query.status` : `const id = req.query._id`,
+                                statusOrIdQueryResult: readModel.todoList ? `collection.find({ "status": status })` : `collection.findOne({ _id: id })`,
+                                idAttribute: idAttribute?.name
+                            })
+
+                        if (!fileExistsByGlob(`${this.answers.appName}/supabase/migrations`, `${_readmodelTitle(readModel.title).toLowerCase()}*.sql`)) {
+                            if (readModel.todoList) {
+                                this.fs.copyTpl(
+                                    this.templatePath(`db_migration_todolist.ts.tpl`),
+                                    this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx * 5)}`),
+                                    {
+                                        readmodel: readModelTitle(readModel)?.toLowerCase()
+                                    })
+
+                            } else {
+                                this.fs.copyTpl(
+                                    this.templatePath(`db_migration.ts.tpl`),
+                                    this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx * 5)}`),
+                                    {
+                                        readmodel: readModelTitle(readModel)?.toLowerCase()
+                                    })
+                            }
+                        } else {
+                            console.log(`Migration ${_readmodelTitle(readModel.title).toLowerCase()} exists. Skipping.`)
+                        }
+
+                    });
+            });
+        }
     }
 
     renderEventstore() {
 
+
         let projectionsImports = []
         let projections = []
 
-        var slicesNames = this.answers.slices
-        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+        config.slices.forEach((slice) => {
+            const slicePath = sliceTitle(slice)
+            if (fileExistsByGlob(`${this.answers.appName}/src/slices`, slicePath)) {
+                const readModels = slice.readmodels || [];
 
-        slices.forEach((slice) => {
-            const readModels = slice.readmodels || [];
-
-            readModels
-                .forEach((readModel) => {
-                    const slicePath = sliceTitle(slice)
-                    projectionsImports.push(`import {${readModelTitle(readModel)}Projection} from "../slices/${slicePath}/${readModelTitle(readModel)}Projection"`)
-                    projections.push(`${readModelTitle(readModel)}Projection`)
-                });
+                readModels
+                    .forEach((readModel) => {
+                        projectionsImports.push(`import {${readModelTitle(readModel)}Projection} from "../slices/${slicePath}/${readModelTitle(readModel)}Projection"`)
+                        projections.push(`${readModelTitle(readModel)}Projection`)
+                    });
+            }
         })
 
         this.fs.copyTpl(
@@ -566,8 +583,7 @@ module.exports = class extends Generator {
     }
 
     writeSpecs() {
-        var slicesNames = this.answers.slices
-        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+        const slices = config.slices.filter(it => this.answers?.slices?.includes(it.title)) || [];
         slices.forEach(slice => {
 
             const slicePath = sliceTitle(slice)
@@ -702,17 +718,15 @@ module.exports = class extends Generator {
      */
 
     writeUiComponents() {
-        this._writeScreens()
+        if (this.answers.generate?.includes("pages")) {
+            this._writeScreens()
+        }
         this._writeCommandsComponents()
         this._writeReadModelComponents()
     }
 
     _loadScreens() {
-
-        var slicesNames = this.answers.slices
-        const slices = config.slices.filter(it => slicesNames.includes(it.title))
-
-        return slices.flatMap(it => it.commands.concat(it.readmodels))
+        return config.slices.flatMap(it => it.commands.concat(it.readmodels))
             // only take commands and readmodels connected to screens
             .filter(commandOrReadModel => commandOrReadModel.dependencies?.some(it => it.elementType === "SCREEN"))
             // find all screen ids referenced in the model
@@ -746,9 +760,11 @@ module.exports = class extends Generator {
         screensWithSameTitle = screensWithSameTitle || []
         var commands = screensWithSameTitle.flatMap(it => it.dependencies.filter(dep => dep.type === "OUTBOUND")
             .filter(dep => dep.elementType === "COMMAND")).map(dep => config.slices.flatMap(it => it.commands).find(it => it.id === dep.id)).filter(it => it)
-
+            .filter(command => fileExistsByGlob(`${this.answers.appName}/src/slices`, sliceTitleFromString(command.slice)))
         var readModels = screensWithSameTitle.flatMap(it => it.dependencies.filter(dep => dep.type === "INBOUND")
             .filter(dep => dep.elementType === "READMODEL")).map(dep => config.slices.flatMap(it => it.readmodels).find(it => it.id == dep.id)).filter(it => it)
+            .filter(readModel => fileExistsByGlob(`${this.answers.appName}/src/slices`, sliceTitleFromString(readModel.slice)))
+
 
         var screenTitle = screensWithSameTitle[0]?.title
         var css = screensWithSameTitle.find(it => !!it.prototype?.css)?.prototype?.css
@@ -815,8 +831,7 @@ module.exports = class extends Generator {
     }
 
     _writeCommandsComponents() {
-        var slicesNames = this.answers.slices
-        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+        const slices = config.slices.filter(it => this.answers?.slices?.includes(it.title)) || [];
         const commands = slices.flatMap(it => it.commands)
 
         commands.forEach((command, index) => {
@@ -843,8 +858,7 @@ module.exports = class extends Generator {
     }
 
     _writeReadModelComponents() {
-        var slicesNames = this.answers.slices
-        const slices = config.slices.filter(it => slicesNames.includes(it.title)) || [];
+        const slices = config.slices.filter(it => this.answers?.slices?.includes(it.title)) || [];
         const readmodels = slices.flatMap(it => it.readmodels)
 
         readmodels.forEach((readmodel, index) => {

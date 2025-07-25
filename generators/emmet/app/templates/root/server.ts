@@ -5,9 +5,6 @@ import LoginHandler from "./src/supabase/LoginHandler";
 import {join} from 'path';
 import {getApplication, startAPI, WebApiSetup} from '@event-driven-io/emmett-expressjs';
 import {glob} from "glob";
-import {PostgreSQLProjectionDefinition, rebuildPostgreSQLProjections} from "@event-driven-io/emmett-postgresql";
-import {findEventstore} from "./src/common/loadPostgresEventstore";
-import {postgresUrl} from "./src/common/db";
 import {replayProjection} from "./src/common/replay";
 import {correlationCausationMiddleware} from "./src/common/correlationCausationMiddleware";
 
