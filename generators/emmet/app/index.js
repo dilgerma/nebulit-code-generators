@@ -169,7 +169,7 @@ module.exports = class extends Generator {
             {
                 type: 'checkbox',
                 name: 'generate',
-                choices: ['skeleton', 'events', 'slices', 'pages']
+                choices: ['skeleton', 'events', 'slices', 'pages', "eventStore"]
             },
             {
                 type: 'checkbox',
@@ -556,7 +556,7 @@ module.exports = class extends Generator {
                                 idAttribute: idAttribute?.name
                             })
 
-                        if (!fileExistsByGlob(`${this.answers.appName}/supabase/migrations`, `${_readmodelTitle(readModel.title).toLowerCase()}*.sql`)) {
+                        if (!fileExistsByGlob(`${this.answers.appName}/supabase/migrations`, `*${_readmodelTitle(readModel.title).toLowerCase()}.sql`)) {
                             if (readModel.todoList) {
                                 this.fs.copyTpl(
                                     this.templatePath(`db_migration_todolist.ts.tpl`),
@@ -584,30 +584,32 @@ module.exports = class extends Generator {
 
     renderEventstore() {
 
+        if (this.answers.generate?.includes("eventStore")) {
 
-        let projectionsImports = []
-        let projections = []
+            let projectionsImports = []
+            let projections = []
 
-        config.slices.forEach((slice) => {
-            const slicePath = sliceTitle(slice)
-            if (fileExistsByGlob(`${this.answers.appName}/src/slices`, slicePath)) {
-                const readModels = slice.readmodels || [];
+            config.slices.forEach((slice) => {
+                const slicePath = sliceTitle(slice)
+                if (fileExistsByGlob(`${this.answers.appName}/src/slices`, slicePath)) {
+                    const readModels = slice.readmodels || [];
 
-                readModels
-                    .forEach((readModel) => {
-                        projectionsImports.push(`import {${readModelTitle(readModel)}Projection} from "../slices/${slicePath}/${readModelTitle(readModel)}Projection"`)
-                        projections.push(`${readModelTitle(readModel)}Projection`)
-                    });
-            }
-        })
-
-        this.fs.copyTpl(
-            this.templatePath(`loadEventStore.ts.tpl`),
-            this.destinationPath(`${this.answers.appName}/src/common/loadPostgresEventstore.ts`),
-            {
-                imports: projectionsImports.join("\n"),
-                projections: projections.join(",\n"),
+                    readModels
+                        .forEach((readModel) => {
+                            projectionsImports.push(`import {${readModelTitle(readModel)}Projection} from "../slices/${slicePath}/${readModelTitle(readModel)}Projection"`)
+                            projections.push(`${readModelTitle(readModel)}Projection`)
+                        });
+                }
             })
+
+            this.fs.copyTpl(
+                this.templatePath(`loadEventStore.ts.tpl`),
+                this.destinationPath(`${this.answers.appName}/src/common/loadPostgresEventstore.ts`),
+                {
+                    imports: projectionsImports.join("\n"),
+                    projections: projections.join(",\n"),
+                })
+        }
     }
 
     writeSpecs() {
