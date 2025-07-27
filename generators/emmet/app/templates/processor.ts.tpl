@@ -20,7 +20,13 @@ export const processor = {
                    <%-assignments%>
                 },metadata: {}
             }
-            await handle<%-command%>(command.data[idAttribute], command)
+
+            const id =  command.data[idAttribute]
+
+            if (!id) {
+                throw `Cannot process Command ${command.type}. No Id available.`
+            }
+            await handle<%-command%>(id, command)
         })
     }
 }

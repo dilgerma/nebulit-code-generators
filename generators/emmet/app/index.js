@@ -169,7 +169,7 @@ module.exports = class extends Generator {
             {
                 type: 'checkbox',
                 name: 'generate',
-                choices: ['skeleton', 'events', 'slices', 'pages', "eventStore"]
+                choices: ['skeleton', 'events', 'slices', 'pages', "eventStore", "db-migrations"]
             },
             {
                 type: 'checkbox',
@@ -273,18 +273,18 @@ module.exports = class extends Generator {
                     });
             });
 
-            if (uniqBy(eventData, it=>it.fileName).length === 0) {
+            if (uniqBy(eventData, it => it.fileName).length === 0) {
                 return {
                     imports: '',
                     unionType: `export type ${this.answers.appName}Events = never;`
                 };
             }
 
-            const imports = uniqBy(eventData, it=>it.fileName)
+            const imports = uniqBy(eventData, it => it.fileName)
                 .map(event => `import { ${event.typeName} } from './${event.fileName}';`)
                 .join('\n');
 
-            const unionType = `export type ${this.answers.appName}Events = ${uniqBy(eventData, it=>it.fileName).map(event => event.typeName).join(' | ')};`;
+            const unionType = `export type ${this.answers.appName}Events = ${uniqBy(eventData, it => it.fileName).map(event => event.typeName).join(' | ')};`;
 
             return `${imports}\n\n${unionType}`
         }
@@ -458,6 +458,72 @@ module.exports = class extends Generator {
         }
     }
 
+    _renderTodoListQuery(readModelName) {
+        return `
+            const status = req.query.status?.toString();
+            const limit = Number(req.query._limit??-1)
+            if(!status) throw "no status provided"
+
+            const supabase = createServiceClient()
+            const collection = "${readModelName?.toLowerCase()}-collection"
+
+
+            const data:${readModelName}ReadModel[]|null = await readmodel(collection, supabase)
+                .findAll<${readModelName}ReadModel>({status:status}, 
+                    (query)=>limit !== -1 ? query.limit(limit): query)
+            `
+    }
+
+    _renderReadModelQuery(readModelName) {
+        return `
+           const id = req.query._id?.toString();
+           if(!id) throw "no id provided"
+
+           const supabase = createServiceClient()
+           const collection = "${readModelName?.toLowerCase()}-collection"
+
+           const data:${readModelName}ReadModel|null = await readmodel(collection, supabase).findById<${readModelName}ReadModel>(id)`
+    }
+
+    renderReadModelMigration(){
+        if(this.answers.generate?.includes("db-migrations")) {
+
+            config.slices.forEach((slice)=>{
+                const slicePath = sliceTitle(slice)
+                if (fileExistsByGlob(`${this.answers.appName}/src/slices`, slicePath)) {
+                    if(slice.readmodels?.length > 0) {
+                        slice.readmodels.forEach((readModel) => {
+                            this._renderReadModelMigration(readModel.todoList, readModel.title)
+                        })
+                    }
+                }
+            })
+        }
+    }
+
+    _renderReadModelMigration(todoList, readModelTitle) {
+        if (!fileExistsByGlob(`${this.answers.appName}/supabase/migrations`, `*${_readmodelTitle(readModelTitle).toLowerCase()}.sql`)) {
+            if (todoList) {
+                this.fs.copyTpl(
+                    this.templatePath(`db_migration_todolist.ts.tpl`),
+                    this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModelTitle).toLowerCase())}`),
+                    {
+                        readmodel: readModelTitle?.toLowerCase()
+                    })
+
+            } else {
+                this.fs.copyTpl(
+                    this.templatePath(`db_migration.ts.tpl`),
+                    this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModelTitle).toLowerCase())}`),
+                    {
+                        readmodel: readModelTitle?.toLowerCase()
+                    })
+            }
+        } else {
+            console.log(`Migration ${_readmodelTitle(readModel.title).toLowerCase()} exists. Skipping.`)
+        }
+    }
+
     writingReadModels() {
         if (this.answers.generate?.includes("slices")) {
 
@@ -544,39 +610,23 @@ module.exports = class extends Generator {
 
                         // assume only one id attribute
                         let idAttribute = readModel.fields.find(field => field.idAttribute)
+
+                        const readModelName = readModelTitle(readModel)
+
+                        const query = readModel.todoList ? this._renderTodoListQuery(readModelName) : this._renderReadModelQuery(readModelName)
+
                         this.fs.copyTpl(
                             this.templatePath(`readModelApi.ts.tpl`),
                             this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/routes.ts`),
                             {
-                                readmodel: readModelTitle(readModel),
+                                readmodel: readModelName,
                                 readModelLowerCase: readModelTitle(readModel)?.toLowerCase(),
                                 slice: slicePath,
-                                statusOrIdQuery: readModel.todoList ? `const status = req.query.status` : `const id = req.query._id`,
-                                statusOrIdQueryResult: readModel.todoList ? `collection.find({ "status": status })` : `collection.findOne({ _id: id })`,
+                                query: query,
                                 idAttribute: idAttribute?.name
                             })
 
-                        if (!fileExistsByGlob(`${this.answers.appName}/supabase/migrations`, `*${_readmodelTitle(readModel.title).toLowerCase()}.sql`)) {
-                            if (readModel.todoList) {
-                                this.fs.copyTpl(
-                                    this.templatePath(`db_migration_todolist.ts.tpl`),
-                                    this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx * 5)}`),
-                                    {
-                                        readmodel: readModelTitle(readModel)?.toLowerCase()
-                                    })
-
-                            } else {
-                                this.fs.copyTpl(
-                                    this.templatePath(`db_migration.ts.tpl`),
-                                    this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModel.title).toLowerCase(), idx * 5)}`),
-                                    {
-                                        readmodel: readModelTitle(readModel)?.toLowerCase()
-                                    })
-                            }
-                        } else {
-                            console.log(`Migration ${_readmodelTitle(readModel.title).toLowerCase()} exists. Skipping.`)
-                        }
-
+                        this._renderReadModelMigration(readModel.todoList, readModel.title)
                     });
             });
         }
@@ -905,12 +955,15 @@ module.exports = class extends Generator {
         });
     }
 
-    _parseAdditionalAttributes(){
+    _parseAdditionalAttributes() {
         const configPath = path.resolve(`${this.answers.appName}/.generator/generator-config.json`);
         const additionalConfigs = fileExistsByGlob(`${this.answers.appName}/.generator`, `generator-config.json`) ? require(`${configPath}`) : {};
         const additionalMetaDataAttributes = (additionalConfigs?.events?.additional_meta_data_fields ?? []).concat(["correlation_id", "causation_id", "now:Date", "streamName"])
         return additionalMetaDataAttributes.map(it => {
-            return it.indexOf(":")!== -1 ? {name: it.split(":")[0], type: it.split(":")[1].trim()} : {name: it, type: "string"}
+            return it.indexOf(":") !== -1 ? {name: it.split(":")[0], type: it.split(":")[1].trim()} : {
+                name: it,
+                type: "string"
+            }
         })
     }
 
@@ -1022,7 +1075,9 @@ const generateMigrationFilename = (name, idx, skipDate) => {
     const day = pad(now.getDate());
     const hour = pad(now.getHours());
     const minute = pad(now.getMinutes());
-    const second = pad(now.getSeconds() + idx);
+    const second = pad(now.getSeconds());
+    const ms = pad(now.getMilliseconds(), 3); // milliseconds padded to 3
 
-    return skipDate ? `${name}` : `${year}${month}${day}${hour}${minute}${second}_${name}.sql`;
+
+    return skipDate ? `${name}` : `${year}${month}${day}${hour}${minute}${second}${ms}_${name}.sql`;
 };

@@ -13,3 +13,11 @@ create table if not exists public."<%-readmodel%>-collection"
     _updated   timestamp with time zone not null default now(),
     constraint <%-readmodel%>_collection_pkey primary key (_id)
     ) TABLESPACE pg_default;
+
+ALTER TABLE public."<%-readmodel%>-collection" ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow read to authenticated users only"
+  ON public."<%-readmodel%>-collection"
+  FOR SELECT
+  TO authenticated
+  USING (true);
