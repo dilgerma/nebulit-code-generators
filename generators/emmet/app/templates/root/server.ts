@@ -6,14 +6,15 @@ import {join} from 'path';
 import {getApplication, startAPI, WebApiSetup} from '@event-driven-io/emmett-expressjs';
 import {glob} from "glob";
 import {replayProjection} from "./src/common/replay";
+import {requireUser} from "./src/supabase/requireUser";
 
 var cookieParser = require('cookie-parser')
 
 const dev = process.env.NODE_ENV !== 'production';
-const app = next({dev});
-const handle = app.getRequestHandler();
+const nextApp = next({dev}); // Renamed to avoid confusion
+const handle = nextApp.getRequestHandler();
 
-app.prepare().then(async () => {
+nextApp.prepare().then(async () => {
 
     const routesPattern = join(__dirname, 'src/slices/**/routes{,-*}.@(ts|js)');
     const routeFiles = await glob(routesPattern, {nodir: true});
@@ -43,46 +44,55 @@ app.prepare().then(async () => {
         }
     }
 
-
-    const express = require('express');
-    const app = express();
-    app.post("/internal/replay/:slice/:projectionName", async (req:Request, resp:Response)=>{
-        const {slice, projectionName} = req.params
-        await replayProjection(slice, projectionName);
-        return resp.status(200).json({ status: 'ok' });
-    })
-
-
-    app.use(cookieParser());
-
+    // Get the main application from emmett
     const application: Application = getApplication({
         apis: webApis,
         disableJsonMiddleware: false,
         enableDefaultExpressEtag: true,
     });
 
-    app.use(application);
+    // Add cookie parser to the main application
+    application.use(cookieParser());
 
-    app.all('/', (req: Request, res: Response) => {
-        console.log("handling /")
-        const parsedUrl = parse(req.url!, true)
-        return handle(req, res, parsedUrl);
+    // Add your custom routes to the main application (BEFORE the catch-all)
+    application.post("/internal/replay/:slice/:projectionName", async (req: Request, resp: Response) => {
+        const {slice, projectionName} = req.params
+        await replayProjection(slice, projectionName);
+        return resp.status(200).json({status: 'ok'});
+    });
+
+    // Add the user route to the main application
+    application.get('/api/user', async (req: Request, res: Response) => {
+        console.log('API user route hit'); // Debug log
+        try {
+            const user = await requireUser(req, res, false)
+            if(user.error) {
+                res.status(400).send({error: user.error})
+            } else {
+                res.status(200).send({userId: user.user.userId, email: user.user.email})
+            }
+        } catch (error) {
+            console.error('Error in /api/user:', error);
+            res.status(500).send({error: 'Internal server error'});
+        }
     });
 
     application.get("/api/auth/confirm", (req, resp) => {
         return LoginHandler(req, resp)
-    })
+    });
 
-    // Let Next.js handle all other routes
+    // Let Next.js handle all other routes (this should be LAST)
     application.all('*', async (req, res) => {
-        //@ts-ignore
+        console.log(`Handling route: ${req.method} ${req.url}`); // Debug log
         const parsedUrl = parse(req.url!, true)
         return await handle(req, res, parsedUrl);
     });
 
     const port = parseInt(process.env.PORT || '3000', 10);
     console.log(`> Ready on port ${port}`);
-    startAPI(app, {port: port});
+
+    // Start the main application (not a separate express app)
+    startAPI(application, {port: port});
 
     process.on('unhandledRejection', (reason, promise) => {
         console.error('⛔ Unhandled Rejection:', reason);
@@ -90,5 +100,4 @@ app.prepare().then(async () => {
             console.error('Stack trace:\n', reason.stack);
         }
     });
-
 });
