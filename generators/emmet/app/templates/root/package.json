@@ -10,6 +10,7 @@
     "test": "tsx --test"
   },
   "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@event-driven-io/emmett": "^0.38.3",
     "@event-driven-io/emmett-postgresql": "^0.38.3",
     "@event-driven-io/emmett-expressjs": "^0.38.3",

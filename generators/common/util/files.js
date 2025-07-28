@@ -11,7 +11,9 @@ function fileExistsByGlob(folder, pattern) {
         return false;
     }
     const fullPattern = path.join(folder, `${pattern}*`);
+
     const files = glob.sync(fullPattern);
+
     return files.length > 0;
 }
 

@@ -5,7 +5,7 @@
             .then(
                 expectPongoDocuments
                     .fromCollection<<%-readModel%>ReadModel>(
-                        "<%-readModel%>-collection",
+                        "<%-collection%>-collection",
                     )
                     .withId("<%-stream%>")
                     .toBeEqual(<%-expectedProjectionValues%>),

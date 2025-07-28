@@ -2,7 +2,7 @@
 import {Request, Response, Router} from 'express';
 import {<%-readmodel%>ReadModel} from "./<%-readmodel%>Projection";
 import {WebApiSetup} from "@event-driven-io/emmett-expressjs";
-import {createServiceClient} from "../../supabase/api";
+import createClient, {createServiceClient} from "../../supabase/api";
 import {readmodel} from "../../core/readmodel";
 
 export const api =

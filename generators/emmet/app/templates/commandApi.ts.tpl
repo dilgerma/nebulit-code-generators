@@ -42,6 +42,8 @@ export const api =
                         type: "<%-command%>"
                     }
 
+                    if (!req.params.id) throw "no id provided"
+
                     const result = await handle<%-command%>(assertNotEmpty(req.params.id), command);
 
                     res.set("correlation_id", correlation_id)

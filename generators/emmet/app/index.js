@@ -169,7 +169,7 @@ module.exports = class extends Generator {
             {
                 type: 'checkbox',
                 name: 'generate',
-                choices: ['skeleton', 'events', 'slices', 'pages', "eventStore", "db-migrations"]
+                choices: ['skeleton', 'events', 'slices', 'pages', "eventStore"]
             },
             {
                 type: 'checkbox',
@@ -458,72 +458,6 @@ module.exports = class extends Generator {
         }
     }
 
-    _renderTodoListQuery(readModelName) {
-        return `
-            const status = req.query.status?.toString();
-            const limit = Number(req.query._limit??-1)
-            if(!status) throw "no status provided"
-
-            const supabase = createServiceClient()
-            const collection = "${readModelName?.toLowerCase()}-collection"
-
-
-            const data:${readModelName}ReadModel[]|null = await readmodel(collection, supabase)
-                .findAll<${readModelName}ReadModel>({status:status}, 
-                    (query)=>limit !== -1 ? query.limit(limit): query)
-            `
-    }
-
-    _renderReadModelQuery(readModelName) {
-        return `
-           const id = req.query._id?.toString();
-           if(!id) throw "no id provided"
-
-           const supabase = createServiceClient()
-           const collection = "${readModelName?.toLowerCase()}-collection"
-
-           const data:${readModelName}ReadModel|null = await readmodel(collection, supabase).findById<${readModelName}ReadModel>(id)`
-    }
-
-    renderReadModelMigration(){
-        if(this.answers.generate?.includes("db-migrations")) {
-
-            config.slices.forEach((slice)=>{
-                const slicePath = sliceTitle(slice)
-                if (fileExistsByGlob(`${this.answers.appName}/src/slices`, slicePath)) {
-                    if(slice.readmodels?.length > 0) {
-                        slice.readmodels.forEach((readModel) => {
-                            this._renderReadModelMigration(readModel.todoList, readModel.title)
-                        })
-                    }
-                }
-            })
-        }
-    }
-
-    _renderReadModelMigration(todoList, readModelTitle) {
-        if (!fileExistsByGlob(`${this.answers.appName}/supabase/migrations`, `*${_readmodelTitle(readModelTitle).toLowerCase()}.sql`)) {
-            if (todoList) {
-                this.fs.copyTpl(
-                    this.templatePath(`db_migration_todolist.ts.tpl`),
-                    this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModelTitle).toLowerCase())}`),
-                    {
-                        readmodel: readModelTitle?.toLowerCase()
-                    })
-
-            } else {
-                this.fs.copyTpl(
-                    this.templatePath(`db_migration.ts.tpl`),
-                    this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(_readmodelTitle(readModelTitle).toLowerCase())}`),
-                    {
-                        readmodel: readModelTitle?.toLowerCase()
-                    })
-            }
-        } else {
-            console.log(`Migration ${_readmodelTitle(readModel.title).toLowerCase()} exists. Skipping.`)
-        }
-    }
-
     writingReadModels() {
         if (this.answers.generate?.includes("slices")) {
 
@@ -598,7 +532,7 @@ module.exports = class extends Generator {
                                 slice: slicePath,
                                 readModelType: tsCode,
                                 readModel: readModelTitle(readModel),
-                                readModelLowerCase: readModelTitle(readModel)?.toLowerCase(),
+                                collection: readModel?.title?.replaceAll(" ","")?.toLowerCase(),
                                 eventsUnion: inboundDeps.map(it => eventTitle(it)).join(` | `),
                                 eventsList: inboundDeps.map(it => `"${eventTitle(it)}"`).join(` , `),
                                 caseStatements: caseStatements.join("\n"),
@@ -620,7 +554,7 @@ module.exports = class extends Generator {
                             this.destinationPath(`${this.answers.appName}/src/slices/${slicePath}/routes.ts`),
                             {
                                 readmodel: readModelName,
-                                readModelLowerCase: readModelTitle(readModel)?.toLowerCase(),
+                                readModelLowerCase: readModel?.title?.replaceAll(" ","")?.toLowerCase(),
                                 slice: slicePath,
                                 query: query,
                                 idAttribute: idAttribute?.name
@@ -661,6 +595,76 @@ module.exports = class extends Generator {
                 })
         }
     }
+
+
+    _renderTodoListQuery(readModelName) {
+        return `
+            const status = req.query.status?.toString();
+            const limit = Number(req.query._limit??-1)
+            if(!status) throw "no status provided"
+
+            const supabase = createServiceClient()
+            const collection = "${readModelName?.replaceAll(" ","")?.toLowerCase()}-collection"
+
+
+            const data:${readModelName}ReadModel[]|null = await readmodel(collection, supabase)
+                .findAll<${readModelName}ReadModel>({status:status}, 
+                    (query)=>limit !== -1 ? query.limit(limit): query)
+            `
+    }
+
+    _renderReadModelQuery(readModelName) {
+        return `
+           const id = req.query._id?.toString();
+           if(!id) throw "no id provided"
+
+           const supabase = createClient(req, res)
+           const collection = "${readModelName?.replaceAll(" ","").toLowerCase()}-collection"
+
+           const data:${readModelName}ReadModel|null = await readmodel(collection, supabase).findById<${readModelName}ReadModel>(id)`
+    }
+
+    renderReadModelMigration(){
+        if(this.answers.generate?.includes("db-migrations")) {
+
+            config.slices.forEach((slice)=>{
+                const slicePath = sliceTitle(slice)
+                //check if slice exists
+                if (fileExistsByGlob(`${this.answers.appName}/src/slices`, slicePath)) {
+                    if(slice.readmodels?.length > 0) {
+                        slice.readmodels.forEach((readModel) => {
+                            this._renderReadModelMigration(readModel.todoList, readModel.title)
+                        })
+                    }
+                }
+            })
+        }
+    }
+
+    _renderReadModelMigration(todoList, readModelTitle) {
+        if (!fileExistsByGlob(`${this.answers.appName}/supabase/migrations`, `*${readModelTitle?.replaceAll(" ","").toLowerCase()}.sql`)) {
+            if (todoList) {
+                this.fs.copyTpl(
+                    this.templatePath(`db_migration_todolist.sql.tpl`),
+                    this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(readModelTitle?.replaceAll(" ","")?.toLowerCase())}`),
+                    {
+                        readmodel: readModelTitle?.replaceAll(" ","").toLowerCase()
+                    })
+
+            } else {
+                this.fs.copyTpl(
+                    this.templatePath(`db_migration.sql.tpl`),
+                    this.destinationPath(`${this.answers.appName}/supabase/migrations/${generateMigrationFilename(readModelTitle?.replaceAll(" ","")?.toLowerCase())}`),
+                    {
+                        readmodel: readModelTitle?.replaceAll(" ","")?.toLowerCase()
+                    })
+            }
+        } else {
+            console.log(`Migration ${readModelTitle.toLowerCase()} exists. Skipping.`)
+        }
+    }
+
+
 
     writeSpecs() {
         const slices = config.slices.filter(it => this.answers?.slices?.includes(it.title)) || [];
@@ -738,6 +742,7 @@ module.exports = class extends Generator {
                             given: renderGivenEvents(spec.given, stream, true),
                             givenFields: givenFieldInitializations.join("\n"),
                             readModel: readModelTitle(specReadModel),
+                            collection: specReadModel?.title?.replaceAll(" ","")?.toLowerCase(),
                             expectedProjectionValues: expectedProjectionValues
                         });
                         specs.push(renderedContent)
@@ -946,9 +951,9 @@ module.exports = class extends Generator {
                 this.templatePath(`ui/readModelUI.tsx.tpl`),
                 this.destinationPath(`${this.answers.appName}/src/slices/${_sliceTitle(readmodel.slice)}/ui/${_readmodelTitle(readmodel.title)}StateView.tsx`),
                 {
-                    endpoint: readModelTitle(readmodel)?.toLowerCase(),
+                    endpoint: readmodel?.title?.replaceAll(" ","")?.toLowerCase(),
                     readmodel: _readmodelTitle(readmodel.title),
-                    lowerCaseReadmodel: _readmodelTitle(readmodel.title)?.toLowerCase(),
+                    lowerCaseReadmodel: readmodel.title?.replaceAll(" ","")?.toLowerCase(),
                     showFilter: !readmodel.todoList,
                     query: readmodel.todoList ? `{status: "OPEN"}` : "{_id: id}"
                 });

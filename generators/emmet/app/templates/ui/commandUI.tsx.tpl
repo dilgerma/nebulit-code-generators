@@ -2,6 +2,7 @@ import {useState} from "react"
 import {JsonForm} from "../../../components/commandselection/JsonForm";
 import schema from './<%-command%>.json'
 import {parseEndpoint} from "../../../components/util/parseEndpoint";
+//import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export const <%-command%>Component = () => {
     const endpoint = "/api/<%-endpoint%>"

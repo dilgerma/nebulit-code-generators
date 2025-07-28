@@ -1,5 +1,6 @@
 import {useState} from "react"
 import DataTable from "../../../components/readmodel/DataTable";
+//import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export const <%-readmodel%>StateView = () => {
     const endpoint = "<%-endpoint%>-collection"
