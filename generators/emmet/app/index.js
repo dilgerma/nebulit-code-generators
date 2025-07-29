@@ -490,26 +490,14 @@ module.exports = class extends Generator {
                                 let query = idFields.map(field => `item.${field.name} === event.${findTargetField(field.name, event, readModel) ?? `noFieldMatch`}`).join(" && ")
                                 if (query) {
                                     return `case "${eventTitle(event)}": {
-                                const existing = state.data?.find(item => ${query})
-                                
-                                if(existing) {
-                                   Object.assign(existing,  {
-                                     ${variableAssignments(readModel.fields, "event", event, ",\n", ":")}
-                                   })
-                                } else {
-                                    state?.data?.push({
-                                        ${variableAssignments(readModel.fields, "event", event, ",\n", ":")}
-                                    })
-                                }
-                                return {...state};
-                        }`
-                                } else {
-                                    return `case "${eventTitle(event)}": {
-                                    state?.data?.push({
-                                        ${variableAssignments(readModel.fields, "event", event, ",\n", ":")}
-                                    })
-                                    return {...state};
-                        }`
+                               
+                                const existing = state?.data ?? {}
+
+                                Object.assign(existing, {
+                                       ${variableAssignments(readModel.fields, "event", event, ",\n", ":")}
+                                })
+                                return {...state, data: {...existing}};
+                                }`
                                 }
                             });
 
@@ -615,13 +603,16 @@ module.exports = class extends Generator {
 
     _renderReadModelQuery(readModelName) {
         return `
+
+
            const id = req.query._id?.toString();
-           if(!id) throw "no id provided"
 
            const supabase = createClient(req, res)
            const collection = "${readModelName?.replaceAll(" ","").toLowerCase()}-collection"
 
-           const data:${readModelName}ReadModel|null = await readmodel(collection, supabase).findById<${readModelName}ReadModel>(id)`
+           const data:${readModelName}ReadModel|${readModelName}ReadModel[]|null = 
+                id ? await readmodel(collection, supabase).findById<${readModelName}ReadModel>(id) : 
+                    await readmodel(collection, supabase).findAll<${readModelName}ReadModel>(req.query)`
     }
 
     renderReadModelMigration(){

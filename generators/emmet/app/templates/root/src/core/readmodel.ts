@@ -4,6 +4,7 @@ import {PostgrestFilterBuilder} from "@supabase/postgrest-js";
 function applyEqFilters<T extends Record<string, any>>(query: any, filters: T) {
     for (const [key, value] of Object.entries(filters)) {
         const jsonbKey = `data->>${key}`;
+        console.log(jsonbKey + value)
         query = query.eq(jsonbKey, value);
     }
     return query;

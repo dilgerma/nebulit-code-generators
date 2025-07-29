@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {parseQueryEndpoint} from "../util/parseEndpoint";
 
-const DataTable = (props: { endpoint: string, queries: Record<string, string> }) => {
+const DataTable = (props: { endpoint: string, queries: string }) => {
     const [data, setData] = useState<string[]>([]);
     const [headers, setHeaders] = useState<string[]>([])
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [errorMode, setErrorMode] = useState(false)
+    const [noData, setNoData] = useState(false)
     const [error, setError] = useState("")
     const [refresh, setRefresh] = useState(false)
     const [arraySelection, setArraySelection] = useState(false)
@@ -24,17 +25,21 @@ const DataTable = (props: { endpoint: string, queries: Record<string, string> })
 
     useEffect(() => {
         try {
-            if (refresh && Object.keys(props.queries).length > 0) {
-                fetchData(parseQueryEndpoint(props.endpoint, {...props.queries})).then((data) => {
+            if (refresh) {
+                fetchData(parseQueryEndpoint(props.endpoint, props.queries)).then((data) => {
                     if (!data) {
-                        setErrorMode(true)
+                        setNoData(true)
                         return
                     }
                     setArraySelection(Array.isArray(data.data) || Array.isArray(data))
-                    if(Array.isArray(data) && !data[0])
+                    if(Array.isArray(data) && !data[0]) {
+                        setNoData(true)
                         return
-                    if (Array.isArray(data.data) && !data.data[0])
+                    }
+                    if (Array.isArray(data.data) && !data.data[0]) {
+                        setNoData(true)
                         return
+                    }
                     if (Array.isArray(data)) {
                         setData(data)
                         setHeaders(Object.keys(data[0]))
@@ -57,9 +62,11 @@ const DataTable = (props: { endpoint: string, queries: Record<string, string> })
 
                     setRefresh(false)
                     setErrorMode(false)
+                    setNoData(false)
                 }).catch((error) => {
                     setErrorMode(true)
                     setError(error)
+                    setNoData(false)
                     setData([])
                 })
             }
@@ -75,16 +82,19 @@ const DataTable = (props: { endpoint: string, queries: Record<string, string> })
     // @ts-ignore
     return (
         <div>
+            {noData ?
+                <div className={"top-margin notification is-info"}>No Data found<br/>{error}</div> :
+                <span/>}
             {errorMode ?
-                <div className={"top-margin notification is-danger"}>Fehler in Laden der Daten<br/>{error}</div> :
+                <div className={"top-margin notification is-danger"}>Error loading Data<br/>{error}</div> :
                 <span/>}
             {arraySelection ? <select onChange={handleSelectionChange}>
                 {data.map((_, index) => (
                     <option key={index} value={index}>{`Item ${index + 1}`}</option>
                 ))}
             </select> : <span/>}
-            {props.queries && Object.values(props.queries)?.length > 0 ? <button onClick={() => setRefresh(true)} className={"button is-small left-margin"}><i
-                className="fa-solid fa-arrows-rotate"></i></button> : <span/>}
+            <button onClick={() => setRefresh(true)} className={"button is-small left-margin"}><i
+                className="fa-solid fa-arrows-rotate"></i></button>
 
             {data[selectedIndex] && (
                 <table>
