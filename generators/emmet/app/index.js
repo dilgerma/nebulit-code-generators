@@ -225,7 +225,7 @@ module.exports = class extends Generator {
 
             this.fs.copyTpl(
                 this.templatePath('git/gitignore'),
-                this.destinationPath(`${slugify(this.answers.appName)}/.gitignore`),
+                this.destinationPath(`.gitignore`),
                 {
                     rootPackageName: this.answers.rootPackageName
                 }
@@ -234,7 +234,7 @@ module.exports = class extends Generator {
         if (!fileExistsByGlob(slugify(this.answers.appName), ".generator")) {
             this.fs.copyTpl(
                 this.templatePath('root/.generator'),
-                this.destinationPath(`${slugify(this.answers.appName)}/.generator`),
+                this.destinationPath(`.generator`),
                 {
                     rootPackageName: this.answers.rootPackageName
                 }
@@ -243,7 +243,7 @@ module.exports = class extends Generator {
         if (!fileExistsByGlob(slugify(this.answers.appName), ".env.local")) {
             this.fs.copyTpl(
                 this.templatePath('root/.env.local'),
-                this.destinationPath(`${slugify(this.answers.appName)}/.env.local`),
+                this.destinationPath(`.env.local`),
                 {
                     rootPackageName: this.answers.rootPackageName
                 }
