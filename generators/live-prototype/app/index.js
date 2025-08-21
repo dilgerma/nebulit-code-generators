@@ -244,6 +244,7 @@ module.exports = class extends Generator {
                 main: this._writeScreen_readModelMain(readModels, "MAIN", false),
                 aside: this._writeScreen_readModelMain(readModels, "RIGHT", true),
             }),
+            commandInvokers: this._writeScreen_commandButton_function(commands)
             css: css ?? ""
         })
     }
@@ -290,7 +291,6 @@ module.exports = class extends Generator {
                 commandModals: this._writeScreen_commandModals(commands, readModels),
                 commandInitializers: this._writeScreen_commandInitialzersFromReadModels(commands, readModels, true),
                 automationAvailabilityChecks: this._writeAutomations_automationAvailable(commands),
-                commandInvokers: this._writeScreen_commandButton_function(commands)
             })
         })
 
