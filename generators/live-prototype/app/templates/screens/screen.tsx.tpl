@@ -20,6 +20,7 @@ export default function <%-name%>() {
     const [images, setImages] = useState<string[]>([<%-images%>])
     const [descriptions, setDescriptions] = useState<string[]>([<%-descriptions%>])
 
+    <%- commandInvokers %>
 
     const nextImage = ()=>{
         if(currentImage < images.length - 1){

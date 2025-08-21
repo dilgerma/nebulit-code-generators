@@ -289,7 +289,8 @@ module.exports = class extends Generator {
                 commandButtons: this._writeAutomation_commandButtons(commands),
                 commandModals: this._writeScreen_commandModals(commands, readModels),
                 commandInitializers: this._writeScreen_commandInitialzersFromReadModels(commands, readModels, true),
-                automationAvailabilityChecks: this._writeAutomations_automationAvailable(commands)
+                automationAvailabilityChecks: this._writeAutomations_automationAvailable(commands),
+                commandInvokers: this._writeScreen_commandButton_function(commands)
             })
         })
 
@@ -335,6 +336,21 @@ module.exports = class extends Generator {
             var title = _commandTitle(item.title)
             return `import {handle as handle${title}} from "@/app/prototype/components/slices/${_sliceTitle(item.slice)}/${title}"
 `
+        }).join("\n")
+    }
+
+    _writeScreen_commandButton_function(commands) {
+        return uniq(commands, (it => it.id)).sort((a, b) => (a.prototype?.order ?? 99) - (b.prototype?.order ?? 99)).map((command) => {
+
+            var title = _commandTitle(command.title)
+            var slice = _sliceTitle(command.slice)
+
+            return `const invoke${_commandTitle} = () => {
+            if(check${_commandTitle(command.title)}().enabled){
+                setActiveCommand("${title}")
+                setSlice("${slice}")
+                setCommand("${title}")
+            }}`
         }).join("\n")
     }
 
