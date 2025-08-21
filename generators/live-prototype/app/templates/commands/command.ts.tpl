@@ -46,6 +46,7 @@ const handleDecision = (events: Event[]): CommandResult => {
 }
 
 export const handle =(data: any):AppEvent[] => {
+    console.log(`handling command with ${JSON.stringify(data)}`)
     var command:<%=name%> =  {
         type: '<%=name%>',
         data: {...data},
@@ -56,6 +57,7 @@ export const handle =(data: any):AppEvent[] => {
         }
     }
     var events = decide(command)
+    console.log(`resulted in ${events?.length} events`)
     if(events.length > 0) {
         findEventStore().appendToStream(`<%=aggregate%>`, events)
     }
