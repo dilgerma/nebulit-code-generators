@@ -339,17 +339,21 @@ module.exports = class extends Generator {
         }).join("\n")
     }
 
+    /**
+     * invoke function that can be called from within the template
+     */
     _writeScreen_commandButton_function(commands) {
         return uniq(commands, (it => it.id)).sort((a, b) => (a.prototype?.order ?? 99) - (b.prototype?.order ?? 99)).map((command) => {
 
             var title = _commandTitle(command.title)
             var slice = _sliceTitle(command.slice)
 
-            return `const invoke${_commandTitle(command.title)} = () => {
+            return `const ${lowercaseFirstCharacter(_commandTitle(command.title))} = () => {
             if(check${_commandTitle(command.title)}().enabled){
                 setActiveCommand("${title}")
                 setSlice("${slice}")
                 setCommand("${title}")
+                setModalActive(true)
             }}`
         }).join("\n")
     }
