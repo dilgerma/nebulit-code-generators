@@ -246,7 +246,7 @@ module.exports = class extends Generator {
             commandInitializers: this._writeScreen_commandInitialzersFromReadModels(commands, readModels),
             commandEnablements: this._writeScreen_commandEnablements(commands),
             title: _screenTitle(screenTitle),
-            template: ejs.render(this._pageTemplate(pageTemplate), {
+            template: ejs.render(this._pageTemplate(template), {
                 title: _screenTitle(screenTitle),
                 main: this._writeScreen_readModelMain(readModels, "MAIN", false),
                 aside: this._writeScreen_readModelMain(readModels, "RIGHT", true),
