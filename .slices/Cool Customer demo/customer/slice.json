@@ -1,0 +1,111 @@
+{
+  "id": "3458764638084546815",
+  "status": "Created",
+  "index": 3,
+  "title": "slice: customer",
+  "context": "Cool Customer demo",
+  "sliceType": "STATE_VIEW",
+  "commands": [],
+  "events": [],
+  "readmodels": [
+    {
+      "id": "3458764638084546725",
+      "tags": [],
+      "modelContext": "Cool Customer demo",
+      "context": "INTERNAL",
+      "slice": "slice: customer",
+      "title": "customers",
+      "fields": [
+        {
+          "name": "name",
+          "type": "String",
+          "cardinality": "Single",
+          "idAttribute": false
+        },
+        {
+          "name": "email",
+          "type": "String",
+          "cardinality": "Single",
+          "idAttribute": false
+        }
+      ],
+      "type": "READMODEL",
+      "description": "",
+      "aggregateDependencies": [],
+      "dependencies": [
+        {
+          "id": "3458764638084546739",
+          "type": "OUTBOUND",
+          "title": "screen",
+          "elementType": "SCREEN"
+        },
+        {
+          "id": "3458764638084546439",
+          "type": "INBOUND",
+          "title": "Customer registered",
+          "elementType": "EVENT"
+        }
+      ],
+      "listElement": true,
+      "createsAggregate": false,
+      "triggers": [],
+      "sketched": false,
+      "prototype": {
+        "activeByDefault": false
+      }
+    }
+  ],
+  "screens": [
+    {
+      "id": "3458764638084546739",
+      "tags": [],
+      "groupId": "3458764638084546744",
+      "modelContext": "Cool Customer demo",
+      "slice": "slice: customer",
+      "title": "screen",
+      "fields": [
+        {
+          "name": "email",
+          "type": "String",
+          "cardinality": "Single",
+          "idAttribute": false
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "cardinality": "Single",
+          "idAttribute": false
+        }
+      ],
+      "type": "SCREEN",
+      "description": "",
+      "aggregateDependencies": [],
+      "dependencies": [
+        {
+          "id": "3458764638084546873",
+          "type": "OUTBOUND",
+          "title": "Delete Customer",
+          "elementType": "COMMAND"
+        },
+        {
+          "id": "3458764638084546725",
+          "type": "INBOUND",
+          "title": "customers",
+          "elementType": "READMODEL"
+        }
+      ],
+      "createsAggregate": false,
+      "triggers": [],
+      "sketched": false,
+      "prototype": {
+        "activeByDefault": false
+      }
+    }
+  ],
+  "screenImages": [],
+  "processors": [],
+  "tables": [],
+  "specifications": [],
+  "actors": [],
+  "aggregates": []
+}

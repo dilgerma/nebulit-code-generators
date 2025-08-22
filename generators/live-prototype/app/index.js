@@ -227,6 +227,7 @@ module.exports = class extends Generator {
             descriptionList.push(`"${description}"`)
         }
 
+        console.log("Screen Rendering - Processing commands " + JSON.stringify(commands?.map(it => it.title)??[]))
         // define replacements for data-command="<command title>" for each command, then replace all data-command tags with proper invocations
         const commandReplacements = commands.map(it => it.title.replace(" ","")).map(title => ({title:title, replacement:`data-command="${title}"`}))
         let template = this._pageTemplate(pageTemplate)

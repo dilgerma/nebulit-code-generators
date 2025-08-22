@@ -1,0 +1,418 @@
+{
+  "slices": [
+    {
+      "id": "3458764638084546694",
+      "status": "Created",
+      "index": 1,
+      "title": "slice: Register Customer",
+      "context": "Cool Customer demo",
+      "sliceType": "STATE_CHANGE",
+      "commands": [
+        {
+          "id": "3458764638084546613",
+          "tags": [],
+          "modelContext": "Cool Customer demo",
+          "slice": "slice: Register Customer",
+          "title": "Register Customer",
+          "fields": [
+            {
+              "name": "name",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            },
+            {
+              "name": "email",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            }
+          ],
+          "type": "COMMAND",
+          "description": "",
+          "aggregateDependencies": [],
+          "dependencies": [
+            {
+              "id": "3458764638084546439",
+              "type": "OUTBOUND",
+              "title": "Customer registered",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764638084546618",
+              "type": "INBOUND",
+              "title": "screen",
+              "elementType": "SCREEN"
+            }
+          ],
+          "createsAggregate": false,
+          "triggers": [],
+          "sketched": false,
+          "prototype": {
+            "projection": "events.forEach((eventData)=>{\n    let event = eventData.data\n   switch(eventData.type) {\n   \n    }}\n  )\n    ",
+            "placement": "MAIN",
+            "initialValue": true,
+            "order": 99,
+            "activeByDefault": false
+          }
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764638084546439",
+          "tags": [],
+          "modelContext": "Cool Customer demo",
+          "context": "INTERNAL",
+          "slice": "slice: Register Customer",
+          "title": "Customer registered",
+          "fields": [
+            {
+              "name": "name",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            },
+            {
+              "name": "email",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "aggregateDependencies": [],
+          "dependencies": [
+            {
+              "id": "3458764638084546725",
+              "type": "OUTBOUND",
+              "title": "customers",
+              "elementType": "READMODEL"
+            },
+            {
+              "id": "3458764638084546613",
+              "type": "INBOUND",
+              "title": "Register Customer",
+              "elementType": "COMMAND"
+            }
+          ],
+          "createsAggregate": false,
+          "triggers": [],
+          "sketched": false,
+          "prototype": {
+            "activeByDefault": false
+          }
+        }
+      ],
+      "readmodels": [],
+      "screens": [
+        {
+          "id": "3458764638084546618",
+          "tags": [],
+          "groupId": "3458764638084546667",
+          "modelContext": "Cool Customer demo",
+          "slice": "slice: Register Customer",
+          "title": "screen",
+          "fields": [
+            {
+              "name": "name",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            },
+            {
+              "name": "email",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            }
+          ],
+          "type": "SCREEN",
+          "description": "",
+          "aggregateDependencies": [],
+          "dependencies": [
+            {
+              "id": "3458764638084546613",
+              "type": "OUTBOUND",
+              "title": "Register Customer",
+              "elementType": "COMMAND"
+            }
+          ],
+          "createsAggregate": false,
+          "triggers": [],
+          "sketched": false,
+          "prototype": {
+            "placement": "MAIN",
+            "css": "body {\n  font-family: 'Tahoma', Geneva, sans-serif;\n  background-color: #c0c0c0;\n  margin: 0;\n  padding: 20px;\n  color: black;\n}\n.columns {\n  display: flex;\n  background-color: #ffffff;\n  border: 2px ridge #808080;\n  box-sizing: border-box;\n  width: 800px;\n  margin: 0 auto;\n  box-shadow: inset 2px 2px 5px #eeeeee;\n}\n.column {\n  box-sizing: border-box;\n  padding: 10px;\n}\n.column.is-9 {\n  flex: 3;\n  border-right: 2px ridge #808080;\n  background-color: #ffffff;\n}\n.column.is-3 {\n  flex: 1;\n  background-color: #d0d0d0;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 20px;\n  border-left: 2px ridge #808080;\n  font-size: 14px;\n  user-select: none;\n}\n.title-bar {\n  background: linear-gradient(to bottom, #000080 0%, #0000cd 100%);\n  color: white;\n  font-weight: bold;\n  padding: 4px 8px;\n  font-size: 16px;\n  border: 2px outset #ffffff;\n  user-select: none;\n  box-shadow: inset 1px 1px 0 #808080;\n  margin-bottom: 10px;\n}\n.window-title {\n  font-family: 'MS Sans Serif', Tahoma, Geneva, sans-serif;\n}\n.button-group {\n  display: flex;\n  gap: 8px;\n}\nbutton {\n  background-color: #d4d0c8;\n  border: 2px outset #ffffff;\n  padding: 5px 12px;\n  font-family: 'MS Sans Serif', Tahoma, Geneva, sans-serif;\n  font-size: 14px;\n  cursor: pointer;\n  box-shadow: 1px 1px 0 #808080 inset;\n  user-select: none;\n  transition: border-color 0.1s ease-in-out, background-color 0.1s ease-in-out;\n}\nbutton:active {\n  border-style: inset;\n  background-color: #c0c0c0;\n  box-shadow: none;\n  outline: none;\n}\n.aside-text {\n  font-family: 'MS Sans Serif', Tahoma, Geneva, sans-serif;\n  color: #000080;\n  font-size: 18px;\n}",
+            "pageTemplate": "<div>\n  <div className=\"columns\">\n    <main className=\"column is-9\">\n      <div className=\"title-bar\">\n        <span className=\"window-title\">Customer Management</span>\n      </div>\n      <div className=\"button-group\">\n        <button data-command=\"Register Customer\">Register Customer</button>\n        <button data-command=\"Remove Customer\">Remove Customer</button>\n      </div>\n    </main>\n    <aside className=\"column is-3\">\n      <p className=\"aside-text\">Commands</p>\n    </aside>\n  </div>\n</div>",
+            "order": 99,
+            "activeByDefault": false
+          }
+        }
+      ],
+      "screenImages": [],
+      "processors": [],
+      "tables": [],
+      "specifications": [],
+      "actors": [],
+      "aggregates": []
+    },
+    {
+      "id": "3458764638084546815",
+      "status": "Created",
+      "index": 3,
+      "title": "slice: customer",
+      "context": "Cool Customer demo",
+      "sliceType": "STATE_VIEW",
+      "commands": [],
+      "events": [],
+      "readmodels": [
+        {
+          "id": "3458764638084546725",
+          "tags": [],
+          "modelContext": "Cool Customer demo",
+          "context": "INTERNAL",
+          "slice": "slice: customer",
+          "title": "customers",
+          "fields": [
+            {
+              "name": "name",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            },
+            {
+              "name": "email",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            }
+          ],
+          "type": "READMODEL",
+          "description": "",
+          "aggregateDependencies": [],
+          "dependencies": [
+            {
+              "id": "3458764638084546739",
+              "type": "OUTBOUND",
+              "title": "screen",
+              "elementType": "SCREEN"
+            },
+            {
+              "id": "3458764638084546439",
+              "type": "INBOUND",
+              "title": "Customer registered",
+              "elementType": "EVENT"
+            }
+          ],
+          "listElement": true,
+          "createsAggregate": false,
+          "triggers": [],
+          "sketched": false,
+          "prototype": {
+            "activeByDefault": false
+          }
+        }
+      ],
+      "screens": [
+        {
+          "id": "3458764638084546739",
+          "tags": [],
+          "groupId": "3458764638084546744",
+          "modelContext": "Cool Customer demo",
+          "slice": "slice: customer",
+          "title": "screen",
+          "fields": [
+            {
+              "name": "email",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            },
+            {
+              "name": "name",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            }
+          ],
+          "type": "SCREEN",
+          "description": "",
+          "aggregateDependencies": [],
+          "dependencies": [
+            {
+              "id": "3458764638084546873",
+              "type": "OUTBOUND",
+              "title": "Delete Customer",
+              "elementType": "COMMAND"
+            },
+            {
+              "id": "3458764638084546725",
+              "type": "INBOUND",
+              "title": "customers",
+              "elementType": "READMODEL"
+            }
+          ],
+          "createsAggregate": false,
+          "triggers": [],
+          "sketched": false,
+          "prototype": {
+            "activeByDefault": false
+          }
+        }
+      ],
+      "screenImages": [],
+      "processors": [],
+      "tables": [],
+      "specifications": [],
+      "actors": [],
+      "aggregates": []
+    },
+    {
+      "id": "3458764638084698135",
+      "status": "Created",
+      "index": 5,
+      "title": "slice: Delete Customer",
+      "context": "Cool Customer demo",
+      "sliceType": "STATE_CHANGE",
+      "commands": [
+        {
+          "id": "3458764638084546873",
+          "tags": [],
+          "modelContext": "Cool Customer demo",
+          "context": "INTERNAL",
+          "slice": "slice: Delete Customer",
+          "title": "Delete Customer",
+          "fields": [
+            {
+              "name": "name",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            }
+          ],
+          "type": "COMMAND",
+          "description": "",
+          "aggregateDependencies": [],
+          "dependencies": [
+            {
+              "id": "3458764638084697963",
+              "type": "OUTBOUND",
+              "title": "Customer removed",
+              "elementType": "EVENT"
+            },
+            {
+              "id": "3458764638084546739",
+              "type": "INBOUND",
+              "title": "screen",
+              "elementType": "SCREEN"
+            }
+          ],
+          "createsAggregate": false,
+          "triggers": [],
+          "sketched": false,
+          "prototype": {
+            "activeByDefault": false
+          }
+        }
+      ],
+      "events": [
+        {
+          "id": "3458764638084697963",
+          "tags": [],
+          "modelContext": "Cool Customer demo",
+          "context": "INTERNAL",
+          "slice": "slice: Delete Customer",
+          "title": "Customer removed",
+          "fields": [
+            {
+              "name": "name",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            }
+          ],
+          "type": "EVENT",
+          "description": "",
+          "aggregateDependencies": [],
+          "dependencies": [
+            {
+              "id": "3458764638084546873",
+              "type": "INBOUND",
+              "title": "Delete Customer",
+              "elementType": "COMMAND"
+            }
+          ],
+          "createsAggregate": false,
+          "triggers": [],
+          "sketched": false,
+          "prototype": {
+            "activeByDefault": false
+          }
+        }
+      ],
+      "readmodels": [],
+      "screens": [
+        {
+          "id": "3458764638084546739",
+          "tags": [],
+          "groupId": "3458764638084546744",
+          "modelContext": "Cool Customer demo",
+          "slice": "slice: Delete Customer",
+          "title": "screen",
+          "fields": [
+            {
+              "name": "email",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            },
+            {
+              "name": "name",
+              "type": "String",
+              "cardinality": "Single",
+              "idAttribute": false
+            }
+          ],
+          "type": "SCREEN",
+          "description": "",
+          "aggregateDependencies": [],
+          "dependencies": [
+            {
+              "id": "3458764638084546873",
+              "type": "OUTBOUND",
+              "title": "Delete Customer",
+              "elementType": "COMMAND"
+            },
+            {
+              "id": "3458764638084546725",
+              "type": "INBOUND",
+              "title": "customers",
+              "elementType": "READMODEL"
+            }
+          ],
+          "createsAggregate": false,
+          "triggers": [],
+          "sketched": false,
+          "prototype": {
+            "activeByDefault": false
+          }
+        }
+      ],
+      "screenImages": [],
+      "processors": [],
+      "tables": [],
+      "specifications": [],
+      "actors": [],
+      "aggregates": []
+    }
+  ],
+  "flows": [],
+  "aggregates": [],
+  "actors": [],
+  "context": "Cool Customer demo",
+  "codeGen": {},
+  "boardId": "uXjVIo6VNAA=",
+  "sliceGroups": [],
+  "sliceImages": []
+}
