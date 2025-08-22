@@ -227,6 +227,13 @@ module.exports = class extends Generator {
             descriptionList.push(`"${description}"`)
         }
 
+        // define replacements for data-command="<command title>" for each command, then replace all data-command tags with proper invocations
+        const commandReplacements = commands.map(it => it.title.replace(" ","")).map(title => ({title:title, replacement:`data-command="${title}"`}))
+        let template = this._pageTemplate(pageTemplate)
+        commandReplacements.forEach(replacement => {
+            template = template.replaceAll(replacement.replacement, `onClick={${lowercaseFirstCharacter(_commandTitle(replacement.title))}}`)
+        })
+
         this.fs.copyTpl(this.templatePath(`screens/screen.tsx.tpl`), this.destinationPath(`./app/prototype/${_flowTitle(flow.name)}/screens/${_screenTitle(screenTitle)}.tsx`), {
             name: _screenTitle(screenTitle),
             images: imageList,
