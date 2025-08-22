@@ -345,7 +345,7 @@ module.exports = class extends Generator {
             var title = _commandTitle(command.title)
             var slice = _sliceTitle(command.slice)
 
-            return `const invoke${_commandTitle} = () => {
+            return `const invoke${_commandTitle(command.title)} = () => {
             if(check${_commandTitle(command.title)}().enabled){
                 setActiveCommand("${title}")
                 setSlice("${slice}")
