@@ -229,7 +229,7 @@ module.exports = class extends Generator {
 
         console.log("Screen Rendering - Processing commands " + JSON.stringify(commands?.map(it => it.title)??[]))
         // define replacements for data-command="<command title>" for each command, then replace all data-command tags with proper invocations
-        const commandReplacements = commands.map(title => ({title:title, replacement:`data-command="${title}"`}))
+        const commandReplacements = commands.map(command => ({title:command.title, replacement:`data-command="${command.title}"`}))
         let template = this._pageTemplate(pageTemplate)
         commandReplacements.forEach(replacement => {
             console.log(`replacing ${replacement.replacement} with ${lowercaseFirstCharacter(_commandTitle(replacement.title))}`)
