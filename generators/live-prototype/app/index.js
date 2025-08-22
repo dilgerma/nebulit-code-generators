@@ -231,8 +231,11 @@ module.exports = class extends Generator {
         const commandReplacements = commands.map(it => it.title.replace(" ","")).map(title => ({title:title, replacement:`data-command="${title}"`}))
         let template = this._pageTemplate(pageTemplate)
         commandReplacements.forEach(replacement => {
+            console.log(`replacing ${replacement.replacement} with ${lowercaseFirstCharacter(_commandTitle(replacement.title))}`)
             template = template.replaceAll(replacement.replacement, `onClick={${lowercaseFirstCharacter(_commandTitle(replacement.title))}}`)
         })
+
+        console.log(template)
 
         this.fs.copyTpl(this.templatePath(`screens/screen.tsx.tpl`), this.destinationPath(`./app/prototype/${_flowTitle(flow.name)}/screens/${_screenTitle(screenTitle)}.tsx`), {
             name: _screenTitle(screenTitle),
@@ -246,7 +249,7 @@ module.exports = class extends Generator {
             commandInitializers: this._writeScreen_commandInitialzersFromReadModels(commands, readModels),
             commandEnablements: this._writeScreen_commandEnablements(commands),
             title: _screenTitle(screenTitle),
-            template: ejs.render(this._pageTemplate(template), {
+            template: ejs.render(template, {
                 title: _screenTitle(screenTitle),
                 main: this._writeScreen_readModelMain(readModels, "MAIN", false),
                 aside: this._writeScreen_readModelMain(readModels, "RIGHT", true),
