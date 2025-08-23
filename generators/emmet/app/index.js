@@ -841,7 +841,6 @@ module.exports = class extends Generator {
             .filter(dep => dep.elementType === "READMODEL")).map(dep => config.slices.flatMap(it => it.readmodels).find(it => it.id == dep.id)).filter(it => it)
             .filter(readModel => fileExistsByGlob(`./src/slices`, sliceTitleFromString(readModel.slice)))
 
-
         var screenTitle = screensWithSameTitle[0]?.title
         var css = screensWithSameTitle.find(it => !!it.prototype?.css)?.prototype?.css
         var pageTemplate = screensWithSameTitle.find(it => !!it.prototype?.pageTemplate)?.prototype?.pageTemplate?.replaceAll("class=\"", "className=\"")

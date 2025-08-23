@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {parseQueryEndpoint} from "../util/parseEndpoint";
 
-const DataTable = (props: { endpoint: string, queries: string }) => {
+const DataTable = (props: { endpoint: string, queries: Record<string,string> }) => {
     const [data, setData] = useState<string[]>([]);
     const [headers, setHeaders] = useState<string[]>([])
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -108,6 +108,7 @@ const DataTable = (props: { endpoint: string, queries: string }) => {
                     {headers.map((header) => (
                         <tr key={header}>
                             <td>{header}</td>
+                            {/*@ts-ignore*/}
                             <td>{`${renderAttribute(data[selectedIndex][header])}`}</td>
                         </tr>
                     ))}
