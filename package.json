@@ -1,6 +1,6 @@
 {
   "name": "@dilgerma/generator-nebulit",
-  "version": "0.1.201",
+  "version": "0.1.202",
   "description": "scaffold example project",
   "repository": "https://github.com/dilgerma/generator-spring-boot.git",
   "files": [
