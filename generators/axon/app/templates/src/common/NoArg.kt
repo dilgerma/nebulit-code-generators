@@ -1,5 +1,3 @@
-package <
-
-%= rootPackageName%>.common
+package <%= rootPackageName%>.common
 
 annotation class NoArg()

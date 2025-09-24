@@ -1,6 +1,4 @@
-package <
-
-%= rootPackageName%>
+package <%= rootPackageName%>
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.test.context.TestConfiguration

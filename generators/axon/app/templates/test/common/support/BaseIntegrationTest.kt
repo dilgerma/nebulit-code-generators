@@ -1,6 +1,4 @@
-package <
-
-%= rootPackageName%>.common.support
+package <%= rootPackageName%>.common.support
 
 import com.ninjasquad.springmockk.MockkBean
 import org.awaitility.Awaitility

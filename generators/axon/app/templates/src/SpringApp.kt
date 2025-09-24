@@ -1,6 +1,4 @@
-package <
-
-%= rootPackageName%>
+package <%= rootPackageName%>
 
 import org.axonframework.commandhandling.CommandBus
 import org.axonframework.commandhandling.CommandMessage

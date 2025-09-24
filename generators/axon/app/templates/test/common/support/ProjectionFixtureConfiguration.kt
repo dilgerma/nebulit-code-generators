@@ -1,7 +1,5 @@
 /* (C)2024 */
-package <
-
-%= rootPackageName%>.common.support
+package <%= rootPackageName%>.common.support
 
 import < %= rootPackageName%>.common.Event
 import org.axonframework.messaging.unitofwork.DefaultUnitOfWork

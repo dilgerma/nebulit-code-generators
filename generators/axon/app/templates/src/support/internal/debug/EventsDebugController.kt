@@ -1,6 +1,4 @@
-package <
-
-%= rootPackageName%>.support.internal .debug
+package <%= rootPackageName%>.support.internal .debug
 
 import org.axonframework.eventhandling.DomainEventMessage
 import org.axonframework.eventsourcing.eventstore.EventStorageEngine

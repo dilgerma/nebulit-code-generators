@@ -1,6 +1,4 @@
-package <
-
-%= rootPackageName%>.common
+package <%= rootPackageName%>.common
 
 import org.springframework.stereotype.Component
 

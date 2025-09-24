@@ -1,6 +1,4 @@
-package <
-
-%= rootPackageName%>.common.support
+package <%= rootPackageName%>.common.support
 
 import org.assertj.core.api.Assertions.assertThat
 import org.axonframework.eventsourcing.eventstore.EventStore

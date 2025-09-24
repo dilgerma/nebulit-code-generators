@@ -1,6 +1,4 @@
-package <
-
-%= rootPackageName%>
+package <%= rootPackageName%>
 
 import java.util.UUID
 

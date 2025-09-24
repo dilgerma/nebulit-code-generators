@@ -1,6 +1,4 @@
-package <
-
-%= rootPackageName%>.common.support
+package <%= rootPackageName%>.common.support
 
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
