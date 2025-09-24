@@ -1,7 +1,7 @@
 /* (C)2024 */
 package <%= rootPackageName%>.common.support
 
-import < %= rootPackageName%>.common.Event
+import <%= rootPackageName%>.common.Event
 import org.axonframework.messaging.unitofwork.DefaultUnitOfWork
 import org.axonframework.modelling.command.Aggregate
 import org.axonframework.modelling.command.AggregateLifecycle

@@ -1,63 +1,33 @@
-# Nebulit Code Generators
+## Nebulit GmbH - Eventmodeling Template
 
-**Nebulit Code Generators** is a modular toolkit designed to automate code scaffolding, streamline development
-workflows, and enhance developer productivity. Built with flexibility in mind, it supports multiple programming
-languages and integrates seamlessly with modern development environments.
+### Setup
 
-Seamlessly combine Software Modelling with Code Generation.
+Slices sind im _root_ Package (wie im Generator angegeben) als Packages definiert.
 
-There is an [8-Day E-Mail Course (free)](https://newsletter.nebulit.de/generator), that guides you through the process
-to build your own code generator.
+### Todos nach der initialen Generierung
 
+Im Code sind TODOs definiert für die Stellen die angepasst werden müssen.
+Der Generator trifft bestimmte Grundannahmen (aggregateIds sind UUIDs beispielsweise).
 
----
+Wird von diesen Annahmen abgewichen kompiliert der Code ggf. nicht sofort sondern muss leicht
+angepasst werden.
 
-## 🚀 Features
+Ihre Code Richtlinien sind natürlich führend, daher ist es erwartungskonform dass Code
+nicht sofort kompiliert (es sollten aber wirklich nur kleine Anpassungen notwendig sein).
 
-- **Multi-Language Support**  
-  Generate boilerplate code for various programming languages including JavaScript, TypeScript, Kotlin, and more.
+### Start der Applikation
 
-- **Template-Driven Architecture**  
-  Utilize customizable templates to ensure consistency and adherence to best practices across projects.
+Zum Start des Services kann die Klasse _ApplicationStarter_ verwendet werden in _src/test/kotlin_.
+Warum in _test_?
 
-- **Docker Integration**  
-  Leverage Docker for isolated and reproducible development environments.
+Diese Klasse startet die komplette Umgebung (inkl. Postgres und ggf. Kafka über TestContainers)
 
-- **Build Custom Code Generators in minutes**  
-  Use the existing code generators as blue print to AI to build custom generators in minutes
+### Package Struktur
 
-- **Easily extensible**
-  Adjust the existing code generators and combine them seamlessly with Event Modeling
+Events sind im Package "events"
 
----
+Aggregates liegen im Package "domain"
 
-## 📄 License
+Slices haben jeweils ein isoliertes Package <sliceName>
 
-This project is licensed under the **MIT License**. See the [LICENSE](./LICENSE) file for details.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
-
----
-
-## How to use the Generators
-
-The Generators use a json representation of an Event Model to generate Code or Documentation.
-The Tool to generate the json-file is the [Miro Event Modeling Toolkit](https://miro.com/marketplace/eventmodeling/)
-
-To learn how to use Event Modeling, you can start with the Book:
-[Understanding Eventsourcing](https://leanpub.com/eventmodeling-and-eventsourcing)
-
-To apply it in practice, you can use the companion course to the book.
-[Implementing Eventsourcing](https://www.eventsourcingcourse.com)
-
-The course includes a free Miro Toolkit License.
-
----
-
-## 📬 Contact
-
-For questions or support, reach out at **[info@nebulit.de](mailto:info@nebulit.de)**.
+Package "common" enthält einige Interfaces für die generelle Struktur.
