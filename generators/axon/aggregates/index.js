@@ -105,7 +105,7 @@ module.exports = class extends Generator {
 
             return `
             ${specs.length > 0 ? `/*
-        //AI-TODO: 
+//AI-TODO: 
         ${specs.join("\n")}
         */` : ``}
     ${command.createsAggregate ? "@CreationPolicy(AggregateCreationPolicy.CREATE_IF_MISSING)" : ""}
