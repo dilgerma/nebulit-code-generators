@@ -173,7 +173,7 @@ module.exports = class extends Generator {
     _writeEvents(sliceName, eventFilter = []) {
 
         var slice = this._findSlice(sliceName)
-        var title = _slicePackage(slice.title).toLowerCase()
+        var title = _slicePackage(slice?.title).toLowerCase()
 
         slice.events?.filter((event) => event.title)
             .filter((event) => {

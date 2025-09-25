@@ -80,7 +80,7 @@ module.exports = class extends Generator {
                         summary: cmd.title,
                         parameters: [
                             {
-                                name: `${}`,
+                                name: `${id}`,
                                 in: 'path',
                                 required: true,
                                 schema: {
