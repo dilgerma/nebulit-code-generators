@@ -49,7 +49,10 @@ module.exports = class extends Generator {
                 name: 'liveReportModels',
                 message: 'Which ReadModels should read directly from the Eventstream?',
                 when: (input) => {
-                    return input.slice?.length == 1 && config.slices.find((slice) => slice.title === input.slice[0])?.readmodels?.length > 0
+                    return input.slice?.length == 1
+                        && config.slices.find((slice) => slice.title === input.slice[0])?.readmodels?.length > 0
+                        // for now don´t use list elements for live models, as it´s uncler how to handle ids
+                        && !config.slices.find((slice) => slice.title === input.slice[0])?.readmodels[0]?.listElement
                 },
                 choices: (items) => config.slices.filter((slice) => !items.context || items.context?.length === 0 || items.context?.includes(slice.context)).filter((item) => item.title === items.slice[0]).flatMap((slice) => slice.readmodels).map(item => item.title)
             },
@@ -252,6 +255,8 @@ module.exports = class extends Generator {
     }
 
     _writeLiveReportReadModel(slice, readmodel, inboundEvents) {
+        const idAttribute = readmodel.fields.find(it => it.idAttribute)?.name
+        const idTypeVar = idType(readmodel)
         if (readmodel.listElement) {
 
             this.fs.copyTpl(
@@ -271,9 +276,12 @@ module.exports = class extends Generator {
 
                     _typeImports: typeImports(readmodel.fields),
                     link: boardlLink(config.boardId, readmodel.id),
+                    idAttribute: idAttribute,
+                    idType: idTypeVar
                 }
             )
         } else {
+
             this.fs.copyTpl(
                 this.templatePath(`src/components/LiveReportReadModel.kt.tpl`),
                 this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${slice}/${_readmodelTitle(readmodel.title)}.kt`),
@@ -291,6 +299,8 @@ module.exports = class extends Generator {
 
                     _typeImports: typeImports(readmodel.fields),
                     link: boardlLink(config.boardId, readmodel.id),
+                    idAttribute: idAttribute,
+                    idType: idTypeVar
                 }
             )
         }
@@ -305,6 +315,8 @@ module.exports = class extends Generator {
                 _name: _readmodelTitle(readmodel.title),
                 _typeImports: typeImports(readmodel.fields),
                 link: boardlLink(config.boardId, readmodel.id),
+                idAttribute: idAttribute,
+                idType: idTypeVar
             }
         )
 
@@ -323,6 +335,8 @@ module.exports = class extends Generator {
                     readmodel.fields
                 ), readmodel, readmodel.apiEndpoint),
                 link: boardlLink(config.boardId, readmodel.id),
+                idAttribute: idAttribute,
+                idType: idTypeVar
             }
         )
     }

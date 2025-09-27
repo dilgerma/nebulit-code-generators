@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 
 import mu.KotlinLogging
 
-class <%= _name%>Query(var aggregateId: UUID): Query
+class <%= _name%>Query(var <%-idAttribute%>: <%-idType%>): Query
 
 /*
 Boardlink: <%- link%>

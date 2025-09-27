@@ -19,11 +19,11 @@ class <%= _name%>QueryHandler(
 ) :
     QueryHandler<<%= _name%>Query, <%= _name%>> {
 
-        @org.axonframework.queryhandling.QueryHandler
+    @org.axonframework.queryhandling.QueryHandler
     override fun handleQuery(query: <%= _name%>Query): <%= _name%> {
            val events =
                    eventStore
-                       .readEvents(query.aggregateId.toString())
+                       .readEvents(query.<%-idAttribute%>.toString())
                        .asStream()
                        .filter { it.payload is Event }
                        .map { it.payload as Event }

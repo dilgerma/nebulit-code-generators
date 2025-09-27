@@ -69,7 +69,6 @@ module.exports = class extends Generator {
             `${_aggregateTitle(aggregate.title)}.kt`,
             false
         );
-        console.log(`File Exists ${fileExists} + ./src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain/${_aggregateTitle(aggregate.title)}.kt`)
         const aggregateFile = fileExists ? `${_aggregateTitle(aggregate.title)}.kt.generated` : `${_aggregateTitle(aggregate.title)}.kt`
 
         this.fs.copyTpl(
