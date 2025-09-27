@@ -17,6 +17,7 @@ const {variableAssignments, processSourceMapping} = require("../../common/util/v
 const {idField, uniqBy} = require("../../common/util/util");
 const {idType} = require("../../common/util/generator");
 const {analyzeSpecs} = require("../../common/util/specs");
+const {fileExistsByGlob} = require("../../common/util/files");
 
 
 let config = {}
@@ -62,9 +63,14 @@ module.exports = class extends Generator {
         var idFields = idField(aggregate)
         var idFieldType = idType(aggregate)
 
-        var aggregateFile = this.answers.aggregate_slices?.length > 0 ?
-            `${_aggregateTitle(aggregate.title)}.kt.tmp` :
-            `${_aggregateTitle(aggregate.title)}.kt`
+
+        const fileExists = fileExistsByGlob(
+            `./src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain`,
+            `${_aggregateTitle(aggregate.title)}.kt`,
+            false
+        );
+        console.log(`File Exists ${fileExists} + ./src/main/kotlin/${this.givenAnswers.rootPackageName.split(".").join("/")}/domain/${_aggregateTitle(aggregate.title)}.kt`)
+        const aggregateFile = fileExists ? `${_aggregateTitle(aggregate.title)}.kt.generated` : `${_aggregateTitle(aggregate.title)}.kt`
 
         this.fs.copyTpl(
             this.templatePath(`src/components/Aggregate.kt.tpl`),
