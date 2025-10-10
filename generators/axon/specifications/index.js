@@ -40,7 +40,7 @@ module.exports = class extends Generator {
         var slice = this._findSlice(this.givenAnswers.slice)
         var title = _sliceTitle(slice.title).toLowerCase()
 
-        slice.specifications?.forEach((specification) => {
+        slice.specifications?.filter(it => !it?.vertical).forEach((specification) => {
 
             var given = specification.given.sort((a, b) => a.index - b.index)
             var when = specification.when?.[0]
@@ -251,7 +251,8 @@ module.exports = class extends Generator {
             return `queryGateway.query(${readModelTitle}Query(), ${readModelTitle}::class.java)`
         } else {
             if (readModelIdFields.length <= 0) {
-                return `queryGateway.query(${readModelTitle}Query(aggregateId), ${readModelTitle}::class.java)`
+                var idFieldValue = commands.length > 0 ? idField(commands[0]) : "aggregateId"
+                return `queryGateway.query(${readModelTitle}Query(${idFieldValue}), ${readModelTitle}::class.java)`
             } else {
                 return `queryGateway.query(${readModelTitle}Query(${commandIdSources.map(it => `${lowercaseFirstCharacter(_commandTitle(it.command.title))}.${it.name}`)}), ${readModelTitle}::class.java)`
             }
