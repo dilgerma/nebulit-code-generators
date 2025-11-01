@@ -45,6 +45,12 @@ module.exports = class extends Generator {
 
             fields.forEach((f) => {
                 let prop = {type: typeMap[f.type] || 'string'};
+
+                // Add format for UUID types
+                if (f.type === 'UUID') {
+                    prop.format = 'uuid';
+                }
+
                 if (f.cardinality === 'List') {
                     prop = {type: 'array', items: prop};
                 }
@@ -60,72 +66,105 @@ module.exports = class extends Generator {
         };
 
         const openapi = {
-            openapi: '3.0.3',
+            openapi: '3.0.1',
             info: {
-                title: 'Generated API from config.json',
-                version: '1.0.0'
+                title: 'OpenAPI definition',
+                version: 'v0'
             },
+            servers: [
+                {
+                    url: 'http://localhost:8080',
+                    description: 'Generated server url'
+                }
+            ],
             paths: {},
             components: {schemas: {}}
         };
+
+        // Track global command index for operationId
+        let globalCommandIndex = 0;
 
         config.slices.forEach((slice) => {
             (slice.commands || []).forEach((cmd) => {
                 const id = (cmd.fields?.find(field => field.idAttribute)?.name ?? "aggregateId").toLowerCase();
                 const schemaName = cmd.title.replace(/\s+/g, '');
+                const payloadSchemaName = `${schemaName}Payload`;
                 const endpoint = `/${cmd?.endpoint ?? (_sliceTitle(slice.title))}/{${id}}`
+                const idField = cmd.fields?.find(field => field.idAttribute);
+                const idType = idField?.type || 'UUID';
+                const resourceTag = `${cmd?.endpoint ?? (_sliceTitle(slice.title))}-ressource`;
 
-                openapi.paths[`${endpoint}`] = {
+                openapi.paths[endpoint] = {
                     post: {
-                        summary: cmd.title,
+                        tags: [resourceTag],
+                        operationId: globalCommandIndex === 0 ? 'processCommand' : `processCommand_${globalCommandIndex}`,
                         parameters: [
                             {
-                                name: `${id}`,
+                                name: id,
                                 in: 'path',
                                 required: true,
                                 schema: {
-                                    type: 'string'
-                                },
-                                description: 'The aggregate identifier'
+                                    type: 'string',
+                                    ...(idType === 'UUID' ? { format: 'uuid' } : {})
+                                }
                             }
                         ],
                         requestBody: {
-                            required: true,
                             content: {
                                 'application/json': {
-                                    schema: {$ref: `#/components/schemas/${schemaName}`}
+                                    schema: {$ref: `#/components/schemas/${payloadSchemaName}`}
+                                }
+                            },
+                            required: true
+                        },
+                        responses: {
+                            '200': {
+                                description: 'OK',
+                                content: {
+                                    '*/*': {
+                                        schema: { type: 'object' }
+                                    }
                                 }
                             }
-                        },
-                        responses: {200: {description: 'OK'}}
+                        }
                     }
                 };
-                openapi.components.schemas[schemaName] = makeSchema(cmd.fields);
+                openapi.components.schemas[payloadSchemaName] = makeSchema(cmd.fields);
+                globalCommandIndex++;
             });
 
             (slice.readmodels || []).forEach((rm) => {
-                const id = (rm.fields?.find(field => field.idAttribute)?.name ?? "aggregateId")
+                const id = (rm.fields?.find(field => field.idAttribute)?.name ?? "aggregateId").toLowerCase();
                 const endpoint = `/${rm?.endpoint ?? (_sliceTitle(slice.title))}/{${id}}`
                 const schemaName = rm.title.replace(/\s+/g, '');
-                openapi.paths[`${endpoint}`] = {
+                const entitySchemaName = `${schemaName}Entity`;
+                const idField = rm.fields?.find(field => field.idAttribute);
+                const idType = idField?.type || 'UUID';
+                const resourceTag = `${rm?.endpoint ?? (_sliceTitle(slice.title))}-ressource`;
+
+                // Determine if this is a list based only on cardinality attribute
+                const isList = rm.cardinality === 'List';
+
+                openapi.paths[endpoint] = {
                     get: {
-                        summary: `Get ${rm.title}`,
+                        tags: [resourceTag],
+                        operationId: `get${schemaName}`,
                         parameters: [
                             {
-                                name: `${id}`,
+                                name: id,
                                 in: 'path',
                                 required: true,
                                 schema: {
-                                    type: 'string'
-                                },
-                                description: 'The aggregate identifier'
+                                    type: 'string',
+                                    ...(idType === 'UUID' ? { format: 'uuid' } : {})
+                                }
                             }
                         ],
                         responses: {
-                            200: {
+                            '200': {
                                 description: 'OK',
                                 content: {
-                                    'application/json': {
+                                    '*/*': {
                                         schema: {$ref: `#/components/schemas/${schemaName}`}
                                     }
                                 }
@@ -133,7 +172,31 @@ module.exports = class extends Generator {
                         }
                     }
                 };
-                openapi.components.schemas[schemaName] = makeSchema(rm.fields);
+
+                // Create the Entity schema (the actual data structure)
+                openapi.components.schemas[entitySchemaName] = makeSchema(rm.fields);
+
+                // Create the wrapper schema with 'data' attribute
+                if (isList) {
+                    openapi.components.schemas[schemaName] = {
+                        required: ['data'],
+                        type: 'object',
+                        properties: {
+                            data: {
+                                type: 'array',
+                                items: {$ref: `#/components/schemas/${entitySchemaName}`}
+                            }
+                        }
+                    };
+                } else {
+                    openapi.components.schemas[schemaName] = {
+                        required: ['data'],
+                        type: 'object',
+                        properties: {
+                            data: {$ref: `#/components/schemas/${entitySchemaName}`}
+                        }
+                    };
+                }
             });
         });
 

@@ -20,6 +20,7 @@ const {ClassesGenerator, typeMapping, typeImports, idType} = require("../../comm
 const {_sliceSpecificClassTitle, _packageName, _packageFolderName} = require("../../common/util/naming");
 const {camelCaseToUnderscores, idField} = require("../../common/util/util");
 const {analyzeSpecs} = require("../../common/util/specs");
+const {buildLink} = require("../../common/util/config");
 
 
 let config = {}
@@ -102,6 +103,7 @@ module.exports = class extends Generator {
     _writeSingleSlice(slice) {
         var sliceName = slice
         this._writeReadme(sliceName)
+        this._writeSliceDescription(sliceName)
         this._writeCommands(sliceName);
         this._writeEvents(sliceName)
         this._writeReadModels(sliceName)
@@ -112,6 +114,19 @@ module.exports = class extends Generator {
         });
         this._writeProcessors(sliceName)
 
+    }
+
+    _writeSliceDescription(sliceName) {
+        var slice = this._findSlice(sliceName)
+        this.fs.copyTpl(
+            this.templatePath(`.slice.json.tpl`),
+            this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${_sliceTitle(sliceName)}/.slice.json`),
+            {
+                title: sliceName,
+                context: slice.context,
+                link: buildLink(config.boardId, slice.id)
+            }
+        )
     }
 
     _writeReadme(sliceName) {
