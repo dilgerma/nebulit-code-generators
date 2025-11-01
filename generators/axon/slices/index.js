@@ -123,6 +123,7 @@ module.exports = class extends Generator {
             this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${_sliceTitle(sliceName)}/.slice.json`),
             {
                 title: sliceName,
+                id: slice.id,
                 context: slice.context,
                 link: buildLink(config.boardId, slice.id)
             }
