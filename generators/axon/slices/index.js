@@ -710,36 +710,48 @@ fun on(event: ${_eventTitle(it.title)}) {
 
             var readModel = config.slices.flatMap(it => it.readmodels).find(it => it.id === readModelDependency?.id)
 
-            if (!readModel) {
-                //dont generate processors without readmodel
-                // typcially external event processors
-                return
-            }
 
             var eventsDeps = readModel?.dependencies?.filter((it) => it.type === "INBOUND" && it.elementType === "EVENT").map(it => it.id) ?? [];
 
             var events = config.slices.flatMap(it => it.events).filter(it => eventsDeps.includes(it?.id));
 
-            this.fs.copyTpl(
-                this.templatePath(`src/components/StatelessProcessor.kt.tpl`),
-                this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${title}/internal/${_processorTitle(processor.title)}.kt`),
-                {
-                    _slice: title,
-                    _readModelSlice: _sliceTitle(readModel.slice),
-                    _readModel: _readmodelTitle(readModel.title),
-                    _typeImports: typeImports(readModel.fields),
-                    _rootPackageName: this.givenAnswers.rootPackageName,
-                    _packageName: _packageName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false),
-                    _name: _processorTitle(processor.title),
-                    _eventsImports: this._eventsImports(this.answers.processTriggers),
-                    _fields: VariablesGenerator.generateVariables(
-                        readModel.fields
-                    ),
-                    _triggers: this._renderStatelessProcessorTriggers(readModel, this.answers.processTriggers || [], events, command),
-                    _command: command ? _commandTitle(command.title) : "",
-                    link: boardlLink(config.boardId, processor.id),
+            if (readModel) {
+                this.fs.copyTpl(
+                    this.templatePath(`src/components/StatelessProcessor.kt.tpl`),
+                    this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${title}/internal/${_processorTitle(processor.title)}.kt`),
+                    {
+                        _slice: title,
+                        _readModelSlice: _sliceTitle(readModel.slice),
+                        _readModel: _readmodelTitle(readModel.title),
+                        _typeImports: typeImports(readModel.fields),
+                        _rootPackageName: this.givenAnswers.rootPackageName,
+                        _packageName: _packageName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false),
+                        _name: _processorTitle(processor.title),
+                        _eventsImports: this._eventsImports(this.answers.processTriggers),
+                        _fields: VariablesGenerator.generateVariables(
+                            readModel.fields
+                        ),
+                        _triggers: this._renderStatelessProcessorTriggers(readModel, this.answers.processTriggers || [], events, command),
+                        _command: command ? _commandTitle(command.title) : "",
+                        link: boardlLink(config.boardId, processor.id),
 
-                })
+                    })
+            } else {
+                this.fs.copyTpl(
+                    this.templatePath(`src/components/StatelessStandaloneProcessor.kt.tpl`),
+                    this.destinationPath(`./src/main/kotlin/${_packageFolderName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false)}/${title}/internal/${_processorTitle(processor.title)}.kt`),
+                    {
+                        _slice: title,
+                        _rootPackageName: this.givenAnswers.rootPackageName,
+                        _packageName: _packageName(this.givenAnswers.rootPackageName, config.codeGen?.contextPackage, false),
+                        _name: _processorTitle(processor.title),
+                        _eventsImports: this._eventsImports(this.answers.processTriggers),
+                        _triggers: this._renderStatelessProcessorTriggers(readModel, this.answers.processTriggers || [], events, command),
+                        _command: command ? _commandTitle(command.title) : "",
+                        link: boardlLink(config.boardId, processor.id),
+
+                    })
+            }
         })
 
 
@@ -754,7 +766,7 @@ fun on(event: ${_eventTitle(it.title)}) {
     _renderStatelessProcessorTriggers(readModel, triggers, events, command) {
         return triggers.map((event) => {
 
-            return `
+            return readModel ? `
                 @EventHandler
                 fun on(event: ${_eventTitle(event)}) {
                      queryGateway.query(
@@ -766,7 +778,13 @@ fun on(event: ${_eventTitle(it.title)}) {
                       ${variableAssignments(command.fields, "it", readModel, "\n", "=")})
                 )*/
         }
-                }`
+                }` : `@EventHandler
+            fun on(event: ${_eventTitle(event)}) {
+                    /*commandGateway.send<${_commandTitle(command.title)}>(
+                        ${_commandTitle(command.title)}(
+                    )*/
+                }
+            }`
         }).join("\n")
     }
 

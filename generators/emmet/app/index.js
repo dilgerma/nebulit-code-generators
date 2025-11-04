@@ -154,6 +154,7 @@ module.exports = class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
+        console.log(JSON.stringify(args))
         this.argument('appname', {type: String, required: false});
         config = require(this.env.cwd + "/config.json");
     }
