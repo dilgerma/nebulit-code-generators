@@ -917,7 +917,7 @@ const defaultValue = (type, cardinality = "single") => {
 }
 
 function _slicePackage(title) {
-    return `${slugify(title.replaceAll("slice:", "")).replaceAll("-", "")}`
+    return `${slugify(title.replaceAll("slice:", "")).replaceAll("-", "").replaceAll("_", "")}`
 }
 
 function toCamelCase(prefix, variableName) {
