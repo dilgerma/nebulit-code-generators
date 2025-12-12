@@ -21,7 +21,7 @@ function _commandTitle(title) {
 }
 
 function _flowTitle(title) {
-    var titleElements = title.replaceAll("flow:", "").split(" ").map(it => capitalizeFirstCharacter(sanitize(it)).join(""))
+    var titleElements = title.replaceAll("flow:", "").split(" ").map(it => capitalizeFirstCharacter(sanitize(it))).join("")
     return `${slugify(capitalizeFirstCharacter(sanitize(titleElements)), "")}${!title?.endsWith("Flow") ? "Flow" : ""}`
 }
 

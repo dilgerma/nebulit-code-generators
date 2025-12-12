@@ -238,7 +238,7 @@ module.exports = class extends Generator {
 
         console.log(template)
 
-        this.fs.copyTpl(this.templatePath(`screens/screen.tsx.tpl`), this.destinationPath(`./app/prototype/${_flowTitle(flow.name)}/screens/${_screenTitle(screenTitle)}.tsx`), {
+        this.fs.copyTpl(this.templatePath(`screens/screen.tsx.tpl`), this.destinationPath(`./app/prototype/${_flowTitle(flow?.name)}/screens/${_screenTitle(screenTitle)}.tsx`), {
             name: _screenTitle(screenTitle),
             images: imageList,
             descriptions: descriptionList,
