@@ -1,0 +1,59 @@
+import {postgreSQLRawSQLProjection} from '@event-driven-io/emmett-postgresql';
+import {sql} from '@event-driven-io/dumbo';
+import knex, {Knex} from 'knex';
+import {ContextEvents} from '../../events/ContextEvents';
+
+export type TablesReadModelItem = {
+    seats: number,
+    name: string,
+    tableId: string,
+}
+
+export type TablesReadModel = {
+    data: TablesReadModelItem[],
+}
+
+export const tableName = 'tables';
+
+export const getKnexInstance = (connectionString: string): Knex => {
+    return knex({
+        client: 'pg',
+        connection: connectionString,
+    });
+};
+
+
+export const TablesProjection = postgreSQLRawSQLProjection<ContextEvents>({
+    canHandle: ['TableAdded', 'TableUpdated'],
+    evolve: (event, context) => {
+        const {type, data} = event;
+        const db = getKnexInstance(context.connection.connectionString);
+
+        switch (type) {
+            case 'TableAdded':
+                return sql(db(tableName)
+                    .withSchema('public')
+                    .insert({
+                        table_id: data.tableid,
+                        name: data.name,
+                        seats: data.seats,
+                    })
+                    .onConflict('table_id')
+                    .merge({name: data.name, seats: data.seats})
+                    .toQuery());
+
+            case 'TableUpdated':
+                return sql(db(tableName)
+                    .withSchema('public')
+                    .where('table_id', data.tableid)
+                    .update({
+                        name: data.name,
+                        seats: data.seats,
+                    })
+                    .toQuery());
+
+            default:
+                return [];
+        }
+    }
+});

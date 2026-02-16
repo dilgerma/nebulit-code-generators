@@ -1,0 +1,76 @@
+import {DeciderSpecification} from '@event-driven-io/emmett';
+import {AddLocationCommand, AddLocationInitialState, decide, evolve} from "./AddLocationCommand";
+import {describe, it} from "node:test";
+
+
+describe('AddLocation Specification', () => {
+
+    const given = DeciderSpecification.for({
+        decide,
+        evolve,
+        initialState: AddLocationInitialState
+    });
+
+    it('spec: Add Location - scenario', () => {
+
+        const command: AddLocationCommand = {
+            type: 'AddLocation',
+            data: {
+                city: "New York",
+                housenumber: "123",
+                name: "Main Office",
+                street: "Broadway",
+                zipCode: "10001",
+                location_id: "7771b53c-b378-4f10-a6b7-16f837316960"
+            },
+            metadata: {now: new Date()},
+        }
+
+        given([])
+            .when(command)
+            .then([{
+                type: 'LocationAdded',
+                data: {
+                    city: command.data.city,
+                    housenumber: command.data.housenumber,
+                    name: command.data.name,
+                    street: command.data.street,
+                    zipCode: command.data.zipCode,
+                    location_id: command.data.location_id
+                },
+                metadata: {}
+            }])
+    });
+
+    it('spec: Add duplicate Location - scenario', () => {
+
+        const command: AddLocationCommand = {
+            type: 'AddLocation',
+            data: {
+                city: "Boston",
+                housenumber: "456",
+                name: "Branch Office",
+                street: "Main St",
+                zipCode: "02101",
+                location_id: "7771b53c-b378-4f10-a6b7-16f837316960"
+            },
+            metadata: {now: new Date()},
+        }
+
+        given([{
+            type: 'LocationAdded',
+            data: {
+                city: "New York",
+                housenumber: "123",
+                name: "Main Office",
+                street: "Broadway",
+                zipCode: "10001",
+                location_id: "7771b53c-b378-4f10-a6b7-16f837316960"
+            },
+            metadata: {}
+        }])
+            .when(command)
+            .thenThrows()
+    });
+
+});

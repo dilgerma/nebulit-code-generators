@@ -1,0 +1,73 @@
+import {Request, Response, Router} from 'express';
+import {AddLocationCommand, handleAddLocation} from './AddLocationCommand';
+import {requireUser} from "../../supabase/requireUser";
+import {WebApiSetup} from "@event-driven-io/emmett-expressjs";
+import {assertNotEmpty} from "../../util/assertions";
+
+export type AddLocationRequestPayload = {
+    city?: string,
+    housenumber?: string,
+    name?: string,
+    street?: string,
+    zipCode?: string,
+    location_id?: string
+}
+
+export type AddLocationRequest = Request<
+    Partial<{ id: string }>,
+    unknown,
+    Partial<AddLocationRequestPayload>
+>;
+
+export const api =
+    (
+        // external dependencies
+    ): WebApiSetup =>
+        (router: Router): void => {
+            router.post('/api/addlocation/:id', requireRestaurantAccess, async (req: AddLocationRequest, res: Response) => {
+                const principal = await requireUser(req, res, false);
+                if (principal.error) {
+                    return res.status(401).json(principal);
+                }
+
+                const correlation_id = req.header("correlation_id") ?? req.params.id
+                const causation_id = req.params.id
+
+                try {
+                    const command: AddLocationCommand = {
+                        data: {
+                            city: assertNotEmpty(req.body.city),
+                            housenumber: assertNotEmpty(req.body.housenumber),
+                            name: assertNotEmpty(req.body.name),
+                            street: assertNotEmpty(req.body.street),
+                            zipCode: assertNotEmpty(req.body.zipCode),
+                            location_id: assertNotEmpty(req.body.location_id)
+                        },
+                        metadata: {
+                            correlation_id: correlation_id,
+                            causation_id: causation_id
+                        },
+                        type: "AddLocation"
+                    }
+
+                    if (!req.params.id) throw "no id provided"
+
+                    const result = await handleAddLocation(assertNotEmpty(req.params.id), command);
+
+                    res.set("correlation_id", correlation_id)
+                    res.set("causation_id", causation_id)
+
+                    return res.status(200).json({
+                        ok: true,
+                        next_expected_stream_version: result.nextExpectedStreamVersion?.toString(),
+                        last_event_global_position: result.lastEventGlobalPosition?.toString()
+                    });
+                } catch (err) {
+                    console.error(err);
+                    if (err instanceof Error && err.message === 'location must be unique') {
+                        return res.status(409).json({ok: false, error: 'location must be unique'});
+                    }
+                    return res.status(500).json({ok: false, error: 'Server error'});
+                }
+            });
+        };

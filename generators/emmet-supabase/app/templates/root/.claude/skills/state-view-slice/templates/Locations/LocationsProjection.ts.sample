@@ -1,0 +1,50 @@
+import {postgreSQLRawSQLProjection} from '@event-driven-io/emmett-postgresql';
+import {sql} from '@event-driven-io/dumbo';
+import knex, {Knex} from 'knex';
+import {LocationAdded} from '../../events/LocationAdded';
+
+export type LocationsReadModelItem = {
+    name?: string,
+    zipCode?: string,
+    city?: string,
+    location_id?: string,
+}
+
+export type LocationsReadModel = {
+    data: LocationsReadModelItem[],
+}
+
+export const tableName = 'locations';
+
+export const getKnexInstance = (connectionString: string): Knex => {
+    return knex({
+        client: 'pg',
+        connection: connectionString,
+    });
+};
+
+export const LocationsProjection = postgreSQLRawSQLProjection<LocationAdded>({
+    canHandle: ["LocationAdded"],
+    evolve: (event, context) => {
+        const {type, data} = event;
+        const db = getKnexInstance(context.connection.connectionString);
+
+        switch (type) {
+            case "LocationAdded":
+                return sql(db(tableName)
+                    .withSchema('public')
+                    .insert({
+                        location_id: data.location_id,
+                        name: data.name,
+                        zip_code: data.zipCode,
+                        city: data.city,
+                    })
+                    .onConflict('location_id')
+                    .merge({name: data.name, zip_code: data.zipCode, city: data.city})
+                    .toQuery());
+
+            default:
+                return [];
+        }
+    }
+});

@@ -1,0 +1,104 @@
+import {before, after, describe, it} from "node:test";
+import {PostgreSQLProjectionAssert, PostgreSQLProjectionSpec} from "@event-driven-io/emmett-postgresql";
+import {TablesProjection} from "./TablesProjection";
+import {PostgreSqlContainer, StartedPostgreSqlContainer} from "@testcontainers/postgresql";
+import {TableAdded} from "../../events/TableAdded"
+import {TableUpdated} from "../../events/TableUpdated"
+import knex from 'knex';
+import assert from 'assert';
+import {runFlywayMigrations} from "../../common/testHelpers";
+
+describe('Tables Specification', () => {
+    let postgres: StartedPostgreSqlContainer;
+    let connectionString: string
+
+    let given: PostgreSQLProjectionSpec<TableAdded | TableUpdated>
+
+    before(async () => {
+        postgres = await new PostgreSqlContainer("postgres").start();
+        connectionString = postgres.getConnectionUri();
+
+        await runFlywayMigrations(connectionString)
+
+        given = PostgreSQLProjectionSpec.for({
+            projection: TablesProjection,
+            connectionString,
+        });
+    });
+
+    after(async () => {
+        await postgres?.stop();
+    });
+
+    it('spec: Tables - add and update scenario', async () => {
+        const tableId1 = "fbf165d3-5fe2-4a34-af24-f0ad64ca8412"
+        const tableId2 = "3ccaf75c-7120-4e4d-9de9-c5ad822a62ec"
+
+        const assertTables: PostgreSQLProjectionAssert = async ({connectionString: connStr}) => {
+            const queryDb = knex({
+                client: 'pg',
+                connection: connStr,
+            });
+
+            try {
+                const result = await queryDb('tables')
+                    .withSchema('public')
+                    .select('table_id', 'name', 'seats')
+                    .orderBy('table_id');
+
+                assert.strictEqual(result.length, 2, 'Should have 2 tables');
+
+                const table1 = result.find(t => t.table_id === tableId1);
+                const table2 = result.find(t => t.table_id === tableId2);
+
+                assert(table1, 'Table 1 should exist');
+                assert.strictEqual(table1.name, "Table 1 Updated");
+                assert.strictEqual(table1.seats, 8);
+
+                assert(table2, 'Table 2 should exist');
+                assert.strictEqual(table2.name, "Table 2");
+                assert.strictEqual(table2.seats, 6);
+            } finally {
+                await queryDb.destroy();
+            }
+        };
+
+        await given([{
+            type: 'TableAdded',
+            data: {
+                minPersons: 2,
+                name: "Table 1",
+                reservable: true,
+                seats: 4,
+                tableid: tableId1
+            },
+            metadata: {streamName: 'fbf165d3-5fe2-4a34-af24-f0ad64ca8412'}
+        }])
+            .when([
+                {
+                    type: 'TableAdded',
+                    data: {
+                        minPersons: 2,
+                        name: "Table 2",
+                        reservable: true,
+                        seats: 6,
+                        tableid: tableId2
+                    },
+                    metadata: {streamName: 'fbf165d3-5fe2-4a34-af24-f0ad64ca8412'}
+                },
+                {
+                    type: 'TableUpdated',
+                    data: {
+                        minPersons: 2,
+                        name: "Table 1 Updated",
+                        reservable: true,
+                        seats: 8,
+                        tableid: tableId1
+                    },
+                    metadata: {streamName: 'fbf165d3-5fe2-4a34-af24-f0ad64ca8412'}
+                }
+            ])
+            .then(assertTables);
+    });
+
+});

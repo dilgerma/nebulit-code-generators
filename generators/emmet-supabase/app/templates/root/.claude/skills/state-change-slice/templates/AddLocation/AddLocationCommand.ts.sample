@@ -1,0 +1,84 @@
+import type {Command} from '@event-driven-io/emmett'
+import {CommandHandler} from '@event-driven-io/emmett';
+import {ContextEvents} from "../../events/ContextEvents";
+import {findEventstore} from "../../common/loadPostgresEventstore";
+
+export type AddLocationCommand = Command<'AddLocation', {
+    city: string,
+    housenumber: string,
+    name: string,
+    street: string,
+    zipCode: string,
+    location_id: string
+},
+    {
+        correlation_id?: string,
+        causation_id?: string,
+        now?: Date,
+        streamName?: string,
+    }>;
+
+export type AddLocationState = {
+    locationIds: Set<string>;
+}
+
+export const AddLocationInitialState = (): AddLocationState => ({
+    locationIds: new Set(),
+});
+
+export const evolve = (
+    state: AddLocationState,
+    event: ContextEvents,
+): AddLocationState => {
+    const {type, data} = event;
+
+    switch (type) {
+        case "LocationAdded":
+            return {
+                ...state,
+                locationIds: new Set([...state.locationIds, data.location_id])
+            };
+        default:
+            return state;
+    }
+};
+
+export const decide = (
+    command: AddLocationCommand,
+    state: AddLocationState,
+): ContextEvents[] => {
+    // Check if location with same location_id already exists
+    if (state.locationIds.has(command.data.location_id)) {
+        throw new Error('location must be unique');
+    }
+
+    return [{
+        type: "LocationAdded",
+        data: {
+            city: command.data.city,
+            housenumber: command.data.housenumber,
+            name: command.data.name,
+            street: command.data.street,
+            zipCode: command.data.zipCode,
+            location_id: command.data.location_id
+        }, metadata: {
+            correlation_id: command.metadata?.correlation_id,
+            causation_id: command.metadata?.causation_id
+        }
+    }]
+};
+
+
+const AddLocationCommandHandler = CommandHandler<AddLocationState, ContextEvents>({
+    evolve,
+    initialState: AddLocationInitialState
+});
+
+export const handleAddLocation = async (id: string, command: AddLocationCommand) => {
+    const eventStore = await findEventstore()
+    const result = await AddLocationCommandHandler(eventStore, id, (state: AddLocationState) => decide(command, state))
+    return {
+        nextExpectedStreamVersion: result.nextExpectedStreamVersion,
+        lastEventGlobalPosition: result.lastEventGlobalPosition
+    }
+}

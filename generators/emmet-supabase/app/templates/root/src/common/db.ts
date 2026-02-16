@@ -1,0 +1,1 @@
+export const postgresUrl = process.env.SUPABASE_DB_URL ?? "missing-url"

@@ -1,0 +1,84 @@
+import {after, before, describe, it} from "node:test";
+import {PostgreSQLProjectionAssert, PostgreSQLProjectionSpec} from "@event-driven-io/emmett-postgresql";
+import {LocationsProjection} from "./LocationsProjection";
+import {PostgreSqlContainer, StartedPostgreSqlContainer} from "@testcontainers/postgresql";
+import {LocationAdded} from "../../events/LocationAdded"
+import knex, {Knex} from "knex";
+import assert from "node:assert";
+import {runFlywayMigrations} from "../../common/testHelpers";
+
+describe('Locations Specification', () => {
+    let postgres: StartedPostgreSqlContainer;
+    let connectionString: string;
+    let db: Knex;
+
+    let given: PostgreSQLProjectionSpec<LocationAdded>
+
+    before(async () => {
+        postgres = await new PostgreSqlContainer("postgres").start();
+        connectionString = postgres.getConnectionUri();
+
+        db = knex({
+            client: 'pg',
+            connection: connectionString,
+        });
+
+        await runFlywayMigrations(connectionString);
+
+        given = PostgreSQLProjectionSpec.for({
+            projection: LocationsProjection,
+            connectionString,
+        });
+    });
+
+    after(async () => {
+        await db?.destroy();
+        await postgres?.stop();
+    });
+
+    it('spec: Locations - scenario', async () => {
+        const city = "New York"
+        const housenumber = "123"
+        const location_id = "7771b53c-b378-4f10-a6b7-16f837316960"
+        const name = "Main Office"
+        const street = "Broadway"
+        const zipCode = "10001"
+
+        const assertLocations: PostgreSQLProjectionAssert = async ({connectionString: connStr}) => {
+            const queryDb = knex({
+                client: 'pg',
+                connection: connStr,
+            });
+
+            try {
+                const result = await queryDb('locations')
+                    .withSchema('public')
+                    .select('*');
+
+                assert.strictEqual(result.length, 1, 'Should have 1 location');
+                assert.strictEqual(result[0].location_id, location_id);
+                assert.strictEqual(result[0].name, name);
+                assert.strictEqual(result[0].zip_code, zipCode);
+                assert.strictEqual(result[0].city, city);
+            } finally {
+                await queryDb.destroy();
+            }
+        };
+
+        await given([{
+            type: 'LocationAdded',
+            data: {
+                city: city,
+                housenumber: housenumber,
+                name: name,
+                street: street,
+                zipCode: zipCode,
+                location_id: location_id
+            },
+            metadata: {streamName: 'fbf165d3-5fe2-4a34-af24-f0ad64ca8412'}
+        }])
+            .when([])
+            .then(assertLocations);
+    });
+
+});
