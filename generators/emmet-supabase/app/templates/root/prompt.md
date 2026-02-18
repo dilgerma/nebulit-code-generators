@@ -11,20 +11,19 @@ The generated code does not reflect the target state, always check against the s
 ## Your Task
 
 0. Do not read the entire code base. Focus on the tasks in this description.
-1. Read the PRD at `.slices/index.json` (in the same directory as this file). Every item in status "in progress" is a task.
+1. Read the description at `.slices/index.json` (in the same directory as this file). Every item in status "planned" is a task.
 2. Read the progress log at `progress.txt` (check Codebase Patterns section first)
 3. Make sure you are on the right branch "feature/<slicename>", if unsure, start from main.
-5. Pick the **highest priority** slice where status is "planned" ( case insensitive ). Set the status "in progress" in the index.json. If no slice has status planned, reply with:
-<promise>NO_TASKS</promise>
-and stop.
-6. Pick the slice definition from .slices in <folder> defined in the prd.
+5. Pick the **highest priority** slice where status is "planned" ( case insensitive ). This becomes your PRD. Set the status "in_progress" in the index.json. If no slice has status planned, reply with:
+   <promise>NO_TASKS</promise> and stop. Do not work on other slices.
+6. Pick the slice definition from the project root / .slices in <folder> defined in the prd.
 7. Define the slice type and load the matching skill. If the processors-array is not empty, it´s an automation slice.
 8. Write a short progress one liner after each step to progress.txt
-9Implement that single slice, make use of the skills in the skills directory, but also your previsously collected
+9. Implement that single slice, make use of the skills in the skills directory, but also your previsously collected
    knowledge. Also make sure to adjust the implementation according to the json definition. Carefully inspect events, fields and compare against the implemented slice. JSON is the desired state.
 10. The slice in the json is always true, the code follows what is defined in the json
 11. slice is only 'Done' if business logic is implemented as defined in the JSON, APIs are implemented, test scenarios are implemented and it
-   fulfills the slice.json. There must be no specification in json, that has no equivalent in code.
+    fulfills the slice.json. There must be no specification in json, that has no equivalent in code.
 12. Run quality checks ( npm run build, npm run test )
 13. If checks pass, commit ALL changes with message: `feat: [Slice Name]` and merge back to main as FF merge ( update
     first )
