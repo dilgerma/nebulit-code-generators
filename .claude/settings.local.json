@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(git -C /Users/martindilger/development/git/sources/nebulit-code-generator/generators/emmet-supabase-ui status --short)",
+      "Bash(git -C /Users/martindilger/development/git/sources/nebulit-code-generator status --short)"
+    ]
+  }
+}
