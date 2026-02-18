@@ -7,14 +7,6 @@ description: builds a state-change slice from an event model
 
 State Change Slices are slices that change the system by processing a command. Each slice implements the Command-Event pattern using event sourcing.
 
-## Critical Requirements
-
-### Restaurant ID Requirement
-- **CRITICAL**: ALL events MUST have `restaurantId` in their metadata (camelCase)
-- **NEVER** use `locationId` or `location_id` - these are outdated and forbidden
-- **CRITICAL**: ALL database tables MUST have a `restaurant_id` column (snake_case)
-- This ensures proper multi-tenancy and data isolation
-
 ## Implementation Steps
 
 When creating a state-change slice, you MUST create the following files in `src/slices/{SliceName}/`:
@@ -46,13 +38,7 @@ Define the command with:
 ```typescript
 export type {CommandName}Command = Command<'{CommandName}', {
     // data fields from spec
-},
-    {
-        correlation_id?: string,
-        causation_id?: string,
-        now?: Date,
-        streamName?: string,
-    }>;
+}>;
 ```
 
 ### 3. State Type
@@ -102,13 +88,6 @@ export const decide = (
         data: {
             // event data fields
         },
-        metadata: {
-            correlation_id: command.metadata?.correlation_id,
-            causation_id: command.metadata?.causation_id,
-            // these 2 are mandatory
-            restaurantId: command.metadata?.restaurantId,
-            userId: command.metadata?.userId
-        }
     }];
 };
 ```
@@ -131,14 +110,6 @@ export const handle{CommandName} = async (id: string, command: {CommandName}Comm
 ```
 
 ## Key Patterns
-
-### Metadata Handling
-- **Optional chaining**: Use `command.metadata?.correlation_id` (some examples use this)
-- **Direct access**: Use `command.metadata.correlation_id` (other examples use this)
-- **CRITICAL**: ALWAYS use `restaurantId` (camelCase) - NEVER use `locationId` or `location_id` (outdated)
-- restaurantId: command.metadata?.restaurantId,
-- userId: command.metadata?.userId
-- Be consistent within your implementation
 
 ### Destructuring
 Two patterns observed:
@@ -174,7 +145,6 @@ describe('{CommandName} Specification', () => {
             data: {
                 // test data
             },
-            metadata: {now: new Date()},
         }
 
         given([/* precondition events */])
@@ -184,7 +154,6 @@ describe('{CommandName} Specification', () => {
                 data: {
                     // expected event data
                 },
-                metadata: {}
             }])
     });
 });
@@ -222,19 +191,10 @@ export const api =
                     return res.status(401).json(principal);
                 }
 
-                const correlation_id = req.header("correlation_id") ?? req.params.id
-                const causation_id = req.params.id
-                const restaurantId = (req as any).restaurant_id
-                const userId = (req as any).user_id
-
                 try {
                     const command: {CommandName}Command = {
                         data: {
                             // map from req.body with assertNotEmpty
-                        },
-                        metadata: {
-                            correlation_id: correlation_id,
-                            causation_id: causation_id
                         },
                         type: "{CommandName}"
                     }
@@ -242,9 +202,6 @@ export const api =
                     if (!req.params.id) throw "no id provided"
 
                     const result = await handle{CommandName}(assertNotEmpty(req.params.id), command);
-
-                    res.set("correlation_id", correlation_id)
-                    res.set("causation_id", causation_id)
 
                     return res.status(200).json({
                         ok: true,
@@ -310,9 +267,6 @@ export const decide = (
         data: {
           ...
         },
-        metadata: {
-            ...
-        }
     }]
 };
 ```

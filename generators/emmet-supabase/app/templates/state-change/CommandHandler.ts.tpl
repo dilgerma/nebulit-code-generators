@@ -5,13 +5,7 @@ import {findEventstore} from "../../common/loadPostgresEventstore";
 
 export type <%=commandName%>Command = Command<'<%=commandName%>', {
 <% fields.forEach(function(field, index) { %>    <%=field.name%>: <%=typeMapping(field.type, field.cardinality)%><% if (index < fields.length - 1) { %>,<% } %>
-<% }); %>},
-    {
-        correlation_id?: string,
-        causation_id?: string,
-        now?: Date,
-        streamName?: string,
-    }>;
+<% }); %>}>;
 
 export type <%=commandName%>State = {
     // Add state fields needed for validation
@@ -49,10 +43,6 @@ export const decide = (
         data: {
 <% fields.forEach(function(field, index) { %>            <%=field.name%>: command.data.<%=field.name%><% if (index < fields.length - 1) { %>,<% } %>
 <% }); %>        },
-        metadata: {
-            correlation_id: command.metadata?.correlation_id,
-            causation_id: command.metadata?.causation_id,
-        }
     }];
 };
 

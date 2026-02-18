@@ -15,7 +15,6 @@ describe('<%=commandName%> Specification', () => {
             data: {
 <% fields.forEach(function(field, index) { %>                <%=field.name%>: <% if (typeMapping(field.type, field.cardinality) === 'string') { %>'test-<%=field.name%>'<% } else if (typeMapping(field.type, field.cardinality) === 'number') { %>123<% } else if (typeMapping(field.type, field.cardinality) === 'boolean') { %>true<% } else { %>new Date()<% } %><% if (index < fields.length - 1) { %>,<% } %>
 <% }); %>            },
-            metadata: {now: new Date()},
         }
 
         given([])
@@ -25,7 +24,6 @@ describe('<%=commandName%> Specification', () => {
                 data: {
 <% fields.forEach(function(field, index) { %>                    <%=field.name%>: command.data.<%=field.name%><% if (index < fields.length - 1) { %>,<% } %>
 <% }); %>                },
-                metadata: {}
             }])
     });
 });

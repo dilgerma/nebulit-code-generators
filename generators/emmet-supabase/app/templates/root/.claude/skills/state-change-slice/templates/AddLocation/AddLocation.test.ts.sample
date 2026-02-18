@@ -23,7 +23,6 @@ describe('AddLocation Specification', () => {
                 zipCode: "10001",
                 location_id: "7771b53c-b378-4f10-a6b7-16f837316960"
             },
-            metadata: {now: new Date()},
         }
 
         given([])
@@ -38,7 +37,6 @@ describe('AddLocation Specification', () => {
                     zipCode: command.data.zipCode,
                     location_id: command.data.location_id
                 },
-                metadata: {}
             }])
     });
 
@@ -54,7 +52,6 @@ describe('AddLocation Specification', () => {
                 zipCode: "02101",
                 location_id: "7771b53c-b378-4f10-a6b7-16f837316960"
             },
-            metadata: {now: new Date()},
         }
 
         given([{
@@ -67,7 +64,6 @@ describe('AddLocation Specification', () => {
                 zipCode: "10001",
                 location_id: "7771b53c-b378-4f10-a6b7-16f837316960"
             },
-            metadata: {}
         }])
             .when(command)
             .thenThrows()

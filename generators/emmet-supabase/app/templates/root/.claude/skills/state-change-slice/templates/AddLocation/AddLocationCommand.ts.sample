@@ -10,13 +10,7 @@ export type AddLocationCommand = Command<'AddLocation', {
     street: string,
     zipCode: string,
     location_id: string
-},
-    {
-        correlation_id?: string,
-        causation_id?: string,
-        now?: Date,
-        streamName?: string,
-    }>;
+}>;
 
 export type AddLocationState = {
     locationIds: Set<string>;
@@ -61,10 +55,7 @@ export const decide = (
             street: command.data.street,
             zipCode: command.data.zipCode,
             location_id: command.data.location_id
-        }, metadata: {
-            correlation_id: command.metadata?.correlation_id,
-            causation_id: command.metadata?.causation_id
-        }
+        },
     }]
 };
 

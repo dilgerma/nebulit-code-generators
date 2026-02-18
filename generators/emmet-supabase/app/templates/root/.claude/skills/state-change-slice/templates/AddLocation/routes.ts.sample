@@ -30,9 +30,6 @@ export const api =
                     return res.status(401).json(principal);
                 }
 
-                const correlation_id = req.header("correlation_id") ?? req.params.id
-                const causation_id = req.params.id
-
                 try {
                     const command: AddLocationCommand = {
                         data: {
@@ -43,19 +40,12 @@ export const api =
                             zipCode: assertNotEmpty(req.body.zipCode),
                             location_id: assertNotEmpty(req.body.location_id)
                         },
-                        metadata: {
-                            correlation_id: correlation_id,
-                            causation_id: causation_id
-                        },
                         type: "AddLocation"
                     }
 
                     if (!req.params.id) throw "no id provided"
 
                     const result = await handleAddLocation(assertNotEmpty(req.params.id), command);
-
-                    res.set("correlation_id", correlation_id)
-                    res.set("causation_id", causation_id)
 
                     return res.status(200).json({
                         ok: true,
