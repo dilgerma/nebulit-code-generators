@@ -41,7 +41,7 @@ SUPABASE_DB_URL=postgresql://postgres.${PROJECT_ID}:${DB_PASSWORD}@aws-1-eu-cent
 SUPABASE_SECRET_KEY=${SECRET_KEY}
 
 # Flyway configuration
-FLYWAY_URL=jdbc:postgresql://aws-1-eu-central-1.pooler.supabase.com:6543/postgres?prepareThreshold=0
+FLYWAY_URL=jdbc:postgresql://aws-1-eu-west-1.pooler.supabase.com:6543/postgres?user=postgres.${PROJECT_ID}&password=${DB_PASSWORD}
 FLYWAY_USER=postgres.${PROJECT_ID}
 FLYWAY_PASSWORD=${DB_PASSWORD}
 EOF

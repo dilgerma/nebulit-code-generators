@@ -101,6 +101,23 @@ export const {Name}Projection = postgreSQLRawSQLProjection<EventType>({
 });
 ```
 
+5. Every Projection must be registered in loadPostgresEventStore.ts
+```
+export const findEventstore = async () => {
+
+    return getPostgreSQLEventStore(postgresUrl, {
+        schema: {
+            autoMigration: "CreateOrUpdate"
+        },
+        projections: projections.inline([
+            <register projection here>
+        ]),
+
+    });
+
+}
+```
+
 ## Key Patterns
 
 ### Insert with Upsert (Merge on Conflict)
