@@ -12,10 +12,10 @@ export const api =
         (router: Router): void => {
             router.get('/api/query/<%=collectionName%>-collection', async (req: Request, res: Response) => {
                 try {
-                    const principal = await requireUser(req, res, true);
+                    /*const principal = await requireUser(req, res, true);
                     if (principal.error) {
                         return;
-                    }
+                    }*/
 
                     const userId = principal.user.id;
                     const id = req.query._id?.toString();

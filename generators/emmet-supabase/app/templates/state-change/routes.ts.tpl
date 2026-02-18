@@ -20,10 +20,10 @@ export const api =
     ): WebApiSetup =>
         (router: Router): void => {
             router.post('/api/<%=sliceName%>/:id', async (req: <%=commandName%>Request, res: Response) => {
-                const principal = await requireUser(req, res, false);
+                /*const principal = await requireUser(req, res, false);
                 if (principal.error) {
                     return res.status(401).json(principal);
-                }
+                }*/
 
                 try {
                     const command: <%=commandName%>Command = {
