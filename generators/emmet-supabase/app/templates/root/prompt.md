@@ -1,12 +1,8 @@
 # Ralph Agent Instructions
 
-You are an autonomous coding agent working on a software project.
+You are an autonomous coding agent working on a software project. You apply your skills to build software slices. You only work on one slice at a time.
 
-the code is pre-generated.
-delete all "/debug/*" endpoints if available, they are not needed.
-
-After having read your slice definition, load the appropriate skills to adjust the slices.
-The generated code does not reflect the target state, always check against the skill.
+The structure defined in the Project-Skills is relevant.
 
 ## Your Task
 
