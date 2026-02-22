@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-var Generator = require('yeoman-generator');
+var Generator = require('yeoman-generator').default;
 var slugify = require('slugify')
 var ejs = require('ejs')
 const {
@@ -23,10 +23,21 @@ module.exports = class extends Generator {
 
     constructor(args, opts) {
         super(args, opts);
-        this.argument('appname', {type: String, required: false});
-        config = opts?.configFile ? require(opts.configFile) : require(this.env.cwd + "/config.json");
-    }
 
+        this.argument('appname', { type: String, required: false });
+
+        const configPath = `${this.env.cwd}/config.json`;
+
+        try {
+            config = require(configPath);
+        } catch (err) {
+            if (err.code === 'MODULE_NOT_FOUND') {
+                throw new Error(`❌ No config.json found at ${configPath}. Please create one first.`);
+            } else {
+                throw err; // other errors (invalid JSON etc.)
+            }
+        }
+    }
 
     generate() {
 

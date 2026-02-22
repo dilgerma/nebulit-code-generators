@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-var Generator = require('yeoman-generator');
+var Generator = require('yeoman-generator').default;
 var slugify = require('slugify')
 const {_screenTitle, _sliceTitle, _processorTitle} = require("../../common/util/naming");
 

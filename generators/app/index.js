@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-var Generator = require('yeoman-generator');
+var Generator = require('yeoman-generator').default;
 
 module.exports = class extends Generator {
 
